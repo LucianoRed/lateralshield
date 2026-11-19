@@ -34,6 +34,10 @@ Um controle entra no catálogo quando:
 4. Se houver automação, rode `ansible-playbook --syntax-check` e `yamllint automacao`.
 5. Abra o pull request descrevendo onde e como o controle foi testado (versões, topologia).
 
+## Contribuindo com agentes de IA
+
+O uso de agentes de IA é bem-vindo. O arquivo [AGENTS.md](AGENTS.md) contém as instruções que eles devem seguir neste repositório. A responsabilidade pelo conteúdo enviado continua sendo de quem abre o pull request: revise o que o agente escreveu e informe o que foi de fato testado.
+
 ## Status dos controles
 
 | Status | Significado |

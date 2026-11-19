@@ -21,6 +21,53 @@ Dois exemplos que motivaram o projeto:
 - **JBoss EAP legado.** Há servidores que não podem ser atualizados no curto prazo. Se não é possível impedir toda invasão, é possível impedir que o processo do JBoss abra conexões para qualquer destino além do banco de dados que ele realmente usa. Ver [LS-JBOSS-002](catalogo/jboss-eap/LS-JBOSS-002-egress-por-usuario.md).
 - **OpenShift.** O Machine Config Server (portas 22623/22624) entrega a configuração Ignition dos nós sem autenticação para quem alcançar a porta na rede local. Ver [LS-OCP-001](catalogo/openshift/LS-OCP-001-machine-config-server.md).
 
+## O propósito das proteções
+
+O diagrama mostra a ideia central: um componente foi invadido, e as proteções decidem o que ele consegue alcançar a partir dali. O caminho de que a aplicação precisa continua aberto; os demais são bloqueados, e cada tentativa bloqueada vira um alerta.
+
+```mermaid
+flowchart LR
+    invasor(["Invasor"])
+
+    subgraph entrada["Componente comprometido"]
+        jboss["JBoss EAP legado"]
+        pod["Pod de aplicação"]
+        chave["Chave de automação vazada"]
+    end
+
+    subgraph alvos["O que o invasor tenta alcançar"]
+        db[("Banco de dados da própria aplicação")]
+        rhel["Outros servidores RHEL via SSH"]
+        mgmt["Consoles de gerenciamento de outros JBoss"]
+        mcs["Machine Config Server do OpenShift"]
+        ns["Pods de outros namespaces"]
+    end
+
+    alerta(["Alerta para a equipe de segurança"])
+
+    invasor --> jboss
+    invasor --> pod
+    invasor --> chave
+
+    jboss -->|"permitido: caminho legítimo"| db
+    jboss -. "bloqueado: LS-JBOSS-002 e LS-RHEL-001" .-> rhel
+    jboss -. "bloqueado: LS-JBOSS-001 e LS-JBOSS-002" .-> mgmt
+    jboss -. "bloqueado: LS-OCP-001" .-> mcs
+    pod -. "bloqueado: LS-OCP-002" .-> ns
+    chave -. "bloqueado: LS-AAP-001" .-> rhel
+
+    jboss ==>|"comandos suspeitos: LS-JBOSS-003"| alerta
+    alvos ==>|"tentativas bloqueadas são registradas"| alerta
+```
+
+Linhas contínuas são tráfego permitido, linhas tracejadas são tentativas de movimentação lateral bloqueadas e linhas grossas são sinais de detecção.
+
+| Pilar | Papel no diagrama | Controles |
+|---|---|---|
+| **Prevenir** | Dificulta a invasão inicial e fecha o que não deveria estar exposto | [LS-JBOSS-001](catalogo/jboss-eap/LS-JBOSS-001-interfaces-de-gerenciamento.md) |
+| **Conter** | Bloqueia os caminhos tracejados: o componente invadido só alcança o que realmente usa | [LS-JBOSS-002](catalogo/jboss-eap/LS-JBOSS-002-egress-por-usuario.md), [LS-RHEL-001](catalogo/rhel/LS-RHEL-001-ssh-somente-de-origens-administrativas.md), [LS-OCP-001](catalogo/openshift/LS-OCP-001-machine-config-server.md), [LS-OCP-002](catalogo/openshift/LS-OCP-002-networkpolicy-negacao-padrao.md), [LS-AAP-001](catalogo/aap/LS-AAP-001-chave-de-automacao-restrita.md) |
+| **Detectar** | Transforma cada tentativa bloqueada e cada comando anômalo em alerta | [LS-JBOSS-003](catalogo/jboss-eap/LS-JBOSS-003-auditoria-de-processos.md) e os registros de bloqueio dos controles de contenção |
+
 ## Escopo tecnológico
 
 | Tecnologia | Foco |
