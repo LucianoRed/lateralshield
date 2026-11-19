@@ -19,6 +19,12 @@ Quem alcança essa porta recebe a configuração completa de um nó, o que tipic
 
 A rede de pods já é bloqueada pelo plugin de rede do OpenShift. O risco está em **qualquer outro host que alcance a rede dos nós ou o balanceador do `api-int`**: um servidor legado na mesma sub-rede, uma VPN, uma rede corporativa roteada. Para um invasor nesse ponto, o MCS é uma fonte de credenciais sem custo.
 
+## Benefício
+
+O pull secret, o kubeconfig de bootstrap e os arquivos de configuração dos nós deixam de estar disponíveis para qualquer host da rede interna. Um invasor que comprometa um servidor vizinho ao cluster perde uma fonte de credenciais que hoje não exige nenhum esforço, e o cluster deixa de ser alcançável a partir de um incidente que começou fora dele.
+
+O custo é uma regra de firewall em duas portas que só são usadas quando um nó é adicionado.
+
 ## Pré-requisitos
 
 - Saber o CIDR da rede de máquinas (`oc get cm cluster-config-v1 -n kube-system -o yaml`, campo `machineNetwork`).

@@ -36,16 +36,25 @@ Critérios práticos de esforço baixo: usa recurso nativo já instalado, não e
 Todo controle segue o [modelo](../catalogo/_MODELO.md) e responde, nesta ordem:
 
 1. **Problema** — o que está exposto e como isso ajuda a movimentação lateral.
-2. **Pré-requisitos** — versões, acessos e informações necessárias.
-3. **Avaliação** — como verificar, sem alterar nada, se o ambiente está exposto.
-4. **Implementação** — passos reproduzíveis, preferindo modo de observação antes do bloqueio.
-5. **Validação** — como confirmar que o controle funciona e que a aplicação continua funcionando.
-6. **Reversão** — como desfazer rapidamente.
-7. **Impacto operacional** — o que pode quebrar e o que muda na rotina.
-8. **Detecção** — que sinal o controle gera e onde procurá-lo.
-9. **Referências** — documentação oficial e fontes.
+2. **Benefício** — o que muda para o invasor e para a operação depois da implementação.
+3. **Pré-requisitos** — versões, acessos e informações necessárias.
+4. **Avaliação** — como verificar, sem alterar nada, se o ambiente está exposto.
+5. **Implementação** — passos reproduzíveis, preferindo modo de observação antes do bloqueio.
+6. **Validação** — como confirmar que o controle funciona e que a aplicação continua funcionando.
+7. **Reversão** — como desfazer rapidamente.
+8. **Impacto operacional** — o que pode quebrar e o que muda na rotina.
+9. **Detecção** — que sinal o controle gera e onde procurá-lo.
+10. **Referências** — documentação oficial e fontes.
 
 Um controle sem validação e reversão não entra no catálogo.
+
+### O benefício precisa estar explícito
+
+Todo controle declara, logo depois do problema, o benefício de implementá-lo. Quem decide aplicar um controle precisa entender em um minuto o que ganha, antes de ler qualquer comando. A seção deve:
+
+- descrever o resultado, e não a configuração: o que o invasor deixa de conseguir e o que a operação passa a ter;
+- ser concreta e proporcional — sem promessas como "elimina o risco";
+- incluir um diagrama de antes e depois quando o controle muda quem pode falar com quem. O [LS-RHEL-001](../catalogo/rhel/LS-RHEL-001-ssh-somente-de-origens-administrativas.md) é a referência.
 
 ## Ciclo de adoção
 

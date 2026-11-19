@@ -13,7 +13,7 @@ Qualquer profissional interessado pode contribuir. Não é preciso vínculo com 
 
 - Conteúdo de vendas, posicionamento comercial ou geração de oportunidades.
 - Controles que dependam de um produto comercial de terceiros sem alternativa nativa, salvo quando não houver outra forma de proteger o ambiente Red Hat.
-- Controles sem procedimento de validação e de reversão.
+- Controles sem benefício declarado ou sem procedimento de validação e de reversão.
 - Material ofensivo: exploits, cargas ou passo a passo de ataque. Descreva o risco apenas no nível necessário para justificar e testar a defesa.
 
 ## Critérios de um controle

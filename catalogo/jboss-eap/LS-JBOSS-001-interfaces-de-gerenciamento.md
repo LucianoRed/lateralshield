@@ -23,6 +23,12 @@ Para quem já invadiu um servidor vizinho, um console de gerenciamento acessíve
 | EAP 6.x | Console 9990, gerenciamento nativo 9999 |
 | EAP 5.x | `jmx-console`, `web-console`, `admin-console` e invocadores HTTP na porta da aplicação (8080); JNDI/RMI 1098, 1099; invocadores 4444, 4445, 4446 |
 
+## Benefício
+
+O caminho mais simples para tomar um JBoss — implantar uma aplicação pelo console — deixa de existir para quem está na rede. Um servidor invadido não consegue mais usar o gerenciamento dos vizinhos para se espalhar, e ataques conhecidos contra consoles de versões legadas perdem o alvo, mesmo sem atualizar o produto.
+
+A administração continua possível, agora por um caminho único e registrado.
+
 ## Pré-requisitos
 
 - Acesso root ao servidor.

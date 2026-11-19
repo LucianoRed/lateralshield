@@ -15,6 +15,10 @@ status: rascunho
 
 O que está exposto e como isso ajuda um invasor a se mover lateralmente.
 
+## Benefício
+
+O que muda para o invasor e para a operação depois que o controle é aplicado. Escreva em termos de resultado ("um servidor invadido deixa de alcançar..."), e não de configuração. Quando ajudar a entender, inclua um diagrama Mermaid de antes e depois.
+
 ## Pré-requisitos
 
 Versões, acessos e informações que é preciso ter em mãos.

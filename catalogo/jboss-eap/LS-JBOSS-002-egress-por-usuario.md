@@ -19,6 +19,12 @@ Um servidor de aplicação, porém, precisa falar com poucos destinos: o banco d
 
 É o controle com melhor relação custo-benefício do catálogo para middleware legado.
 
+## Benefício
+
+Um JBoss invadido passa a alcançar apenas o que já alcançava legitimamente: o seu banco de dados e as suas integrações. Varredura da rede interna, SSH para servidores vizinhos, acesso a outros bancos e download de ferramentas a partir da internet deixam de funcionar para o invasor.
+
+O servidor legado continua vulnerável, mas deixa de ser trampolim. E como a aplicação nunca deveria tentar essas conexões, cada bloqueio é um alerta confiável de invasão em andamento. Tudo isso sem atualizar, reconfigurar ou reiniciar o JBoss.
+
 ## Pré-requisitos
 
 - O JBoss roda com um usuário de sistema dedicado (por exemplo, `jboss`), e não como root. Se roda como root, corrija isso antes.

@@ -15,6 +15,12 @@ status: rascunho
 
 Depois de explorar um JBoss, o invasor quase sempre executa comandos do sistema: um shell, `id`, `whoami`, `curl`, `wget`, `ssh`. Um servidor de aplicação saudável raramente faz isso depois de iniciado. Essa diferença é um sinal de detecção barato e de alta precisão, e na maioria dos ambientes ninguém o está coletando.
 
+## Benefício
+
+A invasão de um JBoss passa a ser percebida no primeiro comando que o invasor executa, e não semanas depois, pelo dano causado. O alerta tem pouquíssimos falsos positivos, porque um servidor de aplicação em operação normal quase não executa programas.
+
+Em caso de incidente, fica também o registro exato do que foi executado, com horário, o que encurta a investigação.
+
 ## Pré-requisitos
 
 - `auditd` ativo (padrão no RHEL).

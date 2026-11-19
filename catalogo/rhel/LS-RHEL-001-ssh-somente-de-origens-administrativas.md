@@ -17,6 +17,40 @@ Em muitas redes, todo servidor aceita SSH de todo outro servidor. Somado a chave
 
 Servidores não precisam abrir SSH uns para os outros. A administração vem de poucos pontos: o bastion e os nós de execução do Ansible Automation Platform.
 
+## Benefício
+
+Um servidor invadido deixa de conseguir abrir SSH para os demais. Chaves privadas esquecidas, senhas reutilizadas e agentes encaminhados perdem o valor para o invasor, porque a porta simplesmente não responde a partir de outro servidor. O principal meio de movimentação lateral em ambientes Linux é fechado com uma regra de firewall por host.
+
+O acesso administrativo passa a ter um único caminho — o bastion e o Ansible Automation Platform — que é onde se concentram autenticação forte, registro de sessão e monitoramento. E qualquer tentativa de SSH entre servidores vira, por definição, um alerta.
+
+```mermaid
+flowchart TB
+    subgraph antes["Antes: todo servidor aceita SSH de todo servidor"]
+        direction LR
+        inv1(["Invasor"]) --> a1["Servidor A invadido"]
+        a1 -->|"SSH"| b1["Servidor B"]
+        a1 -->|"SSH"| c1["Servidor C"]
+        b1 -->|"SSH"| d1["Banco de dados"]
+        c1 -->|"SSH"| d1
+    end
+
+    subgraph depois["Depois: SSH somente do bastion e do AAP"]
+        direction LR
+        adm(["Administrador"]) --> bastion["Bastion"]
+        aap["Nós de execução do AAP"]
+        inv2(["Invasor"]) --> a2["Servidor A invadido"]
+        bastion -->|"SSH"| a2
+        bastion -->|"SSH"| b2["Servidor B"]
+        bastion -->|"SSH"| d2["Banco de dados"]
+        aap -->|"SSH"| a2
+        aap -->|"SSH"| b2
+        aap -->|"SSH"| d2
+        a2 -. "bloqueado" .-> b2
+        a2 -. "bloqueado" .-> d2
+        a2 ==>|"tentativa registrada"| alerta(["Alerta"])
+    end
+```
+
 ## Pré-requisitos
 
 - Lista dos IPs de origem administrativa (bastion, nós de execução do AAP).

@@ -27,7 +27,7 @@ VALORES = {
 }
 CAMPOS = ["id", "titulo", "tecnologia", "pilar", "impacto", "esforco", "versoes", "status"]
 SECOES = [
-    "Problema", "Pré-requisitos", "Avaliação", "Implementação", "Validação",
+    "Problema", "Benefício", "Pré-requisitos", "Avaliação", "Implementação", "Validação",
     "Reversão", "Impacto operacional", "Detecção", "Referências",
 ]
 # Prioridade 80/20 definida em docs/metodologia.md

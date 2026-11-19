@@ -25,7 +25,7 @@ Antes de escrever qualquer coisa, leia [README.md](README.md), [docs/metodologia
 2. **Português brasileiro** em toda a documentação, comentários e mensagens exibidas ao usuário. Comandos, parâmetros e nomes de produto ficam no original.
 3. **Sem conteúdo comercial.** Nada de vendas, posicionamento de produto ou comparação comercial.
 4. **Sem material ofensivo.** Não escreva exploits, cargas ou passo a passo de ataque. Descreva o risco apenas no nível necessário para justificar e testar a defesa.
-5. **Todo controle tem avaliação, validação e reversão.** Sem essas seções o validador recusa o arquivo.
+5. **Todo controle declara o benefício e tem avaliação, validação e reversão.** Sem essas seções o validador recusa o arquivo.
 6. **Não invente fatos técnicos.** Portas, nomes de recursos, versões e sintaxe devem vir da documentação oficial ou de teste real. Se não foi possível confirmar, diga isso explicitamente ao colaborador e no pull request, em vez de escrever com aparência de certeza.
 7. **Não promova status.** Controles novos entram como `rascunho`. Só mude para `validado` ou `em-producao` quando o colaborador informar onde e em quais versões testou, e registre isso no controle.
 8. **Nenhum dado real.** Use as faixas de documentação (`192.0.2.0/24`, `198.51.100.0/24`, `203.0.113.0/24`) e domínios `exemplo.com.br`. Nunca versione inventários, IPs, nomes de host, senhas, chaves ou tokens de ambientes reais.
@@ -45,16 +45,17 @@ Antes de escrever qualquer coisa, leia [README.md](README.md), [docs/metodologia
 
 3. Preencha o cabeçalho. Valores aceitos: `pilar` (`prevenir`, `conter`, `detectar`), `impacto` (`alto`, `medio`, `baixo`), `esforco` (`baixo`, `medio`, `alto`), `status` (`rascunho`, `validado`, `em-producao`). Sem acentos nos valores.
 4. A combinação de impacto e esforço precisa passar no filtro 80/20 da metodologia. Impacto baixo com esforço médio, por exemplo, é recusado.
-5. Mantenha as nove seções do modelo, com os mesmos títulos e na mesma ordem.
+5. Mantenha as dez seções do modelo, com os mesmos títulos e na mesma ordem.
 6. Ao escrever, siga o padrão dos controles existentes:
    - **Problema** explica a exposição em termos de movimentação lateral.
+   - **Benefício** diz o que o invasor deixa de conseguir e o que a operação ganha, em termos de resultado e sem exagero. Inclua um diagrama Mermaid de antes e depois quando o controle muda quem pode falar com quem.
    - **Avaliação** usa apenas comandos de leitura e diz como interpretar o resultado.
    - **Implementação** prefere recurso nativo e, quando possível, modo de observação antes do bloqueio.
    - **Impacto operacional** diz honestamente o que pode quebrar.
    - **Detecção** indica o sinal gerado e onde procurá-lo.
 7. Regenere o índice e, se o controle estava no roadmap como candidato, atualize `docs/roadmap.md` e a tabela de `docs/modelo-de-ameaca.md`.
 
-Um bom controle de referência é [LS-JBOSS-002](catalogo/jboss-eap/LS-JBOSS-002-egress-por-usuario.md).
+Bons controles de referência: [LS-JBOSS-002](catalogo/jboss-eap/LS-JBOSS-002-egress-por-usuario.md) pela estrutura e [LS-RHEL-001](catalogo/rhel/LS-RHEL-001-ssh-somente-de-origens-administrativas.md) pela seção de benefício com diagrama.
 
 ## Como escrever automação
 

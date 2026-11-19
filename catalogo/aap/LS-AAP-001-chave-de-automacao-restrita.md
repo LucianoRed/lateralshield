@@ -19,6 +19,12 @@ Se a chave privada vazar — de um backup, de um repositório, de uma estação 
 
 Restringir a chave à origem legítima faz com que ela só tenha valor para quem já controla um nó de execução do AAP.
 
+## Benefício
+
+A credencial mais poderosa do ambiente deixa de funcionar fora do lugar onde deveria estar. Uma cópia da chave privada obtida em um backup, repositório ou estação passa a não servir para nada, porque os servidores só a aceitam a partir dos nós de execução do AAP.
+
+O vazamento da chave deixa de ser um incidente que compromete o ambiente inteiro e passa a ser um evento detectável: a primeira tentativa de uso fora do AAP fica registrada em cada servidor.
+
 ## Pré-requisitos
 
 - IPs dos nós de execução do AAP (e do controller, se ele executa jobs).

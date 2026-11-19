@@ -15,6 +15,12 @@ status: rascunho
 
 Sem NetworkPolicy, a rede de pods do OpenShift é plana: qualquer pod alcança qualquer outro pod de qualquer namespace. Um invasor que compromete uma aplicação pouco importante consegue falar diretamente com o banco de dados, o cache e as APIs internas de todas as outras.
 
+## Benefício
+
+A invasão de uma aplicação fica restrita ao namespace dela. Bancos de dados, caches e APIs internas das demais aplicações deixam de ser alcançáveis a partir de um pod comprometido, mesmo que não tenham autenticação.
+
+O alcance de um incidente passa a ser uma aplicação, e não o cluster inteiro. Como efeito adicional, as dependências entre aplicações ficam documentadas nas próprias políticas.
+
 ## Pré-requisitos
 
 - Permissão de administração nos namespaces alvo.
