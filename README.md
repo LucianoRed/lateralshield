@@ -106,6 +106,7 @@ Outras tecnologias Red Hat podem entrar no escopo conforme a relevância dos ris
 | [catalogo/](catalogo/) | Controles, um arquivo por controle, organizados por tecnologia |
 | [automacao/](automacao/) | Playbooks e roles Ansible de avaliação e aplicação |
 | [scripts/](scripts/) | Validação do catálogo e geração do índice |
+| [apresentacao/](apresentacao/) | Deck de apresentação do projeto |
 
 ## Estado atual
 

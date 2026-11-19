@@ -18,6 +18,7 @@ Antes de escrever qualquer coisa, leia [README.md](README.md), [docs/metodologia
 | `automacao/playbooks/` | Playbooks `avaliar_*` (somente leitura) e `aplicar_*` | |
 | `automacao/roles/` | Uma role por controle aplicável | |
 | `scripts/catalogo.py` | Valida controles e gera o índice | Fonte da verdade das regras de metadados |
+| `apresentacao/` | Deck HTML de apresentação do projeto | Atualize os números quando o catálogo ou o roadmap mudarem |
 
 ## Regras que não se negociam
 
