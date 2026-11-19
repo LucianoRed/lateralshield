@@ -1,0 +1,41 @@
+# {{ ansible_managed }}
+# LateralShield LS-JBOSS-002 - modo: {{ ls_jboss_egress_modo }}
+
+table inet lateralshield_jboss
+delete table inet lateralshield_jboss
+
+table inet lateralshield_jboss {
+{% if ls_jboss_egress_destinos | length > 0 %}
+  set destinos_permitidos {
+    type ipv4_addr . inet_service
+    elements = {
+{% for d in ls_jboss_egress_destinos %}
+      {{ d.ip }} . {{ d.porta }}{{ "," if not loop.last else "" }}{% if d.descricao is defined %}  # {{ d.descricao }}{% endif %}
+
+{% endfor %}
+    }
+  }
+
+{% endif %}
+  chain saida {
+    type filter hook output priority 0; policy accept;
+
+    meta skuid != "{{ ls_jboss_egress_usuario }}" accept
+    oifname "lo" accept
+    ct state established,related accept
+
+{% for dns in ls_jboss_egress_dns %}
+    ip daddr {{ dns }} meta l4proto { tcp, udp } th dport 53 accept
+{% endfor %}
+{% if ls_jboss_egress_destinos | length > 0 %}
+    ip daddr . tcp dport @destinos_permitidos accept
+{% endif %}
+
+    limit rate {{ ls_jboss_egress_log_limite }} log prefix "{{ ls_jboss_egress_log_prefixo }}" level warning
+{% if ls_jboss_egress_modo == 'bloquear' %}
+    counter drop
+{% else %}
+    counter comment "modo auditoria: nada e descartado"
+{% endif %}
+  }
+}

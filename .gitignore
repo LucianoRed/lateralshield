@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.retry
+.ansible/
+.venv/
+# Inventários e variáveis reais não devem ser versionados
+automacao/inventario/*
+!automacao/inventario/exemplo.yml
+*.vault

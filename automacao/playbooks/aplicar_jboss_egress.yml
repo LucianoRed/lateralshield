@@ -1,0 +1,8 @@
+---
+# LS-JBOSS-002 - Filtro de saida do processo JBoss.
+# Comece com ls_jboss_egress_modo=auditar. Reversao: -e ls_jboss_egress_estado=ausente
+- name: Aplicar LS-JBOSS-002 (filtro de saida do JBoss)
+  hosts: jboss
+  become: true
+  roles:
+    - role: jboss_egress

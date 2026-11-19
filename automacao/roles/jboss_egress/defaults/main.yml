@@ -1,0 +1,23 @@
+---
+# LS-JBOSS-002 - Filtro de saida do processo JBoss
+
+# Usuario de sistema que executa o JBoss.
+ls_jboss_egress_usuario: jboss
+
+# "auditar" apenas registra as conexoes fora da lista; "bloquear" registra e descarta.
+ls_jboss_egress_modo: auditar
+
+# "presente" instala o filtro; "ausente" remove (reversao).
+ls_jboss_egress_estado: presente
+
+# Servidores DNS que o JBoss pode consultar (porta 53 TCP/UDP).
+ls_jboss_egress_dns: []
+#  - 198.51.100.2
+
+# Destinos que o JBoss pode alcancar.
+ls_jboss_egress_destinos: []
+#  - { ip: 198.51.100.10, porta: 5432, descricao: banco de dados }
+#  - { ip: 198.51.100.20, porta: 61616, descricao: mensageria }
+
+ls_jboss_egress_log_prefixo: "LS-JBOSS-EGRESS: "
+ls_jboss_egress_log_limite: 30/minute

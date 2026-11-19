@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+[Unit]
+Description=LateralShield - filtro de saida do JBoss (LS-JBOSS-002)
+After=network-pre.target
+Before=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/nft -f /etc/lateralshield/jboss-egress.nft
+ExecReload=/usr/sbin/nft -f /etc/lateralshield/jboss-egress.nft
+ExecStop=/usr/sbin/nft delete table inet lateralshield_jboss
+
+[Install]
+WantedBy=multi-user.target

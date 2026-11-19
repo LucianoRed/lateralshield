@@ -1,0 +1,91 @@
+---
+- name: Validar parametros
+  ansible.builtin.assert:
+    that:
+      - ls_jboss_egress_modo in ['auditar', 'bloquear']
+      - ls_jboss_egress_estado in ['presente', 'ausente']
+      - ansible_facts['distribution_major_version'] | int >= 8
+    fail_msg: >-
+      Parametros invalidos ou RHEL anterior ao 8. Para RHEL 7 use a variante
+      com iptables descrita no controle LS-JBOSS-002.
+
+- name: Instalar o filtro
+  when: ls_jboss_egress_estado == 'presente'
+  block:
+    - name: Confirmar que o usuario do JBoss existe
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ ls_jboss_egress_usuario }}"
+
+    - name: Recusar bloqueio sem destinos cadastrados
+      ansible.builtin.assert:
+        that: ls_jboss_egress_destinos | length > 0
+        fail_msg: >-
+          Modo "bloquear" sem destinos em ls_jboss_egress_destinos cortaria
+          toda a saida do JBoss, inclusive o banco de dados.
+      when: ls_jboss_egress_modo == 'bloquear'
+
+    - name: Garantir o pacote nftables
+      ansible.builtin.package:
+        name: nftables
+        state: present
+
+    - name: Criar diretorio de configuracao
+      ansible.builtin.file:
+        path: /etc/lateralshield
+        state: directory
+        owner: root
+        group: root
+        mode: "0750"
+
+    - name: Gerar as regras
+      ansible.builtin.template:
+        src: jboss-egress.nft.j2
+        dest: /etc/lateralshield/jboss-egress.nft
+        owner: root
+        group: root
+        mode: "0640"
+        validate: /usr/sbin/nft -c -f %s
+      notify: Recarregar filtro de saida do JBoss
+
+    - name: Instalar a unit do systemd
+      ansible.builtin.template:
+        src: lateralshield-jboss-egress.service.j2
+        dest: /etc/systemd/system/lateralshield-jboss-egress.service
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Habilitar e iniciar o filtro
+      ansible.builtin.systemd:
+        name: lateralshield-jboss-egress.service
+        enabled: true
+        state: started
+        daemon_reload: true
+
+- name: Remover o filtro (reversao)
+  when: ls_jboss_egress_estado == 'ausente'
+  block:
+    - name: Verificar se a unit existe
+      ansible.builtin.stat:
+        path: /etc/systemd/system/lateralshield-jboss-egress.service
+      register: ls_jboss_egress_unit
+
+    - name: Parar e desabilitar o filtro
+      ansible.builtin.systemd:
+        name: lateralshield-jboss-egress.service
+        enabled: false
+        state: stopped
+      when: ls_jboss_egress_unit.stat.exists
+
+    - name: Remover arquivos
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/systemd/system/lateralshield-jboss-egress.service
+        - /etc/lateralshield/jboss-egress.nft
+
+    - name: Recarregar o systemd
+      ansible.builtin.systemd:
+        daemon_reload: true

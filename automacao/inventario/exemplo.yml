@@ -1,0 +1,18 @@
+---
+# Inventario de exemplo. Copie e ajuste; nao versione inventarios reais.
+all:
+  children:
+    jboss:
+      hosts:
+        jboss-legado-01.exemplo.com.br:
+      vars:
+        ls_jboss_egress_usuario: jboss
+        ls_jboss_egress_modo: auditar
+        ls_jboss_egress_dns:
+          - 198.51.100.2
+        ls_jboss_egress_destinos:
+          - { ip: 198.51.100.10, porta: 5432, descricao: banco de dados }
+          - { ip: 198.51.100.20, porta: 61616, descricao: mensageria }
+    rhel:
+      hosts:
+        app-01.exemplo.com.br:

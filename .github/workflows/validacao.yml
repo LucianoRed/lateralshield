@@ -1,0 +1,30 @@
+---
+name: Validação
+
+"on":
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validar o catálogo e o índice
+        run: python3 scripts/catalogo.py --check
+      - name: Instalar ferramentas de lint
+        run: pip install ansible-core ansible-lint yamllint
+      - name: Lint de YAML
+        run: yamllint .
+      - name: Sintaxe e lint dos playbooks
+        working-directory: automacao
+        run: |
+          ansible-playbook --syntax-check playbooks/*.yml
+          ansible-lint

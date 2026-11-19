@@ -1,0 +1,61 @@
+---
+# Avaliacao somente leitura dos controles LS-OCP-001 e LS-OCP-002.
+# Requer o cliente "oc" autenticado no cluster.
+#
+# O teste do LS-OCP-001 so e significativo quando executado a partir de um
+# host que NAO e no do cluster. Repita de cada rede relevante.
+#
+#   ansible-playbook playbooks/avaliar_openshift.yml \
+#     -e ls_ocp_api_int=api-int.cluster.exemplo.com.br
+- name: Avaliar o cluster OpenShift
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    ls_ocp_api_int: ""
+    ls_ocp_ns_ignorados: "^(openshift.*|kube-.*|default)$"
+  tasks:
+    - name: LS-OCP-001 | Consultar o Machine Config Server
+      ansible.builtin.uri:
+        url: "https://{{ ls_ocp_api_int }}:22623/config/worker"
+        headers:
+          Accept: application/vnd.coreos.ignition+json;version=3.2.0
+        validate_certs: false
+        return_content: false
+        timeout: 5
+      register: ls_mcs
+      failed_when: false
+      when: ls_ocp_api_int | length > 0
+
+    - name: LS-OCP-002 | Listar namespaces
+      ansible.builtin.command: oc get namespaces -o json
+      register: ls_ns
+      changed_when: false
+
+    - name: LS-OCP-002 | Listar NetworkPolicies
+      ansible.builtin.command: oc get networkpolicy --all-namespaces -o json
+      register: ls_np
+      changed_when: false
+
+    - name: Montar o resultado
+      ansible.builtin.set_fact:
+        ls_resultado:
+          LS-OCP-001:
+            testado: "{{ ls_ocp_api_int | length > 0 }}"
+            exposto_desta_origem: "{{ (ls_mcs.status | default(-1)) == 200 }}"
+            status_http: "{{ ls_mcs.status | default('nao testado') }}"
+          LS-OCP-002:
+            exposto: "{{ ls_ns_sem_politica | length > 0 }}"
+            namespaces_sem_networkpolicy: "{{ ls_ns_sem_politica }}"
+      vars:
+        ls_ns_todos: >-
+          {{ (ls_ns.stdout | from_json)['items'] | map(attribute='metadata.name')
+             | reject('match', ls_ocp_ns_ignorados) | list }}
+        ls_ns_com_politica: >-
+          {{ (ls_np.stdout | from_json)['items'] | map(attribute='metadata.namespace')
+             | unique | list }}
+        ls_ns_sem_politica: "{{ ls_ns_todos | difference(ls_ns_com_politica) | sort }}"
+
+    - name: Exibir o resultado
+      ansible.builtin.debug:
+        var: ls_resultado

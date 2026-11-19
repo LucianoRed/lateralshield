@@ -1,0 +1,6 @@
+---
+- name: Recarregar filtro de saida do JBoss
+  ansible.builtin.systemd:
+    name: lateralshield-jboss-egress.service
+    state: reloaded
+  when: ls_jboss_egress_estado == 'presente'

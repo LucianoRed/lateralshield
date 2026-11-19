@@ -1,0 +1,129 @@
+---
+# Avaliacao somente leitura dos controles LS-RHEL-001, LS-JBOSS-001,
+# LS-JBOSS-002, LS-JBOSS-003 e LS-AAP-001. Nao altera os hosts.
+- name: Avaliar hosts RHEL e JBoss EAP
+  hosts: all
+  become: true
+  gather_facts: true
+  vars:
+    ls_jboss_usuario: jboss
+    ls_aap_conta: "{{ ansible_user | default(ansible_user_id) }}"
+    ls_jboss_portas_gerenciamento: "9990|9993|9999|1098|1099|4444|4445|4446"
+  tasks:
+    - name: LS-RHEL-001 | Ler a configuracao efetiva do sshd
+      ansible.builtin.command: sshd -T
+      register: ls_sshd
+      changed_when: false
+
+    - name: LS-RHEL-001 | Localizar zonas do firewalld que liberam SSH sem origem definida
+      ansible.builtin.shell: |
+        set -o pipefail
+        for z in $(firewall-cmd --get-zones); do
+          if firewall-cmd --zone="$z" --query-service=ssh >/dev/null 2>&1 \
+             && [ -z "$(firewall-cmd --zone="$z" --list-sources)" ] \
+             && [ -n "$(firewall-cmd --zone="$z" --list-interfaces)$( [ "$z" = "$(firewall-cmd --get-default-zone)" ] && echo padrao )" ]; then
+            echo "$z"
+          fi
+        done
+      args:
+        executable: /bin/bash
+      register: ls_ssh_zonas
+      changed_when: false
+      failed_when: false
+
+    - name: LS-RHEL-001 | Localizar chaves privadas SSH
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -rlsE -- '-----BEGIN [A-Z ]*PRIVATE KEY-----' /root/.ssh /home/*/.ssh 2>/dev/null || true
+      args:
+        executable: /bin/bash
+      register: ls_chaves
+      changed_when: false
+
+    - name: LS-JBOSS-001 | Listar portas de gerenciamento escutando fora do loopback
+      ansible.builtin.shell: |
+        set -o pipefail
+        ss -Htln | awk '{print $4}' \
+          | grep -E ':({{ ls_jboss_portas_gerenciamento }})$' \
+          | grep -vE '^(127\.|\[::1\])' || true
+      args:
+        executable: /bin/bash
+      register: ls_jboss_mgmt
+      changed_when: false
+
+    - name: LS-JBOSS-002 | Verificar regra de saida para o usuario do JBoss
+      ansible.builtin.shell: |
+        set -o pipefail
+        { nft list ruleset 2>/dev/null; iptables-save 2>/dev/null; } \
+          | grep -cE 'skuid|--uid-owner' || true
+      args:
+        executable: /bin/bash
+      register: ls_jboss_egress
+      changed_when: false
+
+    - name: LS-JBOSS-003 | Verificar regra de auditoria de execucao
+      ansible.builtin.shell: |
+        set -o pipefail
+        auditctl -l 2>/dev/null | grep -c ls_jboss_exec || true
+      args:
+        executable: /bin/bash
+      register: ls_jboss_audit
+      changed_when: false
+
+    - name: LS-AAP-001 | Contar chaves da conta de automacao sem restricao de origem
+      ansible.builtin.shell: |
+        set -o pipefail
+        arq=~{{ ls_aap_conta }}/.ssh/authorized_keys
+        [ -f "$arq" ] || arq=/dev/null
+        awk '!/^[[:space:]]*(#|$)/ && !/from=/ {n++} END {print n+0}' "$arq"
+      args:
+        executable: /bin/bash
+      register: ls_aap_chaves
+      changed_when: false
+      failed_when: false
+
+    - name: Verificar se ha JBoss em execucao
+      ansible.builtin.command: pgrep -u {{ ls_jboss_usuario }} java
+      register: ls_jboss_proc
+      changed_when: false
+      failed_when: false
+
+    - name: Montar o resultado
+      ansible.builtin.set_fact:
+        ls_tem_jboss: "{{ ls_jboss_proc.rc == 0 }}"
+        ls_resultado:
+          LS-RHEL-001:
+            exposto: >-
+              {{ (ls_ssh_zonas.stdout_lines | length > 0)
+                 or ('passwordauthentication yes' in ls_sshd.stdout)
+                 or ('permitrootlogin yes' in ls_sshd.stdout)
+                 or ('allowagentforwarding yes' in ls_sshd.stdout)
+                 or (ls_chaves.stdout_lines | length > 0) }}
+            zonas_ssh_sem_origem: "{{ ls_ssh_zonas.stdout_lines }}"
+            sshd: >-
+              {{ ls_sshd.stdout_lines
+                 | select('match', '^(passwordauthentication|permitrootlogin|allowagentforwarding|allowtcpforwarding) ')
+                 | list }}
+            chaves_privadas: "{{ ls_chaves.stdout_lines }}"
+          LS-AAP-001:
+            exposto: "{{ (ls_aap_chaves.stdout | default('0') | trim | int) > 0 }}"
+            conta: "{{ ls_aap_conta }}"
+            chaves_sem_restricao_de_origem: "{{ ls_aap_chaves.stdout | default('0') | trim | int }}"
+
+    - name: Acrescentar o resultado do JBoss
+      ansible.builtin.set_fact:
+        ls_resultado: "{{ ls_resultado | combine(ls_resultado_jboss) }}"
+      vars:
+        ls_resultado_jboss:
+          LS-JBOSS-001:
+            exposto: "{{ ls_jboss_mgmt.stdout_lines | length > 0 }}"
+            portas_expostas: "{{ ls_jboss_mgmt.stdout_lines }}"
+          LS-JBOSS-002:
+            exposto: "{{ (ls_jboss_egress.stdout | trim | int) == 0 }}"
+          LS-JBOSS-003:
+            exposto: "{{ (ls_jboss_audit.stdout | trim | int) == 0 }}"
+      when: ls_tem_jboss or 'jboss' in group_names
+
+    - name: Exibir o resultado
+      ansible.builtin.debug:
+        var: ls_resultado
