@@ -58,6 +58,10 @@ Antes de escrever qualquer coisa, leia [README.md](README.md), [docs/metodologia
 
 Bons controles de referência: [LS-JBOSS-002](catalogo/jboss-eap/LS-JBOSS-002-egress-por-usuario.md) pela estrutura e [LS-RHEL-001](catalogo/rhel/LS-RHEL-001-ssh-somente-de-origens-administrativas.md) pela seção de benefício com diagrama.
 
+## Logs centralizados vêm primeiro
+
+A existência de syslog central é a primeira verificação em qualquer ambiente (ver [docs/metodologia.md](docs/metodologia.md)). Ao escrever um controle de contenção ou detecção, diga na seção **Detecção** qual mensagem ele gera e assuma que ela precisa chegar ao destino central; referencie LS-RHEL-002, LS-OCP-003 ou LS-JBOSS-004 conforme a camada.
+
 ## Como escrever automação
 
 - Playbooks `avaliar_*` **nunca alteram** o alvo: toda tarefa `command`/`shell` leva `changed_when: false`.

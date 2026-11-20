@@ -10,8 +10,8 @@ Os playbooks de avaliação não alteram os sistemas. Para cada controle, inform
 
 | Playbook | Controles | Alvo |
 |---|---|---|
-| `playbooks/avaliar_rhel_jboss.yml` | LS-RHEL-001, LS-JBOSS-001, LS-JBOSS-002, LS-JBOSS-003, LS-AAP-001 | Hosts RHEL, com ou sem JBoss EAP |
-| `playbooks/avaliar_openshift.yml` | LS-OCP-001, LS-OCP-002 | Cluster OpenShift, via `oc` autenticado |
+| `playbooks/avaliar_rhel_jboss.yml` | LS-RHEL-001, LS-RHEL-002, LS-JBOSS-001, LS-JBOSS-002, LS-JBOSS-003, LS-JBOSS-004, LS-AAP-001 | Hosts RHEL, com ou sem JBoss EAP |
+| `playbooks/avaliar_openshift.yml` | LS-OCP-001, LS-OCP-002, LS-OCP-003 | Cluster OpenShift, via `oc` autenticado |
 
 ```bash
 ansible-playbook -i inventario/meu-inventario.yml playbooks/avaliar_rhel_jboss.yml

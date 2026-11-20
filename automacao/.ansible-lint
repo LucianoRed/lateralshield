@@ -1,0 +1,5 @@
+---
+# As variáveis das roles usam o prefixo ls_<role>_ (convenção do projeto,
+# ver AGENTS.md), e não apenas <role>_ como o ansible-lint espera.
+skip_list:
+  - var-naming[no-role-prefix]

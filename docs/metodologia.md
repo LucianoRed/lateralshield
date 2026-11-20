@@ -56,9 +56,24 @@ Todo controle declara, logo depois do problema, o benefício de implementá-lo. 
 - ser concreta e proporcional — sem promessas como "elimina o risco";
 - incluir um diagrama de antes e depois quando o controle muda quem pode falar com quem. O [LS-RHEL-001](../catalogo/rhel/LS-RHEL-001-ssh-somente-de-origens-administrativas.md) é a referência.
 
+## A primeira verificação: os logs saem do servidor?
+
+Antes de qualquer outro controle, verifique se o ambiente encaminha logs para um destino central. É a ação mais importante da avaliação inicial, por dois motivos:
+
+- log que fica só no host invadido pode ser apagado pelo invasor;
+- os controles de contenção deste catálogo geram alertas nos logs. Sem um destino central, ninguém os vê.
+
+O encaminhamento por syslog é simples de implantar e tem controle próprio em cada camada:
+
+| Camada | Controle |
+|---|---|
+| Sistema operacional | [LS-RHEL-002](../catalogo/rhel/LS-RHEL-002-syslog-central.md) |
+| Ingress do OpenShift | [LS-OCP-003](../catalogo/openshift/LS-OCP-003-log-de-acesso-do-ingress-em-syslog.md) |
+| JBoss EAP | [LS-JBOSS-004](../catalogo/jboss-eap/LS-JBOSS-004-logs-do-jboss-em-syslog.md) |
+
 ## Ciclo de adoção
 
-1. **Avaliar** — rodar as avaliações do catálogo e registrar a exposição atual.
+1. **Avaliar** — rodar as avaliações do catálogo e registrar a exposição atual, começando pela existência de syslog central.
 2. **Priorizar** — ordenar por prioridade 80/20 e pelo que o [modelo de ameaça](modelo-de-ameaca.md) indica como caminho mais provável.
 3. **Observar** — aplicar em modo de auditoria quando o controle permitir, e coletar o comportamento legítimo.
 4. **Aplicar** — bloquear, em homologação e depois em produção, com a reversão testada.

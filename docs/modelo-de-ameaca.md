@@ -60,7 +60,9 @@ Ficam fora do escopo: ataques físicos, comprometimento da cadeia de suprimentos
 |---|---|
 | Saída irrestrita do JBoss | [LS-JBOSS-002](../catalogo/jboss-eap/LS-JBOSS-002-egress-por-usuario.md) |
 | Interfaces de gerenciamento do JBoss expostas | [LS-JBOSS-001](../catalogo/jboss-eap/LS-JBOSS-001-interfaces-de-gerenciamento.md) |
-| Invasão do JBoss passa despercebida | [LS-JBOSS-003](../catalogo/jboss-eap/LS-JBOSS-003-auditoria-de-processos.md) |
+| Invasão do JBoss passa despercebida | [LS-JBOSS-003](../catalogo/jboss-eap/LS-JBOSS-003-auditoria-de-processos.md), [LS-JBOSS-004](../catalogo/jboss-eap/LS-JBOSS-004-logs-do-jboss-em-syslog.md) |
+| Invasor apaga os logs do host invadido | [LS-RHEL-002](../catalogo/rhel/LS-RHEL-002-syslog-central.md) |
+| Ponto de entrada pela web não fica registrado | [LS-OCP-003](../catalogo/openshift/LS-OCP-003-log-de-acesso-do-ingress-em-syslog.md) |
 | Machine Config Server acessível | [LS-OCP-001](../catalogo/openshift/LS-OCP-001-machine-config-server.md) |
 | Rede de pods plana | [LS-OCP-002](../catalogo/openshift/LS-OCP-002-networkpolicy-negacao-padrao.md) |
 | SSH livre entre servidores | [LS-RHEL-001](../catalogo/rhel/LS-RHEL-001-ssh-somente-de-origens-administrativas.md) |

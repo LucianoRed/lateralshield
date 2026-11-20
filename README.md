@@ -70,7 +70,7 @@ Linhas contínuas são tráfego permitido, linhas tracejadas são tentativas de 
 |---|---|---|
 | **Prevenir** | Dificulta a invasão inicial e fecha o que não deveria estar exposto | [LS-JBOSS-001](catalogo/jboss-eap/LS-JBOSS-001-interfaces-de-gerenciamento.md) |
 | **Conter** | Bloqueia os caminhos tracejados: o componente invadido só alcança o que realmente usa | [LS-JBOSS-002](catalogo/jboss-eap/LS-JBOSS-002-egress-por-usuario.md), [LS-RHEL-001](catalogo/rhel/LS-RHEL-001-ssh-somente-de-origens-administrativas.md), [LS-OCP-001](catalogo/openshift/LS-OCP-001-machine-config-server.md), [LS-OCP-002](catalogo/openshift/LS-OCP-002-networkpolicy-negacao-padrao.md), [LS-AAP-001](catalogo/aap/LS-AAP-001-chave-de-automacao-restrita.md) |
-| **Detectar** | Transforma cada tentativa bloqueada e cada comando anômalo em alerta | [LS-JBOSS-003](catalogo/jboss-eap/LS-JBOSS-003-auditoria-de-processos.md) e os registros de bloqueio dos controles de contenção |
+| **Detectar** | Transforma cada tentativa bloqueada e cada comando anômalo em alerta | [LS-RHEL-002](catalogo/rhel/LS-RHEL-002-syslog-central.md), [LS-OCP-003](catalogo/openshift/LS-OCP-003-log-de-acesso-do-ingress-em-syslog.md), [LS-JBOSS-003](catalogo/jboss-eap/LS-JBOSS-003-auditoria-de-processos.md), [LS-JBOSS-004](catalogo/jboss-eap/LS-JBOSS-004-logs-do-jboss-em-syslog.md) e os registros de bloqueio dos controles de contenção |
 
 ## Escopo tecnológico
 
@@ -97,10 +97,11 @@ Outras tecnologias Red Hat podem entrar no escopo conforme a relevância dos ris
 ## Como usar
 
 1. Leia a [metodologia](docs/metodologia.md) e o [modelo de ameaça](docs/modelo-de-ameaca.md).
-2. Escolha controles no [catálogo](catalogo/INDICE.md), começando pelos de impacto alto e esforço baixo.
-3. Rode a etapa de **avaliação** de cada controle antes de mudar qualquer coisa.
-4. Aplique em laboratório ou homologação, valide e só então leve para produção. Todo controle traz a reversão.
-5. Use a [automação Ansible](automacao/README.md) para repetir avaliação e aplicação em escala.
+2. **Verifique primeiro se os logs saem dos servidores** para um syslog central ([LS-RHEL-002](catalogo/rhel/LS-RHEL-002-syslog-central.md), [LS-OCP-003](catalogo/openshift/LS-OCP-003-log-de-acesso-do-ingress-em-syslog.md), [LS-JBOSS-004](catalogo/jboss-eap/LS-JBOSS-004-logs-do-jboss-em-syslog.md)). Sem isso, os alertas dos demais controles não chegam a ninguém.
+3. Escolha controles no [catálogo](catalogo/INDICE.md), começando pelos de impacto alto e esforço baixo.
+4. Rode a etapa de **avaliação** de cada controle antes de mudar qualquer coisa.
+5. Aplique em laboratório ou homologação, valide e só então leve para produção. Todo controle traz a reversão.
+6. Use a [automação Ansible](automacao/README.md) para repetir avaliação e aplicação em escala.
 
 ## Estrutura do repositório
 

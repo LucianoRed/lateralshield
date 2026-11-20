@@ -6,10 +6,10 @@ O roadmap segue o escopo do projeto: OpenShift, RHEL, JBoss EAP e Ansible Automa
 
 - [x] Missão, princípios e escopo documentados.
 - [x] Metodologia, modelo de ameaça e modelo de controle.
-- [x] Primeiros sete controles em `rascunho`, cobrindo as quatro tecnologias e os três pilares.
+- [x] Primeiros dez controles em `rascunho`, cobrindo as quatro tecnologias e os três pilares.
 - [x] Validação automática do catálogo e geração do índice.
 - [x] Primeira automação Ansible: avaliação de RHEL/JBoss e OpenShift, aplicação do LS-JBOSS-002.
-- [ ] Validar em laboratório os sete controles e promovê-los a `validado`, registrando versões testadas.
+- [ ] Validar em laboratório os dez controles e promovê-los a `validado`, registrando versões testadas.
 
 ## Fase 1 — Controles de prioridade 1
 
@@ -25,7 +25,7 @@ Controles candidatos, ainda não escritos.
 | Auditar workloads com SCC privilegiada, `hostNetwork`, `hostPath` e `hostPID` | Conter |
 | Não guardar segredos em MachineConfig | Prevenir |
 | Restringir o acesso à API e ao console a redes administrativas | Prevenir |
-| Encaminhar o log de auditoria da API e alertar sobre ações sensíveis (`exec`, leitura de secrets, novos `ClusterRoleBinding`) | Detectar |
+| Encaminhar os logs do cluster (ClusterLogForwarder) e o log de auditoria da API, e alertar sobre ações sensíveis (`exec`, leitura de secrets, novos `ClusterRoleBinding`) | Detectar |
 | Aprovação de CSRs de nós: revisar aprovações automáticas e alertar sobre CSRs inesperados | Detectar |
 
 ### RHEL

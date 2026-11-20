@@ -1,5 +1,5 @@
 ---
-# Avaliacao somente leitura dos controles LS-OCP-001 e LS-OCP-002.
+# Avaliacao somente leitura dos controles LS-OCP-001, LS-OCP-002 e LS-OCP-003.
 # Requer o cliente "oc" autenticado no cluster.
 #
 # O teste do LS-OCP-001 so e significativo quando executado a partir de um
@@ -37,6 +37,11 @@
       register: ls_np
       changed_when: false
 
+    - name: LS-OCP-003 | Listar IngressControllers
+      ansible.builtin.command: oc get ingresscontroller -n openshift-ingress-operator -o json
+      register: ls_ic
+      changed_when: false
+
     - name: Montar o resultado
       ansible.builtin.set_fact:
         ls_resultado:
@@ -47,7 +52,18 @@
           LS-OCP-002:
             exposto: "{{ ls_ns_sem_politica | length > 0 }}"
             namespaces_sem_networkpolicy: "{{ ls_ns_sem_politica }}"
+          LS-OCP-003:
+            exposto: "{{ ls_ic_sem_syslog | length > 0 }}"
+            ingresscontrollers_sem_syslog: "{{ ls_ic_sem_syslog }}"
       vars:
+        ls_ic_sem_syslog: >-
+          {{ (ls_ic.stdout | from_json)['items']
+             | rejectattr('spec.logging.access.destination.type', 'defined')
+             | map(attribute='metadata.name') | list
+             + ((ls_ic.stdout | from_json)['items']
+                | selectattr('spec.logging.access.destination.type', 'defined')
+                | rejectattr('spec.logging.access.destination.type', 'equalto', 'Syslog')
+                | map(attribute='metadata.name') | list) }}
         ls_ns_todos: >-
           {{ (ls_ns.stdout | from_json)['items'] | map(attribute='metadata.name')
              | reject('match', ls_ocp_ns_ignorados) | list }}

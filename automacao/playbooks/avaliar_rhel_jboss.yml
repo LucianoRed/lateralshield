@@ -1,6 +1,6 @@
 ---
-# Avaliacao somente leitura dos controles LS-RHEL-001, LS-JBOSS-001,
-# LS-JBOSS-002, LS-JBOSS-003 e LS-AAP-001. Nao altera os hosts.
+# Avaliacao somente leitura dos controles LS-RHEL-001, LS-RHEL-002,
+# LS-JBOSS-001 a LS-JBOSS-004 e LS-AAP-001. Nao altera os hosts.
 - name: Avaliar hosts RHEL e JBoss EAP
   hosts: all
   become: true
@@ -39,6 +39,26 @@
         executable: /bin/bash
       register: ls_chaves
       changed_when: false
+
+    - name: LS-RHEL-002 | Verificar encaminhamento de logs no rsyslog
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -rEsh '^[^#]*(@@?[A-Za-z0-9\[(]|omfwd)' /etc/rsyslog.conf /etc/rsyslog.d/ | wc -l
+      args:
+        executable: /bin/bash
+      register: ls_syslog
+      changed_when: false
+      failed_when: false
+
+    - name: LS-JBOSS-004 | Verificar se o rsyslog le o log do JBoss
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -rEsh '^[^#]*(imfile|server\.log)' /etc/rsyslog.conf /etc/rsyslog.d/ | wc -l
+      args:
+        executable: /bin/bash
+      register: ls_jboss_syslog
+      changed_when: false
+      failed_when: false
 
     - name: LS-JBOSS-001 | Listar portas de gerenciamento escutando fora do loopback
       ansible.builtin.shell: |
@@ -105,6 +125,9 @@
                  | select('match', '^(passwordauthentication|permitrootlogin|allowagentforwarding|allowtcpforwarding) ')
                  | list }}
             chaves_privadas: "{{ ls_chaves.stdout_lines }}"
+          LS-RHEL-002:
+            exposto: "{{ (ls_syslog.stdout | default('0') | trim | int) == 0 }}"
+            regras_de_encaminhamento: "{{ ls_syslog.stdout | default('0') | trim | int }}"
           LS-AAP-001:
             exposto: "{{ (ls_aap_chaves.stdout | default('0') | trim | int) > 0 }}"
             conta: "{{ ls_aap_conta }}"
@@ -122,6 +145,9 @@
             exposto: "{{ (ls_jboss_egress.stdout | trim | int) == 0 }}"
           LS-JBOSS-003:
             exposto: "{{ (ls_jboss_audit.stdout | trim | int) == 0 }}"
+          LS-JBOSS-004:
+            exposto: "{{ (ls_jboss_syslog.stdout | default('0') | trim | int) == 0 }}"
+            observacao: verifica apenas a leitura pelo rsyslog; handler de syslog no JBoss deve ser conferido pelo CLI
       when: ls_tem_jboss or 'jboss' in group_names
 
     - name: Exibir o resultado
