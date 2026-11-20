@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="images/logo_lateral_shield_low.png" alt="LateralShield — Segurança pragmática para tecnologias Red Hat. Prevenir, Conter, Detectar." width="640">
+</p>
+
 # LateralShield
 
 **Segurança pragmática para tecnologias Red Hat.**
