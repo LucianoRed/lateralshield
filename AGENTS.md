@@ -13,6 +13,7 @@ Antes de escrever qualquer coisa, leia [README.md](README.md), [docs/metodologia
 | Caminho | Conteúdo | Observações |
 |---|---|---|
 | `docs/` | Metodologia, modelo de ameaça, roadmap | Atualize o roadmap quando um candidato virar controle |
+| `docs/recomendacoes-para-incidentes.md` | Medidas de emergência para incidentes em andamento | Não são controles: sem identificador, status ou validador |
 | `catalogo/<tecnologia>/` | Um arquivo Markdown por controle | Segue `catalogo/_MODELO.md` |
 | `catalogo/INDICE.md` | Índice do catálogo | **Gerado. Nunca edite à mão** |
 | `automacao/playbooks/` | Playbooks `avaliar_*` (somente leitura) e `aplicar_*` | |
@@ -61,6 +62,16 @@ Bons controles de referência: [LS-JBOSS-002](catalogo/jboss-eap/LS-JBOSS-002-eg
 ## Logs centralizados vêm primeiro
 
 A existência de syslog central é a primeira verificação em qualquer ambiente (ver [docs/metodologia.md](docs/metodologia.md)). Ao escrever um controle de contenção ou detecção, diga na seção **Detecção** qual mensagem ele gera e assuma que ela precisa chegar ao destino central; referencie LS-RHEL-002, LS-OCP-003 ou LS-JBOSS-004 conforme a camada.
+
+## Recomendações gerais para incidentes
+
+[docs/recomendacoes-para-incidentes.md](docs/recomendacoes-para-incidentes.md) reúne medidas de emergência para incidentes em andamento. É a única área em que entram recomendações que não são específicas de tecnologias Red Hat (perímetro de rede, processo de resposta), desde que protejam esses ambientes durante a crise. Ao acrescentar uma recomendação:
+
+- mantenha os quatro blocos: **Quando usar**, **O que fazer**, **Cuidados** e **Como desfazer**;
+- diga na tabela de resumo se a medida contém o invasor ou apenas reduz ruído;
+- não escreva sintaxe de fabricantes de firewall, WAF ou CDN; cite o controle do catálogo relacionado quando existir;
+- atualize o número de recomendações no slide "Incidentes" de `apresentacao/index.html`;
+- se a medida for específica de uma tecnologia Red Hat e fizer sentido de forma permanente, ela é um controle e vai para o catálogo.
 
 ## Como escrever automação
 

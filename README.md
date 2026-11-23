@@ -103,11 +103,13 @@ Outras tecnologias Red Hat podem entrar no escopo conforme a relevância dos ris
 5. Aplique em laboratório ou homologação, valide e só então leve para produção. Todo controle traz a reversão.
 6. Use a [automação Ansible](automacao/README.md) para repetir avaliação e aplicação em escala.
 
+Está com um incidente em andamento? As [recomendações gerais para incidentes](docs/recomendacoes-para-incidentes.md) reúnem medidas de emergência, como restringir a entrada no perímetro a endereços do Brasil, com os cuidados e a forma de desfazer cada uma.
+
 ## Estrutura do repositório
 
 | Caminho | Conteúdo |
 |---|---|
-| [docs/](docs/) | Metodologia, modelo de ameaça e roadmap |
+| [docs/](docs/) | Metodologia, modelo de ameaça, roadmap e recomendações gerais para incidentes |
 | [catalogo/](catalogo/) | Controles, um arquivo por controle, organizados por tecnologia |
 | [automacao/](automacao/) | Playbooks e roles Ansible de avaliação e aplicação |
 | [scripts/](scripts/) | Validação do catálogo e geração do índice |
