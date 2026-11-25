@@ -227,6 +227,7 @@ def gerar_manifesto(dados_js):
         "# GERADO por scripts/mission_control.py. Não edite manualmente.\n"
         "# Fontes: mission-control/openshift/base.yaml e mission-control/web/.\n"
         "#\n"
+        "#   oc new-project lateralshield\n"
         "#   oc apply -f mission-control/openshift/mission-control.yaml\n",
         base,
     ]

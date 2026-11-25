@@ -23,13 +23,14 @@ Abra [web/index.html](web/index.html). Não há build nem servidor. As respostas
 ### 2. Instalar no OpenShift
 
 ```bash
+oc new-project lateralshield
 oc apply -f https://raw.githubusercontent.com/LucianoRed/lateralshield/main/mission-control/openshift/mission-control.yaml
 oc get route mission-control -n lateralshield
 ```
 
-Ou, a partir de uma cópia do repositório: `oc apply -f mission-control/openshift/mission-control.yaml`.
+Ou, a partir de uma cópia do repositório, troque o endereço por `mission-control/openshift/mission-control.yaml`.
 
-O manifesto cria, no namespace `lateralshield`:
+O `oc new-project` cria o projeto `lateralshield`, e o manifesto cria dentro dele:
 
 - a aplicação, na imagem `ubi9/php-82`, **sem etapa de build**: a página e o código chegam por ConfigMaps;
 - um MySQL (`rhel9/mysql-80`) com volume persistente de 1 Gi;
@@ -38,11 +39,11 @@ O manifesto cria, no namespace `lateralshield`:
 
 Pré-requisitos:
 
-- permissão para criar namespaces;
+- permissão para criar projetos (`oc new-project`). Se o projeto `lateralshield` já existir, basta ser administrador dele;
 - uma StorageClass padrão;
 - acesso do cluster a `registry.redhat.io` e a `registry.access.redhat.com`. Em clusters desconectados, espelhe as duas imagens e ajuste os campos `image`.
 
-Para outro namespace, ou para trocar a senha do banco antes de instalar, edite [openshift/base.yaml](openshift/base.yaml) e regenere o manifesto (veja [Manutenção](#manutenção)).
+O nome do projeto está fixo no manifesto. Para outro nome, ou para trocar a senha do banco antes de instalar, edite [openshift/base.yaml](openshift/base.yaml) e o nome do namespace dos ConfigMaps em `scripts/mission_control.py`, e regenere o manifesto (veja [Manutenção](#manutenção)).
 
 ### 3. Executar em um contêiner
 
@@ -82,7 +83,7 @@ O relatório mostra onde o ambiente é mais frágil. **Guarde-o com acesso restr
 
 - A instalação padrão usa senhas conhecidas: a do `admin`, trocada no primeiro acesso, e a do banco, que só é alcançável pelo pod da aplicação. Em ambiente compartilhado, troque a do banco antes de instalar.
 - Há um único usuário, e todas as pessoas com a senha veem e alteram tudo.
-- `oc delete -f` com o manifesto remove o namespace e o volume do banco. Exporte o JSON antes.
+- `oc delete -f` com o manifesto remove a aplicação e o volume do banco, e `oc delete project lateralshield` remove tudo. Exporte o JSON antes.
 
 ## Manutenção
 
@@ -106,7 +107,7 @@ Rode o script sempre que um controle, uma pergunta ou um arquivo de `web/` mudar
 | `web/index.php` | Autenticação, API e roteamento. Todas as requisições passam por ele |
 | `web/relatorio.php` | Geração do PDF e da planilha, sem bibliotecas externas |
 | `web/.htaccess` | Encaminha tudo para o `index.php` |
-| `openshift/base.yaml` | Namespace, Secrets, MySQL, Deployment, Service, Route e NetworkPolicies |
+| `openshift/base.yaml` | Secrets, MySQL, Deployment, Service, Route e NetworkPolicies |
 | `Containerfile` | Imagem única, para uso fora do OpenShift |
 
 Para desenvolver sem contêiner: `cd mission-control/web && php -S 127.0.0.1:8080 index.php` (usa SQLite em um arquivo temporário).

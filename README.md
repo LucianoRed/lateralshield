@@ -105,7 +105,7 @@ Outras tecnologias Red Hat podem entrar no escopo conforme a relevância dos ris
 5. Rode a etapa de **avaliação** de cada controle antes de mudar qualquer coisa.
 6. Aplique em laboratório ou homologação, valide e só então leve para produção. Todo controle traz a reversão.
 7. Use a [automação Ansible](automacao/README.md) para repetir avaliação e aplicação em escala.
-8. Registre a situação de cada controle e de cada pergunta no [Mission Control](mission-control/README.md), que guarda o checklist e emite o relatório em PDF e Excel. Ele abre direto no navegador ou é instalado no OpenShift com um `oc apply`.
+8. Registre a situação de cada controle e de cada pergunta no [Mission Control](mission-control/README.md), que guarda o checklist e emite o relatório em PDF e Excel. Ele abre direto no navegador ou é instalado no OpenShift com `oc new-project lateralshield` e um `oc apply`.
 
 Está com um incidente em andamento? As [recomendações gerais para incidentes](docs/recomendacoes-para-incidentes.md) reúnem medidas de emergência, como restringir a entrada no perímetro a endereços do Brasil, com os cuidados e a forma de desfazer cada uma.
 

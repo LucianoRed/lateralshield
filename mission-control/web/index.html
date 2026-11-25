@@ -658,7 +658,7 @@
     if (modo === 'servidor') {
       h += '<div class="card"><h3>Acesso</h3><p class="sub">Autenticado como <b>' + esc(usuario) + '</b>. A senha fica guardada no banco na forma de hash.</p><button type="button" class="btn" data-acao="senha">Trocar a senha</button></div>';
     } else {
-      h += '<div class="card"><h3>Instalar no OpenShift</h3><p class="sub">Um único comando cria o Mission Control e um banco MySQL, com autenticação. O usuário inicial é <code>admin</code>, a senha inicial é <code>redhat</code> e a troca é exigida no primeiro acesso.</p><pre class="code">oc apply -f ' + esc(D.repositorio.replace('github.com', 'raw.githubusercontent.com')) + '/main/mission-control/openshift/mission-control.yaml\noc get route mission-control -n lateralshield</pre><p class="muted">' + link('mission-control/README.md', 'Instruções completas') + ', incluindo como executar em um contêiner local.</p></div>';
+      h += '<div class="card"><h3>Instalar no OpenShift</h3><p class="sub">Crie o projeto e aplique o manifesto: ele instala o Mission Control e um banco MySQL, com autenticação. O usuário inicial é <code>admin</code>, a senha inicial é <code>redhat</code> e a troca é exigida no primeiro acesso.</p><pre class="code">oc new-project lateralshield\noc apply -f ' + esc(D.repositorio.replace('github.com', 'raw.githubusercontent.com')) + '/main/mission-control/openshift/mission-control.yaml\noc get route mission-control -n lateralshield</pre><p class="muted">' + link('mission-control/README.md', 'Instruções completas') + ', incluindo como executar em um contêiner local.</p></div>';
     }
     $('#s-relatorio').innerHTML = h;
   }

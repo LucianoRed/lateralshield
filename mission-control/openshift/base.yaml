@@ -8,13 +8,10 @@
 # A aplicação não precisa de build: usa a imagem UBI de PHP e lê o código de
 # ConfigMaps. O usuário inicial é "admin" com a senha "redhat", e a troca da
 # senha é exigida no primeiro acesso.
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: lateralshield
-  labels:
-    app.kubernetes.io/part-of: lateralshield-mission-control
----
+#
+# O projeto não é criado aqui: crie-o antes, com "oc new-project lateralshield".
+# Assim a instalação não exige permissão para criar namespaces.
+#
 # Credenciais do banco. O MySQL só aceita conexões do pod da aplicação (veja as
 # NetworkPolicies no fim do arquivo). Troque a senha antes de aplicar, se quiser.
 apiVersion: v1
