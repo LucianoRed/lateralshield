@@ -17,6 +17,7 @@ const MC_ROTULOS = [
     'nao' => 'Não',
     'pendente' => 'Pendente',
     'em-andamento' => 'Em andamento',
+    'no-plano' => 'No plano de ação',
     'feito' => 'Feito',
 ];
 const MC_CORES = [
@@ -24,6 +25,7 @@ const MC_CORES = [
     'nao' => [0.70, 0, 0],
     'em-implantacao' => [0.11, 0.37, 0.66],
     'parcial' => [0.60, 0.42, 0],
+    'no-plano' => [0.60, 0.42, 0],
     'aplicado' => [0.10, 0.48, 0.46],
     'sim' => [0.10, 0.48, 0.46],
 ];
@@ -60,6 +62,7 @@ function montar_relatorio(array $dados, array $estado): array
         'logs' => [],
         'contagem' => ['controle' => [], 'processo' => [], 'tecnologia' => []],
     ];
+    $daCrise = [];
 
     foreach ($dados['controles'] as $c) {
         $item = ($itens[$c['id']] ?? []) + ['status' => 'nao-avaliado'] + $vazio;
@@ -99,8 +102,17 @@ function montar_relatorio(array $dados, array $estado): array
             $k['secao'] = $secao['nome'];
             $k['item'] = ($itens[$k['id']] ?? []) + ['status' => 'pendente'] + $vazio;
             $r['crise'][] = $k;
+            if ($k['item']['status'] === 'no-plano') {
+                $daCrise[] = [
+                    'id' => 'Crise ' . $k['n'], 'descricao' => sem_markdown($k['verificacao']), 'status' => 'no-plano', 'prioridade' => '',
+                    'responsavel' => $k['item']['responsavel'], 'prazo' => $k['item']['prazo'], 'nota' => $k['item']['nota'],
+                    'vencido' => $k['item']['prazo'] !== '' && $k['item']['prazo'] < $hoje,
+                ];
+            }
         }
     }
+    // O que saiu da sala de crise abre o plano: é o que ficou em aberto de um incidente.
+    $r['plano'] = array_merge($daCrise, $r['plano']);
 
     foreach ($dados['logs'] as $log) {
         $c = $r['controles'][$log['id']] ?? null;
@@ -447,7 +459,7 @@ function relatorio_pdf(array $r): string
     if (!$r['plano']) {
         $pdf->paragrafo('Nenhuma lacuna registrada até o momento.', 9, false, $cinza);
     } else {
-        $pdf->paragrafo('Controles expostos ou em implantação, por prioridade 80/20, e perguntas de processo com resposta "não" ou "parcial".', 8.5, false, $cinza);
+        $pdf->paragrafo('Itens do guia de crise levados ao plano, controles expostos ou em implantação, por prioridade 80/20, e perguntas de processo com resposta "não" ou "parcial".', 8.5, false, $cinza);
         $pdf->espaco(4);
         $pdf->tabela(
             [62, 213.28, 70, 26, 90, 54],

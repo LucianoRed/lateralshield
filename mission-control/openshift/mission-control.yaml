@@ -421,7 +421,7 @@ data:
       .pill.exposto,.pill.nao,.pill.late{color:var(--rh-red-dark);background:var(--red-bg);border-color:var(--red-bd)}
       .pill.em-implantacao,.pill.em-andamento,.pill.conter{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-bd)}
       .pill.aplicado,.pill.sim,.pill.feito,.pill.detectar{color:var(--teal);background:var(--teal-bg);border-color:var(--teal-bd)}
-      .pill.parcial,.pill.prevenir{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-bd)}
+      .pill.parcial,.pill.no-plano,.pill.prevenir{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-bd)}
       .pill.p1{color:#fff;background:var(--ink);border-color:var(--ink)}
       .pill.nao-se-aplica{border-style:dashed}
 
@@ -459,7 +459,7 @@ data:
       .it.exposto,.it.nao{border-left-color:var(--rh-red)}
       .it.em-implantacao,.it.em-andamento{border-left-color:var(--blue)}
       .it.aplicado,.it.sim,.it.feito{border-left-color:var(--teal)}
-      .it.parcial{border-left-color:#D9A100}
+      .it.parcial,.it.no-plano{border-left-color:#D9A100}
       .it .hd{display:grid;grid-template-columns:108px 1fr 168px 20px;gap:12px;align-items:center;padding:9px 14px;cursor:pointer}
       .it .hd .id{font-family:ui-monospace,Menlo,monospace;font-weight:700;font-size:12.5px;white-space:nowrap}
       .it .hd .ti{font-size:13.5px;font-weight:500}
@@ -472,7 +472,7 @@ data:
       select.st.exposto,select.st.nao{color:var(--rh-red-dark);background:var(--red-bg);border-color:var(--red-bd)}
       select.st.em-implantacao,select.st.em-andamento{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-bd)}
       select.st.aplicado,select.st.sim,select.st.feito{color:var(--teal);background:var(--teal-bg);border-color:var(--teal-bd)}
-      select.st.parcial{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-bd)}
+      select.st.parcial,select.st.no-plano{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-bd)}
       .it .bd{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr);gap:24px;padding:6px 16px 18px;border-top:1px solid #ECECEC}
       .it .bd h4{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--g400);margin:14px 0 5px}
       .it .bd p,.it .bd li{font-size:13.5px;color:#2b2b2b}
@@ -504,7 +504,7 @@ data:
       .sbar .aplicado,.sbar .sim,.sbar .feito,.sw.aplicado,.sw.sim,.sw.feito{background:var(--c-aplicado)}
       .sbar .em-implantacao,.sbar .em-andamento,.sw.em-implantacao,.sw.em-andamento{background:var(--c-impl)}
       .sbar .exposto,.sbar .nao,.sw.exposto,.sw.nao{background:var(--c-exposto)}
-      .sbar .parcial,.sw.parcial{background:var(--c-parcial)}
+      .sbar .parcial,.sbar .no-plano,.sw.parcial,.sw.no-plano{background:var(--c-parcial)}
       .sbar .nao-se-aplica,.sw.nao-se-aplica{background:repeating-linear-gradient(135deg,#BDBDBD 0 3px,#E4E4E4 3px 6px)}
       .sw.nao-avaliado,.sw.sem-resposta,.sw.pendente{background:var(--c-trilha)}
       .crow{display:grid;grid-template-columns:var(--lb,104px) 1fr 122px;gap:12px;align-items:center;padding:7px 0;font-size:13px}
@@ -601,6 +601,9 @@ data:
       /* ---- modal de senha ---- */
       .veu{position:fixed;inset:0;background:rgba(21,21,21,.6);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
       .veu.on{display:flex}
+      .naosalvo{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:55;display:none;gap:14px;align-items:center;max-width:calc(100vw - 32px);background:var(--rh-red-dark);color:#fff;font-size:13px;padding:10px 12px 10px 16px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.3)}
+      .naosalvo.on{display:flex}
+      .naosalvo .btn{flex:none;white-space:nowrap;border-color:#fff}
       .pw{background:#fff;border-radius:16px;padding:26px 28px;width:100%;max-width:440px}
       .pw h2{font-size:22px;font-weight:900;margin-bottom:6px}
       .pw p{font-size:13.5px;color:var(--g700);margin-bottom:6px}
@@ -627,7 +630,7 @@ data:
       @media print{
         @page{size:A4;margin:14mm}
         body{background:#fff;font-size:10.5px}
-        .sb,main,.veu{display:none !important}
+        .sb,main,.veu,.naosalvo{display:none !important}
         #impressao{display:block}
         #impressao h1{font-size:22px;margin-bottom:4px}
         #impressao h2{font-size:14px;margin:18px 0 6px;padding-bottom:3px;border-bottom:2px solid var(--rh-red)}
@@ -679,6 +682,7 @@ data:
       </form>
     </div>
 
+    <div class="naosalvo" id="naosalvo" role="alert"></div>
     <div id="tip" role="tooltip"></div>
     <div id="impressao"></div>
 
@@ -691,14 +695,14 @@ data:
       const ROT = {
         'nao-avaliado': 'Não avaliado', 'exposto': 'Exposto', 'em-implantacao': 'Em implantação', 'aplicado': 'Aplicado',
         'nao-se-aplica': 'Não se aplica', 'sem-resposta': 'Sem resposta', 'sim': 'Sim', 'parcial': 'Parcial', 'nao': 'Não',
-        'pendente': 'Pendente', 'em-andamento': 'Em andamento', 'feito': 'Feito'
+        'pendente': 'Pendente', 'em-andamento': 'Em andamento', 'no-plano': 'No plano de ação', 'feito': 'Feito'
       };
       const SITUACOES = {
         controle: ['nao-avaliado', 'exposto', 'em-implantacao', 'aplicado', 'nao-se-aplica'],
         processo: ['sem-resposta', 'sim', 'parcial', 'nao'],
-        crise: ['pendente', 'em-andamento', 'feito', 'nao-se-aplica']
+        crise: ['pendente', 'em-andamento', 'no-plano', 'feito', 'nao-se-aplica']
       };
-      const LACUNA = ['exposto', 'em-implantacao', 'nao', 'parcial'];
+      const LACUNA = ['exposto', 'em-implantacao', 'nao', 'parcial', 'no-plano'];
       const SECOES = [
         ['visao', 'Visão geral'], ['topologia', 'Topologia de ataque'], ['controles', 'Controles'], ['prioridades', 'Matriz 80/20'], ['processos', 'Processos'],
         ['plano', 'Plano de ação'], ['incidentes', 'Sala de crise'], ['relatorio', 'Relatório e dados']
@@ -709,7 +713,7 @@ data:
       const API = location.origin + location.pathname.replace(/[^/]*$/, '') + 'api/';
 
       const E = { meta: {}, itens: {} };
-      let modo = 'local', usuario = '', senhaMinima = 10, salvo = null, trocaObrigatoria = false;
+      let modo = 'local', usuario = '', armazenamento = '', senhaMinima = 10, salvo = null, trocaObrigatoria = false;
       const F = { tec: '', pilar: '', pri: '', st: '', q: '' };
       const abertos = new Set();
 
@@ -817,13 +821,37 @@ data:
       }
       const agoraUTC = () => new Date().toISOString().slice(0, 19).replace('T', ' ');
 
+      // Alterações que o servidor ainda não confirmou: chave → função que reenvia o valor atual.
+      // Sem isso, uma gravação que falha (durante um reinício, por exemplo) continua na tela como se estivesse salva.
+      const pendentes = new Map();
+      let reenvio = null;
+      function avisoPendentes() {
+        const n = pendentes.size, el = $('#naosalvo');
+        el.classList.toggle('on', n > 0);
+        if (n) el.innerHTML = '<span><b>' + n + (n === 1 ? ' alteração não foi salva' : ' alterações não foram salvas') + ' no servidor.</b> A página tenta de novo sozinha: não a feche antes disso.</span><button type="button" class="btn" data-acao="reenviar">Tentar agora</button>';
+        clearTimeout(reenvio);
+        if (n) reenvio = setTimeout(reenviar, 15000);
+      }
+      async function enviar(chave, gravar) {
+        try { await gravar(); pendentes.delete(chave); marcar(true); }
+        catch (e) {
+          // Um valor recusado pelo servidor (erro 4xx) não melhora com nova tentativa.
+          if (!e.status || e.status >= 500 || e.status === 401) pendentes.set(chave, gravar); else pendentes.delete(chave);
+          marcar(false, e.status === 401 ? 'Sessão encerrada: recarregue a página' : e.status ? e.message : 'Sem contato com o servidor');
+        }
+        avisoPendentes();
+      }
+      async function reenviar() {
+        for (const [chave, gravar] of Array.from(pendentes)) await enviar(chave, gravar);
+        menu();
+      }
+
       async function salvarItem(id, campos) {
         const it = item(id);
         Object.assign(it, campos, { atualizado_em: agoraUTC(), atualizado_por: usuario || 'local' });
         E.itens[id] = it;
         if (modo === 'servidor') {
-          try { E.itens[id] = (await api('PUT', 'item/' + id, it)).item; marcar(true); }
-          catch (e) { marcar(false, e.status === 401 ? 'Sessão encerrada: recarregue a página' : e.message); }
+          await enviar(id, async () => { E.itens[id] = (await api('PUT', 'item/' + id, E.itens[id])).item; });
         } else {
           marcar(gravarLocal());
         }
@@ -832,8 +860,10 @@ data:
       async function salvarMeta(chave, valor) {
         E.meta[chave] = valor;
         if (modo === 'servidor') {
-          try { E.meta = (await api('PUT', 'meta', { [chave]: valor })).meta || {}; marcar(true); }
-          catch (e) { marcar(false, e.message); }
+          await enviar('meta:' + chave, async () => {
+            const meta = (await api('PUT', 'meta', { [chave]: E.meta[chave] })).meta || {};
+            if (chave in meta) E.meta[chave] = meta[chave];
+          });
         } else {
           marcar(gravarLocal());
         }
@@ -863,7 +893,10 @@ data:
           const it = item(p.id);
           if (LACUNA.includes(it.status)) lista.push({ id: p.id, rotulo: 'Pergunta ' + p.n, href: '#processos/' + p.id, descricao: p.pergunta, prioridade: '', it: it });
         });
-        return lista;
+        // O que saiu da sala de crise abre o plano: é o que ficou em aberto de um incidente.
+        const daCrise = Object.values(CRISE).filter(k => item(k.id).status === 'no-plano')
+          .map(k => ({ id: k.id, rotulo: 'Crise ' + k.n, href: '#incidentes/' + k.id, descricao: k.verificacao.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/\*\*|`/g, ''), prioridade: '', it: item(k.id) }));
+        return daCrise.concat(lista);
       }
 
       // ---------------------------------------------------------------- menu e rodapé
@@ -879,9 +912,10 @@ data:
         }).join('');
         $('#sb-proj').textContent = [E.meta.organizacao, E.meta.ambiente].filter(Boolean).join(' · ') || 'Avaliação do ambiente';
       }
+      const ONDE = { 'mysql': 'Respostas guardadas no banco MySQL', 'sqlite': 'Respostas guardadas em arquivo SQLite', 'sqlite-temporario': '<span class="bad">Respostas em arquivo temporário</span>' };
       function rodape() {
         const onde = modo === 'servidor'
-          ? '<b>Servidor</b> · usuário ' + esc(usuario) + '<br>Respostas guardadas no banco de dados'
+          ? '<b>Servidor</b> · usuário ' + esc(usuario) + '<br>' + (ONDE[armazenamento] || 'Respostas guardadas no banco de dados')
           : '<b>Modo local</b><br>Respostas guardadas só neste navegador';
         const estado = salvo ? '<br><span class="' + (salvo.ok ? 'ok' : 'bad') + '">' + esc(salvo.texto) + '</span>' : '';
         $('#sb-foot').innerHTML = onde + estado + '<br>' + D.controles.length + ' controles · catálogo em rascunho';
@@ -1067,6 +1101,7 @@ data:
         const m = E.meta, nv = nivel(real), cam = caminhos(real), ce = contarEstados(cam);
         let h = cabecalho('Mission Control', 'Avaliação <em>do ambiente</em>', 'Assuma o comprometimento, contenha o impacto. Cada controle aplicado fecha um caminho do invasor: acompanhe aqui o nível de proteção do ambiente e o que falta fechar.');
         if (modo === 'local') h += '<div class="aviso"><b>Modo local.</b> As respostas ficam só neste navegador. Para guardar em banco de dados e gerar o relatório em PDF e Excel, instale o Mission Control no OpenShift (veja <a href="#relatorio">Relatório e dados</a>).</div>';
+        if (armazenamento === 'sqlite-temporario') h += '<div class="aviso"><b>Armazenamento temporário.</b> As respostas estão em um arquivo temporário do servidor e se perdem quando o contêiner reinicia. Aponte a aplicação para um MySQL (<code>MC_DB_HOST</code>) ou para um arquivo em volume (<code>MC_SQLITE</code>), e exporte o JSON antes de reiniciar.</div>';
 
         h += '<div class="hero"><div class="card mark"><h3>Nível de proteção</h3><div class="nv"><div>' + medidor(nv)
           + '<div class="nvn">' + nv.nome + '<small>Nível ' + (nv.n + 1) + ' de ' + NIVEIS.length + '</small></div>'
@@ -1132,12 +1167,12 @@ data:
           + legenda(['sim', 'parcial', 'nao', 'sem-resposta'].map(s => [s, ROT[s]])) + '</div>';
 
         h += '<div class="card"><h3>Próximos passos</h3>';
-        if (!avaliados) {
+        if (!avaliados && !gaps.length) {
           h += '<p class="sub">Nada foi avaliado ainda. Comece pela primeira verificação e siga pelos controles de prioridade 1, rodando a avaliação somente leitura de cada um.</p><a class="btn pri" href="#controles">Abrir os controles</a>';
         } else if (!gaps.length) {
           h += '<p class="sub">Nenhuma lacuna registrada. Continue a avaliação dos controles restantes e repita-a periodicamente: configuração de segurança se degrada com o tempo.</p>';
         } else {
-          h += '<p class="sub">' + gaps.length + ' lacunas no plano de ação' + (semDono ? ', ' + semDono + ' sem responsável' : '') + (atrasados.length ? ', ' + atrasados.length + ' com prazo vencido' : '') + '.</p><ul class="lst">'
+          h += '<p class="sub">' + gaps.length + (gaps.length === 1 ? ' item' : ' itens') + ' no plano de ação' + (semDono ? ', ' + semDono + ' sem responsável' : '') + (atrasados.length ? ', ' + atrasados.length + ' com prazo vencido' : '') + '.</p><ul class="lst">'
             + gaps.slice(0, 6).map(g => '<li><a class="id" href="' + g.href + '">' + esc(g.rotulo) + '</a><span class="x">' + esc(g.descricao) + '</span>' + (vencido(g.it) ? pill('late', 'vencido') : pill(g.it.status, ROT[g.it.status])) + '</li>').join('')
             + '</ul><p style="margin-top:12px"><a class="btn" href="#plano">Ver o plano de ação</a></p>';
         }
@@ -1418,9 +1453,9 @@ data:
 
       function plano() {
         const gaps = lacunas();
-        let h = cabecalho('Resultado', 'Plano <em>de ação</em>', 'Controles expostos ou em implantação, por prioridade, e perguntas de processo com resposta "não" ou "parcial". Cada linha precisa de um responsável e de um prazo.');
+        let h = cabecalho('Resultado', 'Plano <em>de ação</em>', 'Itens do guia de crise levados ao plano, controles expostos ou em implantação, por prioridade, e perguntas de processo com resposta "não" ou "parcial". Cada linha precisa de um responsável e de um prazo.');
         if (!gaps.length) {
-          h += '<div class="card"><p class="sub" style="margin:0">Nenhuma lacuna registrada até o momento. Marque um controle como exposto ou responda "não" ou "parcial" a uma pergunta para que ele apareça aqui.</p></div>';
+          h += '<div class="card"><p class="sub" style="margin:0">Nenhuma lacuna registrada até o momento. Marque um controle como exposto, responda "não" ou "parcial" a uma pergunta ou marque um item do guia de crise como "no plano de ação" para que ele apareça aqui.</p></div>';
         } else {
           h += '<div class="tw"><table class="t"><tr><th>Item</th><th>Lacuna</th><th>Situação</th><th>Pri.</th><th>Responsável</th><th>Prazo</th></tr>'
             + gaps.map(g => '<tr><td class="id"><a href="' + g.href + '">' + esc(g.rotulo) + '</a></td><td>' + esc(g.descricao) + (g.it.nota ? '<div class="muted">' + esc(g.it.nota) + '</div>' : '') + '</td><td class="nw">' + pill(g.it.status, ROT[g.it.status]) + '</td><td class="n">' + g.prioridade + '</td><td>' + (g.it.responsavel ? esc(g.it.responsavel) : pill('late', 'sem responsável')) + '</td><td class="nw"><span class="due' + (vencido(g.it) ? ' late' : '') + '">' + (dataBR(g.it.prazo) || '&mdash;') + (vencido(g.it) ? ' · vencido' : '') + '</span></td></tr>').join('')
@@ -1431,7 +1466,7 @@ data:
 
       // ---------------------------------------------------------------- sala de crise
       let ABA = 'guia';
-      const ORDEM_CRISE = ['feito', 'em-andamento', 'pendente', 'nao-se-aplica'];
+      const ORDEM_CRISE = ['feito', 'em-andamento', 'no-plano', 'pendente', 'nao-se-aplica'];
       function contarCrise(ids) {
         const x = {};
         ids.forEach(id => { const s = item(id).status; x[s] = (x[s] || 0) + 1; });
@@ -1448,7 +1483,7 @@ data:
         D.crise.secoes.forEach((b, i) => { $('#cr-sec-' + i).textContent = feitosDe(contarCrise(b.itens.map(k => k.id)), b.itens.length) + ' feitos'; });
       }
       function incidentes() {
-        let h = cabecalho('Em crise', 'Sala <em>de crise</em>', 'Um guia para organizar a resposta a um incidente em andamento: o que levantar, o que preservar, o que bloquear e como voltar. Marque cada item e registre o que foi apurado, por quem e a que horas.');
+        let h = cabecalho('Em crise', 'Sala <em>de crise</em>', 'Um guia para organizar a resposta a um incidente em andamento: o que levantar, o que preservar, o que bloquear e como voltar. Marque cada item e registre o que foi apurado, por quem e a que horas. O que não se resolve durante a crise recebe a situação "no plano de ação" e passa a aparecer no <a href="#plano">plano de ação</a>, com responsável e prazo.');
         h += '<div class="bar">' + [['guia', 'Guia de crise'], ['medidas', 'Medidas de emergência']].map(x => '<button type="button" class="chip' + (ABA === x[0] ? ' on' : '') + '" data-aba="' + x[0] + '">' + x[1] + '<small>' + (x[0] === 'guia' ? Object.keys(CRISE).length : D.incidentes.itens.length) + '</small></button>').join('') + '</div>';
         if (ABA === 'guia') {
           h += '<div class="aviso"><b>Use o guia fora do ambiente afetado.</b> Se este Mission Control está instalado em um cluster que faz parte do incidente, abra a página em modo local em uma estação fora dele, ou imprima o guia. O registro mostra o que está exposto: guarde com acesso restrito.</div>';
@@ -1485,7 +1520,8 @@ data:
         window.print();
       }
       async function zerarCrise() {
-        if (!confirm('Zerar apaga a situação e o registro de todos os itens do guia de crise. Imprima ou exporte antes. Continuar?')) return;
+        const noPlano = Object.keys(CRISE).filter(id => item(id).status === 'no-plano').length;
+        if (!confirm('Zerar apaga a situação e o registro de todos os itens do guia de crise.' + (noPlano ? ' ' + noPlano + (noPlano === 1 ? ' item sai' : ' itens saem') + ' do plano de ação.' : '') + ' Imprima ou exporte antes. Continuar?')) return;
         for (const id of Object.keys(CRISE)) {
           if (E.itens[id]) await salvarItem(id, { status: 'pendente', responsavel: '', prazo: '', nota: '' });
         }
@@ -1660,6 +1696,7 @@ data:
           if (a === 'senha') abrirSenha(false);
           if (a === 'imprimir-crise') imprimirCrise();
           if (a === 'zerar-crise') zerarCrise();
+          if (a === 'reenviar') reenviar();
           if (a === 'pausar') {
             pausado = !pausado;
             const svg = $('#tp-svg svg');
@@ -1719,6 +1756,7 @@ data:
       $('#pw').addEventListener('submit', trocarSenha);
       $('#pw-cancelar').addEventListener('click', () => $('#veu').classList.remove('on'));
       window.addEventListener('hashchange', navegar);
+      window.addEventListener('beforeunload', ev => { if (pendentes.size) { ev.preventDefault(); ev.returnValue = ''; } });
 
       // ---------------------------------------------------------------- início
       // A página veio de um servidor, mas a API falhou: não cai em modo local, para ninguém registrar respostas no lugar errado.
@@ -1734,11 +1772,15 @@ data:
             if ((r.headers.get('content-type') || '').includes('json')) {
               const j = await r.json();
               if (!r.ok) { indisponivel(j.mensagem || ('Erro ' + r.status)); return; }
-              modo = 'servidor'; usuario = j.usuario; senhaMinima = j.senha_minima || senhaMinima;
+              modo = 'servidor'; usuario = j.usuario; armazenamento = j.armazenamento || ''; senhaMinima = j.senha_minima || senhaMinima;
               if (j.deve_trocar) { menu(); rodape(); abrirSenha(true); return; }
               E.meta = j.meta || {}; E.itens = j.itens || {};
+            } else if (r.status !== 404) {
+              // Página de erro de um roteador ou proxy, durante um reinício por exemplo. Cair em modo local aqui
+              // mostraria a avaliação vazia e gravaria as respostas só no navegador.
+              indisponivel('O servidor não respondeu como esperado (HTTP ' + r.status + ').'); return;
             }
-            // Qualquer outra resposta (um 404 de servidor de arquivos, por exemplo): não há API, segue em modo local.
+            // Um 404 sem JSON é um servidor de arquivos, sem API: segue em modo local.
           } catch (e) { indisponivel('Não foi possível falar com o servidor.'); return; }
         }
         if (modo === 'local') carregarLocal();
@@ -1766,7 +1808,7 @@ data:
     const MC_STATUS = [
         'controle' => ['nao-avaliado', 'exposto', 'em-implantacao', 'aplicado', 'nao-se-aplica'],
         'processo' => ['sem-resposta', 'sim', 'parcial', 'nao'],
-        'crise' => ['pendente', 'em-andamento', 'feito', 'nao-se-aplica'],
+        'crise' => ['pendente', 'em-andamento', 'no-plano', 'feito', 'nao-se-aplica'],
     ];
     const MC_META = ['organizacao' => 200, 'ambiente' => 200, 'responsavel' => 200, 'inicio' => 10, 'observacoes' => 2000];
     const MC_SENHA_MINIMA = 10;
@@ -1831,6 +1873,15 @@ data:
             }
         }
         return $tipos;
+    }
+
+    /** Onde as respostas ficam: a página mostra, para ninguém descobrir só depois de um reinício. */
+    function armazenamento(): string
+    {
+        if (env('MC_DB_HOST') !== '') {
+            return 'mysql';
+        }
+        return env('MC_SQLITE') !== '' ? 'sqlite' : 'sqlite-temporario';
     }
 
     function banco(): PDO
@@ -2090,7 +2141,7 @@ data:
         }
 
         if ($metodo === 'GET' && $rota === '/api/estado') {
-            responder(200, estado($pdo) + ['usuario' => $sessao['usuario'], 'deve_trocar' => false, 'senha_minima' => MC_SENHA_MINIMA]);
+            responder(200, estado($pdo) + ['usuario' => $sessao['usuario'], 'deve_trocar' => false, 'senha_minima' => MC_SENHA_MINIMA, 'armazenamento' => armazenamento()]);
         }
 
         if ($metodo === 'PUT' && preg_match('#^/api/item/([A-Z]+(?:-[A-Z0-9]+)+)$#', $rota, $m)) {
@@ -2178,6 +2229,7 @@ data:
         'nao' => 'Não',
         'pendente' => 'Pendente',
         'em-andamento' => 'Em andamento',
+        'no-plano' => 'No plano de ação',
         'feito' => 'Feito',
     ];
     const MC_CORES = [
@@ -2185,6 +2237,7 @@ data:
         'nao' => [0.70, 0, 0],
         'em-implantacao' => [0.11, 0.37, 0.66],
         'parcial' => [0.60, 0.42, 0],
+        'no-plano' => [0.60, 0.42, 0],
         'aplicado' => [0.10, 0.48, 0.46],
         'sim' => [0.10, 0.48, 0.46],
     ];
@@ -2221,6 +2274,7 @@ data:
             'logs' => [],
             'contagem' => ['controle' => [], 'processo' => [], 'tecnologia' => []],
         ];
+        $daCrise = [];
 
         foreach ($dados['controles'] as $c) {
             $item = ($itens[$c['id']] ?? []) + ['status' => 'nao-avaliado'] + $vazio;
@@ -2260,8 +2314,17 @@ data:
                 $k['secao'] = $secao['nome'];
                 $k['item'] = ($itens[$k['id']] ?? []) + ['status' => 'pendente'] + $vazio;
                 $r['crise'][] = $k;
+                if ($k['item']['status'] === 'no-plano') {
+                    $daCrise[] = [
+                        'id' => 'Crise ' . $k['n'], 'descricao' => sem_markdown($k['verificacao']), 'status' => 'no-plano', 'prioridade' => '',
+                        'responsavel' => $k['item']['responsavel'], 'prazo' => $k['item']['prazo'], 'nota' => $k['item']['nota'],
+                        'vencido' => $k['item']['prazo'] !== '' && $k['item']['prazo'] < $hoje,
+                    ];
+                }
             }
         }
+        // O que saiu da sala de crise abre o plano: é o que ficou em aberto de um incidente.
+        $r['plano'] = array_merge($daCrise, $r['plano']);
 
         foreach ($dados['logs'] as $log) {
             $c = $r['controles'][$log['id']] ?? null;
@@ -2608,7 +2671,7 @@ data:
         if (!$r['plano']) {
             $pdf->paragrafo('Nenhuma lacuna registrada até o momento.', 9, false, $cinza);
         } else {
-            $pdf->paragrafo('Controles expostos ou em implantação, por prioridade 80/20, e perguntas de processo com resposta "não" ou "parcial".', 8.5, false, $cinza);
+            $pdf->paragrafo('Itens do guia de crise levados ao plano, controles expostos ou em implantação, por prioridade 80/20, e perguntas de processo com resposta "não" ou "parcial".', 8.5, false, $cinza);
             $pdf->espaco(4);
             $pdf->tabela(
                 [62, 213.28, 70, 26, 90, 54],
@@ -3807,7 +3870,7 @@ data:
      },
      "crise": {
       "arquivo": "docs/guia-de-crise.md",
-      "como_usar": "1. **Abra o guia no primeiro sinal**, mesmo que ainda seja só suspeita. Fechar um alarme falso custa pouco; começar a registrar tarde custa a linha do tempo.\n2. **Uma pessoa registra.** Quem investiga e quem bloqueia não deve parar para escrever.\n3. **Use quatro situações:** `pendente`, `em andamento`, `feito` ou `não se aplica`. \"Não se aplica\" também é uma decisão, e merece uma linha dizendo por quê.\n4. **Registre fato separado de hipótese, com horário** e sempre no mesmo fuso.\n5. **As seções não são fases estanques.** A contenção não espera o levantamento terminar: levantamento, coleta de evidências e bloqueios andam juntos. A única ordem que não se inverte é conter antes de limpar.\n6. **Use o guia fora do ambiente afetado.** Se o Mission Control está instalado em um cluster que faz parte do incidente, abra a página em modo local em uma estação fora dele, ou use o guia impresso.\n7. **Trate o registro como informação sensível.** Ele mostra o que está exposto: guarde com acesso restrito e não o publique com dados reais.",
+      "como_usar": "1. **Abra o guia no primeiro sinal**, mesmo que ainda seja só suspeita. Fechar um alarme falso custa pouco; começar a registrar tarde custa a linha do tempo.\n2. **Uma pessoa registra.** Quem investiga e quem bloqueia não deve parar para escrever.\n3. **Use quatro situações:** `pendente`, `em andamento`, `feito` ou `não se aplica`. \"Não se aplica\" também é uma decisão, e merece uma linha dizendo por quê. O que não se resolve durante a crise não fica como pendente: ganha responsável e prazo e vai para o plano de ação. No Mission Control, é a situação `no plano de ação`.\n4. **Registre fato separado de hipótese, com horário** e sempre no mesmo fuso.\n5. **As seções não são fases estanques.** A contenção não espera o levantamento terminar: levantamento, coleta de evidências e bloqueios andam juntos. A única ordem que não se inverte é conter antes de limpar.\n6. **Use o guia fora do ambiente afetado.** Se o Mission Control está instalado em um cluster que faz parte do incidente, abra a página em modo local em uma estação fora dele, ou use o guia impresso.\n7. **Trate o registro como informação sensível.** Ele mostra o que está exposto: guarde com acesso restrito e não o publique com dados reais.",
       "secoes": [
        {
         "nome": "Abertura da sala de crise",

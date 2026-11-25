@@ -13,7 +13,7 @@ require __DIR__ . '/relatorio.php';
 const MC_STATUS = [
     'controle' => ['nao-avaliado', 'exposto', 'em-implantacao', 'aplicado', 'nao-se-aplica'],
     'processo' => ['sem-resposta', 'sim', 'parcial', 'nao'],
-    'crise' => ['pendente', 'em-andamento', 'feito', 'nao-se-aplica'],
+    'crise' => ['pendente', 'em-andamento', 'no-plano', 'feito', 'nao-se-aplica'],
 ];
 const MC_META = ['organizacao' => 200, 'ambiente' => 200, 'responsavel' => 200, 'inicio' => 10, 'observacoes' => 2000];
 const MC_SENHA_MINIMA = 10;
@@ -78,6 +78,15 @@ function tipos_de_item(): array
         }
     }
     return $tipos;
+}
+
+/** Onde as respostas ficam: a página mostra, para ninguém descobrir só depois de um reinício. */
+function armazenamento(): string
+{
+    if (env('MC_DB_HOST') !== '') {
+        return 'mysql';
+    }
+    return env('MC_SQLITE') !== '' ? 'sqlite' : 'sqlite-temporario';
 }
 
 function banco(): PDO
@@ -337,7 +346,7 @@ try {
     }
 
     if ($metodo === 'GET' && $rota === '/api/estado') {
-        responder(200, estado($pdo) + ['usuario' => $sessao['usuario'], 'deve_trocar' => false, 'senha_minima' => MC_SENHA_MINIMA]);
+        responder(200, estado($pdo) + ['usuario' => $sessao['usuario'], 'deve_trocar' => false, 'senha_minima' => MC_SENHA_MINIMA, 'armazenamento' => armazenamento()]);
     }
 
     if ($metodo === 'PUT' && preg_match('#^/api/item/([A-Z]+(?:-[A-Z0-9]+)+)$#', $rota, $m)) {

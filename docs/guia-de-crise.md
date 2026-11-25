@@ -12,7 +12,7 @@ Três avisos:
 
 1. **Abra o guia no primeiro sinal**, mesmo que ainda seja só suspeita. Fechar um alarme falso custa pouco; começar a registrar tarde custa a linha do tempo.
 2. **Uma pessoa registra.** Quem investiga e quem bloqueia não deve parar para escrever.
-3. **Use quatro situações:** `pendente`, `em andamento`, `feito` ou `não se aplica`. "Não se aplica" também é uma decisão, e merece uma linha dizendo por quê.
+3. **Use quatro situações:** `pendente`, `em andamento`, `feito` ou `não se aplica`. "Não se aplica" também é uma decisão, e merece uma linha dizendo por quê. O que não se resolve durante a crise não fica como pendente: ganha responsável e prazo e vai para o plano de ação. No Mission Control, é a situação `no plano de ação`.
 4. **Registre fato separado de hipótese, com horário** e sempre no mesmo fuso.
 5. **As seções não são fases estanques.** A contenção não espera o levantamento terminar: levantamento, coleta de evidências e bloqueios andam juntos. A única ordem que não se inverte é conter antes de limpar.
 6. **Use o guia fora do ambiente afetado.** Se o Mission Control está instalado em um cluster que faz parte do incidente, abra a página em modo local em uma estação fora dele, ou use o guia impresso.

@@ -9,7 +9,7 @@ Painel de avaliação do LateralShield: uma página única, com menu fixo à esq
 | **Controles** | Os controles do catálogo, com filtros por tecnologia, pilar, prioridade e situação. Cada um abre com o problema, o benefício e os comandos de avaliação, que são somente leitura |
 | **Matriz 80/20** | Impacto × esforço, com a cor de cada controle indicando a situação registrada |
 | **Processos** | As perguntas de pessoas e processos, com resposta `sim`, `parcial` ou `não`. Sem nota e sem nível de maturidade |
-| **Plano de ação** | Controles expostos ou em implantação e perguntas com resposta `não` ou `parcial`, com responsável, prazo e destaque para o que venceu |
+| **Plano de ação** | Itens do guia de crise marcados como `no plano de ação`, controles expostos ou em implantação e perguntas com resposta `não` ou `parcial`, com responsável, prazo e destaque para o que venceu |
 | **Sala de crise** | O [guia de crise](../docs/guia-de-crise.md) como checklist marcável, com situação, responsável e registro por item, e o texto completo das [recomendações gerais para incidentes](../docs/recomendacoes-para-incidentes.md), sem sair da página |
 | **Relatório e dados** | Relatório em PDF e Excel, cópia dos dados em JSON e troca de senha |
 
@@ -43,10 +43,11 @@ O desenho reflete a situação registrada, e não um teste do ambiente: não há
 
 ## Sala de crise
 
-A seção tem duas abas. **Guia de crise** é o checklist: cada item recebe uma situação (`pendente`, `em andamento`, `feito` ou `não se aplica`), um responsável e um registro do que foi apurado ou feito. **Medidas de emergência** traz as recomendações completas, com quando usar, o que fazer, cuidados e como desfazer.
+A seção tem duas abas. **Guia de crise** é o checklist: cada item recebe uma situação (`pendente`, `em andamento`, `no plano de ação`, `feito` ou `não se aplica`), um responsável e um registro do que foi apurado ou feito. **Medidas de emergência** traz as recomendações completas, com quando usar, o que fazer, cuidados e como desfazer.
 
 - "Imprimir o registro" gera o registro da crise pela impressão do navegador, que também salva em PDF. Na instalação com servidor, a planilha Excel traz a aba `Guia de crise`. O relatório em PDF do servidor cobre só a avaliação do ambiente.
-- "Zerar para um novo incidente" limpa a situação e os registros do guia. Imprima ou exporte antes.
+- A situação `no plano de ação` serve para o que não se resolve durante a crise: o item passa a abrir o plano de ação, na página e nos relatórios, com o responsável e o prazo registrados nele.
+- "Zerar para um novo incidente" limpa a situação e os registros do guia, e tira do plano de ação os itens que estavam nele. Imprima ou exporte antes.
 - O guia guarda um incidente por vez.
 - **Use o guia fora do ambiente afetado.** Se o cluster onde o Mission Control está instalado faz parte do incidente, abra `web/index.html` em uma estação fora dele, ou use o guia impresso.
 
@@ -95,6 +96,8 @@ oc rollout status deploy/mission-control -n lateralshield
 - A página e o código chegam por ConfigMaps, que o pod relê sozinho em cerca de um minuto. O reinício garante que a versão nova entre de imediato.
 - Para aplicar uma versão que ainda não está na `main` do GitHub, use o arquivo de uma cópia do repositório: `oc apply -f mission-control/openshift/mission-control.yaml`.
 - Depois, recarregue a página no navegador.
+- O rodapé do menu diz onde as respostas estão: "Servidor" e "banco MySQL" nesta instalação. "Modo local" significa que elas estão só naquele navegador.
+- Se uma gravação falhar durante o reinício, a página avisa em uma faixa vermelha e tenta de novo sozinha. Enquanto o servidor não responde, ela mostra "Servidor indisponível" em vez de abrir vazia.
 
 ### 3. Executar em um contêiner
 
@@ -104,7 +107,7 @@ podman run -d --name mission-control -p 8080:8080 \
   -v mission-control-dados:/dados lateralshield-mission-control
 ```
 
-Nessa forma as respostas ficam em um arquivo SQLite no volume `/dados`. Para usar um MySQL externo, defina `MC_DB_HOST`, `MC_DB_PORT`, `MC_DB_NAME`, `MC_DB_USER` e `MC_DB_PASSWORD`. A autenticação Basic envia a senha a cada requisição: publique o contêiner atrás de HTTPS.
+Nessa forma as respostas ficam em um arquivo SQLite no volume `/dados`. Sem `MC_DB_HOST` e sem `MC_SQLITE`, a aplicação usa um arquivo temporário, que se perde com o contêiner, e avisa disso na visão geral. Para usar um MySQL externo, defina `MC_DB_HOST`, `MC_DB_PORT`, `MC_DB_NAME`, `MC_DB_USER` e `MC_DB_PASSWORD`. A autenticação Basic envia a senha a cada requisição: publique o contêiner atrás de HTTPS.
 
 ## Acesso
 
@@ -170,5 +173,7 @@ Para desenvolver sem contêiner: `cd mission-control/web && php -S 127.0.0.1:808
 Testado em contêineres locais, com a imagem `ubi9/php-82` e um MySQL 8.0, simulando o usuário sem privilégio do OpenShift: autenticação, troca de senha, gravação, relatórios e importação. O MySQL do teste foi a imagem comunitária equivalente (`quay.io/sclorg/mysql-80-c9s`), e não a `rhel9/mysql-80` do manifesto.
 
 O nível de proteção, os gráficos, a topologia e a sala de crise foram conferidos no Chrome, em modo local; a gravação dos itens do guia e a planilha foram testadas com o servidor PHP local e SQLite. Não foram conferidos em Firefox nem em Safari.
+
+A situação `no plano de ação` do guia de crise (página, PDF e planilha), o aviso de alteração não salva e a tela de servidor indisponível foram conferidos no Chrome, contra a imagem `ubi9/php-82` e o MySQL 8.0 em contêineres locais, parando a aplicação durante uma gravação. Nesse mesmo arranjo, as respostas continuaram no banco depois de recriar o contêiner da aplicação.
 
 **O manifesto ainda não foi aplicado em um cluster OpenShift.** Rota, NetworkPolicies, volume persistente e a leitura dos ConfigMaps pelo pod dependem de teste em laboratório.
