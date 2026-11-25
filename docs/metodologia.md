@@ -69,11 +69,19 @@ O encaminhamento por syslog é simples de implantar e tem controle próprio em c
 |---|---|
 | Sistema operacional | [LS-RHEL-002](../catalogo/rhel/LS-RHEL-002-syslog-central.md) |
 | Ingress do OpenShift | [LS-OCP-003](../catalogo/openshift/LS-OCP-003-log-de-acesso-do-ingress-em-syslog.md) |
+| API do OpenShift (auditoria) | [LS-OCP-006](../catalogo/openshift/LS-OCP-006-auditoria-da-api-fora-do-cluster.md) |
 | JBoss EAP | [LS-JBOSS-004](../catalogo/jboss-eap/LS-JBOSS-004-logs-do-jboss-em-syslog.md) |
+| Ansible Automation Platform | [LS-AAP-007](../catalogo/aap/LS-AAP-007-logs-e-activity-stream-em-agregador.md) |
+
+## Processos: quem sustenta os controles?
+
+Configuração não se mantém sozinha. Um controle precisa de alguém que o aplique, de alguém que leia o alerta que ele gera e de alguém que decida o que fazer quando o alerta é real. A [avaliação básica de processos](avaliacao-de-processos.md) verifica isso em 20 perguntas, organizadas em cinco blocos: resposta a incidentes, segurança e políticas, operação, monitoramento e detecção, e desenvolvimento.
+
+Ela não é um controle e não mede maturidade. O resultado é uma lista curta de lacunas com responsável e prazo, tratadas pelo mesmo critério 80/20: o menor passo que muda a resposta.
 
 ## Ciclo de adoção
 
-1. **Avaliar** — rodar as avaliações do catálogo e registrar a exposição atual, começando pela existência de syslog central.
+1. **Avaliar** — rodar as avaliações do catálogo e registrar a exposição atual, começando pela existência de syslog central. Fazer também a [avaliação básica de processos](avaliacao-de-processos.md).
 2. **Priorizar** — ordenar por prioridade 80/20 e pelo que o [modelo de ameaça](modelo-de-ameaca.md) indica como caminho mais provável.
 3. **Observar** — aplicar em modo de auditoria quando o controle permitir, e coletar o comportamento legítimo.
 4. **Aplicar** — bloquear, em homologação e depois em produção, com a reversão testada.

@@ -1,0 +1,4 @@
+# Todas as requisições passam pelo index.php, que exige autenticação
+# antes de entregar a página, os dados e os relatórios.
+RewriteEngine On
+RewriteRule !^index\.php$ index.php [L]

@@ -16,12 +16,14 @@ Navegação: setas ← →, clique ou swipe. Nos slides com estágios, → avan�
 | 6 | RHEL | Diagrama em dois estágios: SSH antes e depois do bastion |
 | 7 | OpenShift | Machine Config Server e isolamento entre namespaces |
 | 8 | Ansible Automation Platform | Chave de automação restrita à origem |
-| 9 | Estado atual | Controles escritos, validados e candidatos; fases do roadmap |
-| 10 | Como participar | Validar, contribuir, relatar |
+| 9 | Incidentes | Medidas de emergência: três exemplos e as regras de dono, prazo e reversão |
+| 10 | Estado atual | Controles escritos, validados e candidatos; fases do roadmap |
+| 11 | Como participar | Validar, contribuir, relatar |
 
 ## Manutenção
 
-- Os números dos slides 4 e 9 (controles escritos, validados, candidatos no roadmap) vêm de [catalogo/INDICE.md](../catalogo/INDICE.md) e de [docs/roadmap.md](../docs/roadmap.md). Atualize o deck quando eles mudarem.
+- Os números dos slides 4 e 10 (controles escritos, validados, candidatos no roadmap) vêm de [catalogo/INDICE.md](../catalogo/INDICE.md) e de [docs/roadmap.md](../docs/roadmap.md). Atualize o deck quando eles mudarem.
+- O número de recomendações do slide 9 vem da tabela de resumo de [docs/recomendacoes-para-incidentes.md](../docs/recomendacoes-para-incidentes.md).
 - O layout segue o template "Red Hat moderno": um slide, uma ideia; pouco texto; diagramas em SVG. O CSS e o JavaScript são os do template; a única adição é a regra `.lever-grid.two`, no fim do `<style>`.
 - Os diagramas foram desenhados para projetor. No celular os slides funcionam, mas o texto dentro dos diagramas fica pequeno.
 
