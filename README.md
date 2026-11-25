@@ -123,6 +123,18 @@ O último comando mostra o endereço da página. Entre com o usuário `admin` e 
 
 A partir de uma cópia do repositório, troque o endereço por `mission-control/openshift/mission-control.yaml`. Para usar sem instalar nada, abra [mission-control/web/index.html](mission-control/web/index.html) no navegador; nesse modo as respostas ficam só naquele navegador.
 
+### Atualização
+
+Para levar uma instalação existente à versão mais recente, aplique o manifesto de novo e reinicie a aplicação:
+
+```bash
+oc apply -f https://raw.githubusercontent.com/LucianoRed/lateralshield/main/mission-control/openshift/mission-control.yaml
+oc rollout restart deploy/mission-control -n lateralshield
+oc rollout status deploy/mission-control -n lateralshield
+```
+
+As respostas ficam no banco e não são afetadas: só a aplicação reinicia, e o MySQL, o volume e a senha do `admin` continuam como estavam. Depois, recarregue a página no navegador.
+
 Pré-requisitos, execução em contêiner fora do OpenShift e como recuperar a senha estão no [README do Mission Control](mission-control/README.md). O manifesto foi testado em contêineres locais e **ainda não foi aplicado em um cluster OpenShift**.
 
 ## Estrutura do repositório

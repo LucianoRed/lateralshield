@@ -72,6 +72,21 @@ Pré-requisitos:
 
 O nome do projeto está fixo no manifesto. Para outro nome, ou para trocar a senha do banco antes de instalar, edite [openshift/base.yaml](openshift/base.yaml) e o nome do namespace dos ConfigMaps em `scripts/mission_control.py`, e regenere o manifesto (veja [Manutenção](#manutenção)).
 
+#### Atualizar uma instalação
+
+Aplique o manifesto de novo e reinicie a aplicação:
+
+```bash
+oc apply -f https://raw.githubusercontent.com/LucianoRed/lateralshield/main/mission-control/openshift/mission-control.yaml
+oc rollout restart deploy/mission-control -n lateralshield
+oc rollout status deploy/mission-control -n lateralshield
+```
+
+- As respostas ficam no banco e não são afetadas. Só o Deployment `mission-control` reinicia: o MySQL, o volume e a senha do `admin` continuam como estavam.
+- A página e o código chegam por ConfigMaps, que o pod relê sozinho em cerca de um minuto. O reinício garante que a versão nova entre de imediato.
+- Para aplicar uma versão que ainda não está na `main` do GitHub, use o arquivo de uma cópia do repositório: `oc apply -f mission-control/openshift/mission-control.yaml`.
+- Depois, recarregue a página no navegador.
+
 ### 3. Executar em um contêiner
 
 ```bash
@@ -126,7 +141,7 @@ python3 scripts/mission_control.py           # regenera os dois
 python3 scripts/mission_control.py --check   # falha se estiverem desatualizados (usado no CI)
 ```
 
-Rode o script sempre que um controle, uma pergunta ou um arquivo de `web/` mudar. Para atualizar uma instalação, aplique o manifesto de novo. Os ConfigMaps são relidos pelo pod em cerca de um minuto; se a página não mudar, execute `oc rollout restart deploy/mission-control -n lateralshield`.
+Rode o script sempre que um controle, uma pergunta ou um arquivo de `web/` mudar. Para levar a mudança a uma instalação, veja [Atualizar uma instalação](#atualizar-uma-instalação).
 
 | Arquivo | Papel |
 |---|---|
