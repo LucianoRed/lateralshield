@@ -850,60 +850,448 @@ window.LS_DADOS = {
  },
  "incidentes": {
   "arquivo": "docs/recomendacoes-para-incidentes.md",
+  "regras": "1. **Dono e prazo.** Toda medida é registrada com quem aplicou, quando, por quê e até quando vale. Medida de emergência sem prazo vira configuração permanente que ninguém sabe explicar.\n2. **Reversão conhecida antes de aplicar.** Se não se sabe desfazer, não é medida de emergência, é mudança de risco.\n3. **Registrar o que foi bloqueado.** Um bloqueio que não gera log tira da equipe a informação de que ela mais precisa.\n4. **Conter antes de limpar.** Remover o invasor de um servidor enquanto ele ainda alcança os outros só o avisa de que foi percebido.\n5. **Não confundir redução de ruído com contenção.** Algumas medidas abaixo apenas diminuem o volume de ataque; a tabela indica quais.",
   "itens": [
    {
-    "titulo": "Aceitar entrada apenas do Brasil",
+    "id": "REC-01",
+    "ancora": "aceitar-entrada-apenas-do-brasil-no-perímetro",
+    "grupo": "Perímetro de rede",
+    "titulo": "Aceitar entrada apenas do Brasil no perímetro",
     "link": "docs/recomendacoes-para-incidentes.md#aceitar-entrada-apenas-do-brasil-no-perímetro",
+    "corpo": "**Quando usar.** O serviço atende essencialmente usuários no Brasil e o incidente envolve grande volume de origens no exterior: varredura, tentativa de senha em massa, exploração automatizada de uma falha recém-divulgada.\n\n**O que fazer.** No firewall de borda, WAF ou CDN, permitir a entrada nos serviços publicados apenas de endereços alocados ao Brasil e registrar o que for descartado. Aplicar no ponto mais externo que enxerga o endereço real do cliente: se há CDN ou proxy na frente, a regra precisa estar nele, porque o firewall atrás só vê os endereços do próprio CDN. Quando a borda é um host RHEL, o `firewalld` aceita conjuntos de endereços (`ipset`) como origem de uma zona.\n\n**Cuidados.**\n\n- **Não é contenção.** Um invasor determinado usa uma origem no Brasil (VPN, hospedagem local, máquina comprometida). A medida reduz volume e ganha tempo; não substitui corrigir a falha explorada.\n- **Não remove quem já entrou.** Atua só na entrada. Um invasor que já tem acesso interno, ou que usa conexões iniciadas de dentro para fora, não é afetado; para isso, veja [restringir a saída](docs/recomendacoes-para-incidentes.md#restringir-a-saída-dos-servidores-para-a-internet).\n- **Quebra integrações legítimas.** Antes de aplicar, liste o que chega de fora do país: gateways de pagamento, webhooks, monitoramento externo, provedores de e-mail, parceiros, usuários em viagem e equipes no exterior. Crie exceções explícitas para esses endereços.\n- **Geolocalização de IP é aproximada.** As bases erram, especialmente com operadoras móveis e provedores de nuvem. Espere alguns bloqueios indevidos e tenha um canal para o usuário reclamar.\n- **Não esquecer do IPv6.** Uma regra só para IPv4 deixa a outra metade aberta.\n- **A lista envelhece.** As alocações mudam; se a medida durar mais que alguns dias, a lista precisa de atualização automática.\n\n**Como desfazer.** Remover a regra de bloqueio por país e manter as exceções documentadas. Definir a data de revisão no momento da aplicação.",
+    "curto": "Aceitar entrada apenas do Brasil",
     "efeito": "Menos origens conseguem alcançar os serviços publicados",
     "tipo": "Reduz ruído"
    },
    {
-    "titulo": "Fechar interfaces administrativas expostas",
+    "id": "REC-02",
+    "ancora": "fechar-interfaces-administrativas-expostas-à-internet",
+    "grupo": "Perímetro de rede",
+    "titulo": "Fechar interfaces administrativas expostas à internet",
     "link": "docs/recomendacoes-para-incidentes.md#fechar-interfaces-administrativas-expostas-à-internet",
+    "corpo": "**Quando usar.** Sempre que o incidente revelar SSH, consoles de gerenciamento, API ou console do OpenShift ou a interface do Ansible Automation Platform acessíveis diretamente da internet.\n\n**O que fazer.** Restringir essas portas no perímetro à VPN ou à rede administrativa. É a versão de emergência, feita na borda, do que os controles [LS-RHEL-001](catalogo/rhel/LS-RHEL-001-ssh-somente-de-origens-administrativas.md) e [LS-JBOSS-001](catalogo/jboss-eap/LS-JBOSS-001-interfaces-de-gerenciamento.md) fazem no próprio host.\n\n**Cuidados.** Confirmar antes que a equipe de resposta consegue entrar pelo caminho que vai sobrar. Pipelines e automações externas que usam a API do cluster param de funcionar.\n\n**Como desfazer.** Reabrir a regra anterior. Na prática, esta medida deveria se tornar permanente.",
+    "curto": "Fechar interfaces administrativas expostas",
     "efeito": "Administração só por VPN ou rede administrativa",
     "tipo": "Contém"
    },
    {
-    "titulo": "Restringir a saída para a internet",
+    "id": "REC-03",
+    "ancora": "restringir-a-saída-dos-servidores-para-a-internet",
+    "grupo": "Perímetro de rede",
+    "titulo": "Restringir a saída dos servidores para a internet",
     "link": "docs/recomendacoes-para-incidentes.md#restringir-a-saída-dos-servidores-para-a-internet",
+    "corpo": "**Quando usar.** Há suspeita de que um servidor comprometido está recebendo comandos de fora ou enviando dados para fora.\n\n**O que fazer.** No perímetro, negar a saída direta dos segmentos de servidores para a internet, permitindo apenas os destinos necessários (proxy corporativo, repositórios de pacotes, serviços de parceiros) e registrando o restante. As tentativas registradas mostram quais outros servidores apresentam o mesmo comportamento.\n\n**Cuidados.** Atualizações de pacotes, consultas a serviços externos, envio de e-mail e validação de certificados podem parar. Aplicar primeiro em modo de registro, se o tempo permitir, para conhecer o tráfego legítimo.\n\n**Como desfazer.** Remover a regra de negação. Para tornar o controle permanente e mais fino, por processo, veja [LS-JBOSS-002](catalogo/jboss-eap/LS-JBOSS-002-egress-por-usuario.md).",
+    "curto": "Restringir a saída para a internet",
     "efeito": "Dificulta comando remoto e saída de dados",
     "tipo": "Contém"
    },
    {
-    "titulo": "Isolar sem desligar",
+    "id": "REC-04",
+    "ancora": "isolar-o-componente-suspeito-sem-desligá-lo",
+    "grupo": "Contenção e evidências",
+    "titulo": "Isolar o componente suspeito sem desligá-lo",
     "link": "docs/recomendacoes-para-incidentes.md#isolar-o-componente-suspeito-sem-desligá-lo",
+    "corpo": "**Quando usar.** Um servidor, pod ou nó está sob suspeita e ainda não foi investigado.\n\n**O que fazer.** Cortar a comunicação do componente com o restante do ambiente e mantê-lo ligado. Desligar ou reinstalar apaga o conteúdo da memória e os processos em execução, que costumam ser a melhor evidência.\n\n- **Servidor RHEL ou JBoss EAP:** mover para uma rede de quarentena ou negar o tráfego no firewall ou no grupo de segurança, mantendo apenas o acesso da equipe de resposta.\n- **OpenShift:** isolar o namespace com uma `NetworkPolicy` de negação (ver [LS-OCP-002](catalogo/openshift/LS-OCP-002-networkpolicy-negacao-padrao.md)) e impedir novos agendamentos no nó suspeito (`oc adm cordon`). Apagar o pod destrói a evidência; prefira retirá-lo do tráfego e preservá-lo para análise.\n\n**Cuidados.** O isolamento derruba o serviço que o componente presta. A decisão entre disponibilidade e contenção é do negócio e precisa de um responsável definido.\n\n**Como desfazer.** Devolver o componente à rede original somente depois da análise e, de preferência, depois de reconstruí-lo a partir de fonte confiável.",
+    "curto": "Isolar sem desligar",
     "efeito": "O componente suspeito para de alcançar os vizinhos e a evidência é mantida",
     "tipo": "Contém"
    },
    {
-    "titulo": "Preservar evidências",
+    "id": "REC-05",
+    "ancora": "preservar-evidências-antes-de-limpar",
+    "grupo": "Contenção e evidências",
+    "titulo": "Preservar evidências antes de limpar",
     "link": "docs/recomendacoes-para-incidentes.md#preservar-evidências-antes-de-limpar",
+    "corpo": "**Quando usar.** Antes de qualquer reinício, reinstalação, restauração de backup ou remoção de arquivos suspeitos.\n\n**O que fazer.**\n\n- Confirmar que os logs do componente já estão no destino central; se não estiverem, copiá-los para fora do host. Ver [LS-RHEL-002](catalogo/rhel/LS-RHEL-002-syslog-central.md), [LS-OCP-003](catalogo/openshift/LS-OCP-003-log-de-acesso-do-ingress-em-syslog.md) e [LS-JBOSS-004](catalogo/jboss-eap/LS-JBOSS-004-logs-do-jboss-em-syslog.md).\n- Tirar um snapshot da máquina virtual ou do disco.\n- Aumentar a retenção dos logs no destino central enquanto durar a investigação, para que a rotação normal não apague o período de interesse.\n- Anotar horários no mesmo fuso em todos os registros.\n\n**Cuidados.** Snapshots e cópias de log contêm dados sensíveis e credenciais: guardar com acesso restrito e prazo de descarte.\n\n**Como desfazer.** Descartar as cópias ao final do prazo de retenção definido para o incidente.",
+    "curto": "Preservar evidências",
     "efeito": "A investigação continua possível depois da limpeza",
     "tipo": "—"
    },
    {
+    "id": "REC-06",
+    "ancora": "trocar-credenciais-na-ordem-certa",
+    "grupo": "Identidades e credenciais",
     "titulo": "Trocar credenciais na ordem certa",
     "link": "docs/recomendacoes-para-incidentes.md#trocar-credenciais-na-ordem-certa",
+    "corpo": "**Quando usar.** Um componente comprometido tinha acesso a credenciais: senhas de datasource, chaves SSH, tokens de service account, credenciais guardadas no Ansible Automation Platform.\n\n**O que fazer.**\n\n1. **Conter primeiro.** Trocar a senha enquanto o invasor ainda lê o arquivo de configuração só entrega a senha nova.\n2. **Listar o que o componente alcançava.** Tudo o que estava legível para o processo ou usuário comprometido deve ser tratado como exposto, mesmo sem prova de uso.\n3. **Começar pelas credenciais de maior alcance:** contas administrativas, chaves de automação que entram em muitos servidores (ver [LS-AAP-001](catalogo/aap/LS-AAP-001-chave-de-automacao-restrita.md)), contas de serviço compartilhadas.\n4. **Encerrar sessões e tokens ativos**, não apenas trocar a senha: uma sessão aberta continua valendo depois da troca.\n\n**Cuidados.** Troca de credencial compartilhada derruba todos os sistemas que a usam. Mapear os consumidores antes e trocar de forma coordenada.\n\n**Como desfazer.** Não se desfaz: uma credencial exposta não volta a ser confiável.",
+    "curto": "Trocar credenciais na ordem certa",
     "efeito": "Credenciais expostas deixam de valer",
     "tipo": "Contém"
    },
    {
+    "id": "REC-07",
+    "ancora": "desenhar-a-topologia-dos-ativos-envolvidos",
+    "grupo": "Organização da resposta",
     "titulo": "Desenhar a topologia dos ativos envolvidos",
     "link": "docs/recomendacoes-para-incidentes.md#desenhar-a-topologia-dos-ativos-envolvidos",
+    "corpo": "**Quando usar.** Logo no início, assim que houver um primeiro ativo confirmado ou suspeito. Sem um desenho, cada pessoa da equipe trabalha com um mapa diferente na cabeça, e as medidas de contenção são aplicadas no lugar errado ou deixam um caminho aberto.\n\n**O que fazer.** Desenhar apenas o que interessa ao incidente, não a rede inteira:\n\n- **os ativos confirmados e os suspeitos**, com marcação diferente para cada situação;\n- **o que cada um alcança**: bancos de dados, outros servidores, plano de controle do cluster, interfaces de gerenciamento, internet;\n- **o que alcança cada um**: por onde o invasor pode ter entrado e por onde a administração e a automação chegam;\n- **os pontos de bloqueio disponíveis** em cada caminho: firewall de borda, firewall entre segmentos, firewall do host, `NetworkPolicy`;\n- **as credenciais que atravessam o desenho**: chaves de automação, contas de serviço e senhas de datasource ligam ativos que a rede não liga;\n- **para onde vão os logs** de cada ativo.\n\nO desenho não precisa ser bonito: quadro branco fotografado ou um diagrama Mermaid como o do exemplo servem. Precisa ter data e hora e ser atualizado a cada descoberta, guardando as versões anteriores junto da linha do tempo.\n\n```mermaid\nflowchart LR\n    internet([\"Internet\"])\n    borda[\"Firewall de borda\"]\n\n    subgraph dmz[\"Segmento de aplicação\"]\n        jboss[\"JBoss EAP legado: COMPROMETIDO\"]\n        app2[\"Servidor de aplicação vizinho: SUSPEITO\"]\n    end\n\n    subgraph dados[\"Segmento de dados\"]\n        db[(\"Banco de dados da aplicação\")]\n    end\n\n    subgraph adm[\"Rede administrativa\"]\n        aap[\"Ansible Automation Platform\"]\n        syslog[\"Syslog central\"]\n    end\n\n    internet --> borda --> jboss\n    jboss -->|\"datasource\"| db\n    jboss -. \"SSH observado nos logs\" .-> app2\n    aap -->|\"chave de automação\"| jboss\n    aap -->|\"chave de automação\"| app2\n    jboss ==>|\"logs\"| syslog\n    app2 ==>|\"logs\"| syslog\n```\n\nLinhas contínuas são caminhos legítimos, tracejadas são movimentações observadas ou suspeitas e grossas são o envio de logs.\n\n**Cuidados.**\n\n- **O desenho é informação sensível.** Mostra exatamente o que está exposto: guardar fora do ambiente afetado e com acesso restrito à equipe de resposta.\n- **Desenhar o que se observa, não o que a documentação diz.** Diagramas de arquitetura antigos costumam estar desatualizados; conferir os caminhos com as regras de firewall e os logs reais.\n- **Separar fato de hipótese.** Um ativo marcado como comprometido sem evidência desvia a investigação; um marcado como limpo sem verificação é pior.\n- **Não publicar com dados reais.** Em relatos e contribuições para este projeto, trocar endereços e nomes por valores de exemplo.\n\n**Como desfazer.** Não há o que desfazer. Ao encerrar o incidente, a versão final vai para o relatório e as cópias de trabalho são descartadas. Os caminhos que apareceram no desenho e não deveriam existir são os candidatos a controle do [catálogo](catalogo/INDICE.md).",
+    "curto": "Desenhar a topologia dos ativos envolvidos",
     "efeito": "Todos enxergam o mesmo mapa: o que foi atingido, o que está ao alcance e onde bloquear",
     "tipo": "—"
    },
    {
+    "id": "REC-08",
+    "ancora": "organizar-a-resposta",
+    "grupo": "Organização da resposta",
     "titulo": "Organizar a resposta",
     "link": "docs/recomendacoes-para-incidentes.md#organizar-a-resposta",
+    "corpo": "- **Um responsável pelo incidente**, com autoridade para decidir entre manter o serviço no ar e conter.\n- **Linha do tempo única**, com cada ação tomada, por quem e a que horas. É o que permite desfazer as medidas de emergência depois.\n- **Canal de comunicação fora do ambiente afetado.** Se o e-mail ou o chat corporativo podem estar comprometidos, a coordenação precisa de outro meio.\n- **Congelar mudanças não relacionadas.** Implantações e manutenções durante o incidente confundem a investigação e escondem o que o invasor fez.\n- **Obrigações de comunicação.** Envolver cedo as áreas jurídica e de privacidade: incidentes com dados pessoais podem exigir comunicação a autoridades e titulares em prazo definido.",
+    "curto": "Organizar a resposta",
     "efeito": "Decisões registradas e comunicação fora do ambiente afetado",
     "tipo": "—"
    },
    {
+    "id": "REC-09",
+    "ancora": "encerrar-o-incidente",
+    "grupo": "Organização da resposta",
     "titulo": "Encerrar o incidente",
     "link": "docs/recomendacoes-para-incidentes.md#encerrar-o-incidente",
+    "corpo": "Para cada medida de emergência registrada na linha do tempo, decidir explicitamente:\n\n- **vira permanente**, e então passa a ser tratada como controle, com avaliação, validação e reversão (procure o equivalente no [catálogo](catalogo/INDICE.md) ou proponha um novo controle); ou\n- **é removida**, com data e responsável.\n\nDepois, rodar as avaliações do catálogo nos componentes envolvidos: o caminho que o invasor percorreu indica quais controles de contenção faltavam.",
+    "curto": "Encerrar o incidente",
     "efeito": "Medidas temporárias viram controle permanente ou são removidas",
     "tipo": "—"
+   }
+  ]
+ },
+ "crise": {
+  "arquivo": "docs/guia-de-crise.md",
+  "como_usar": "1. **Abra o guia no primeiro sinal**, mesmo que ainda seja só suspeita. Fechar um alarme falso custa pouco; começar a registrar tarde custa a linha do tempo.\n2. **Uma pessoa registra.** Quem investiga e quem bloqueia não deve parar para escrever.\n3. **Use quatro situações:** `pendente`, `em andamento`, `feito` ou `não se aplica`. \"Não se aplica\" também é uma decisão, e merece uma linha dizendo por quê.\n4. **Registre fato separado de hipótese, com horário** e sempre no mesmo fuso.\n5. **As seções não são fases estanques.** A contenção não espera o levantamento terminar: levantamento, coleta de evidências e bloqueios andam juntos. A única ordem que não se inverte é conter antes de limpar.\n6. **Use o guia fora do ambiente afetado.** Se o Mission Control está instalado em um cluster que faz parte do incidente, abra a página em modo local em uma estação fora dele, ou use o guia impresso.\n7. **Trate o registro como informação sensível.** Ele mostra o que está exposto: guarde com acesso restrito e não o publique com dados reais.",
+  "secoes": [
+   {
+    "nome": "Abertura da sala de crise",
+    "central": "Quem decide, quem faz o quê e por onde a equipe fala?",
+    "itens": [
+     {
+      "id": "CRISE-01",
+      "n": 1,
+      "verificacao": "Há um responsável pelo incidente, com autoridade para decidir entre manter o serviço no ar e conter?",
+      "registrar": "Nome, substituto e como acionar os dois",
+      "porque": "Isolar um componente derruba o serviço que ele presta. Sem alguém que decida, a contenção espera uma reunião"
+     },
+     {
+      "id": "CRISE-02",
+      "n": 2,
+      "verificacao": "Os papéis da sala estão distribuídos?",
+      "registrar": "Quem investiga, quem aplica os bloqueios, quem fala com as outras áreas e quem registra",
+      "porque": "Com todos investigando, ninguém contém e ninguém registra"
+     },
+     {
+      "id": "CRISE-03",
+      "n": 3,
+      "verificacao": "O canal de comunicação da equipe está fora do ambiente afetado?",
+      "registrar": "Qual canal está em uso e quem tem acesso a ele",
+      "porque": "Se o e-mail ou o chat corporativo podem estar comprometidos, o invasor acompanha a resposta"
+     },
+     {
+      "id": "CRISE-04",
+      "n": 4,
+      "verificacao": "Existe uma linha do tempo única, com uma pessoa responsável por mantê-la?",
+      "registrar": "Onde ela fica. Cada ação entra com hora, autor e motivo",
+      "porque": "É o que permite desfazer as medidas de emergência depois, e separar o que a equipe fez do que o invasor fez"
+     },
+     {
+      "id": "CRISE-05",
+      "n": 5,
+      "verificacao": "As mudanças não relacionadas ao incidente foram congeladas?",
+      "registrar": "Quem avisou as equipes e desde quando vale",
+      "porque": "Implantações e manutenções durante o incidente confundem a investigação e escondem o que o invasor fez"
+     },
+     {
+      "id": "CRISE-06",
+      "n": 6,
+      "verificacao": "As áreas jurídica, de privacidade e de comunicação foram avisadas?",
+      "registrar": "Quem foi avisado e a que horas",
+      "porque": "Incidentes com dados pessoais podem exigir comunicação a autoridades e titulares, com prazo. Quem conhece o prazo precisa saber cedo"
+     }
+    ]
+   },
+   {
+    "nome": "Levantamento do incidente",
+    "central": "O que aconteceu, por onde entrou e até onde chegou?",
+    "itens": [
+     {
+      "id": "CRISE-07",
+      "n": 7,
+      "verificacao": "Quais são as evidências do incidente?",
+      "registrar": "Descrição curta do que aconteceu ou do que se suspeita, separando fato de hipótese",
+      "porque": "Sem uma descrição comum, cada pessoa da sala trabalha em um incidente diferente"
+     },
+     {
+      "id": "CRISE-08",
+      "n": 8,
+      "verificacao": "Como e quando o incidente foi percebido?",
+      "registrar": "Alerta, relato de usuário ou aviso de terceiro. Horário do primeiro sinal e do evento mais antigo já encontrado",
+      "porque": "A distância entre os dois horários mostra por quanto tempo o invasor agiu sem ser visto, e até onde os logs precisam ser lidos"
+     },
+     {
+      "id": "CRISE-09",
+      "n": 9,
+      "verificacao": "O incidente ainda está em andamento?",
+      "registrar": "Atividade observada agora: conexões, processos, logins, mudanças de configuração",
+      "porque": "Define a urgência da contenção"
+     },
+     {
+      "id": "CRISE-10",
+      "n": 10,
+      "verificacao": "A origem é conhecida?",
+      "registrar": "Endereços de origem, contas usadas e ponto de entrada provável: falha sem correção, credencial vazada ou serviço exposto",
+      "porque": "Sem o ponto de entrada, o invasor volta pelo mesmo caminho depois da limpeza"
+     },
+     {
+      "id": "CRISE-11",
+      "n": 11,
+      "verificacao": "Quais ativos estão envolvidos?",
+      "registrar": "Servidores, pods, namespaces, clusters e contas, marcando o que é confirmado e o que é suspeito",
+      "porque": "É a lista do que isolar e do que preservar. Ativo marcado como limpo sem verificação é pior do que ativo marcado como suspeito"
+     },
+     {
+      "id": "CRISE-12",
+      "n": 12,
+      "verificacao": "Houve elevação de privilégio?",
+      "registrar": "Indícios de uso de root, de `sudo`, de `cluster-admin`, de contêiner privilegiado ou de administrador do Ansible Automation Platform",
+      "porque": "Com privilégio de administrador, os logs locais e a configuração do ativo deixam de ser confiáveis"
+     },
+     {
+      "id": "CRISE-13",
+      "n": 13,
+      "verificacao": "Quais credenciais estavam ao alcance dos ativos envolvidos?",
+      "registrar": "Senhas de datasource, chaves SSH, tokens de service account, Secrets e credenciais guardadas no Ansible Automation Platform",
+      "porque": "Tudo o que estava legível para o processo comprometido deve ser tratado como exposto, mesmo sem prova de uso"
+     },
+     {
+      "id": "CRISE-14",
+      "n": 14,
+      "verificacao": "Para onde o invasor pode ter se movido?",
+      "registrar": "Um desenho dos ativos envolvidos: o que cada um alcança, o que alcança cada um e onde é possível bloquear",
+      "porque": "[Desenhar a topologia](docs/recomendacoes-para-incidentes.md#desenhar-a-topologia-dos-ativos-envolvidos) evita bloquear no lugar errado ou deixar um caminho aberto"
+     },
+     {
+      "id": "CRISE-15",
+      "n": 15,
+      "verificacao": "Há indício de acesso a dados ou de saída de dados?",
+      "registrar": "Quais dados, se incluem dados pessoais, e o tráfego de saída observado",
+      "porque": "Muda as obrigações de comunicação e a prioridade do bloqueio de saída"
+     },
+     {
+      "id": "CRISE-16",
+      "n": 16,
+      "verificacao": "Qual é o impacto no negócio neste momento?",
+      "registrar": "Serviços afetados, usuários atingidos e o que para de funcionar se os ativos forem isolados",
+      "porque": "É a informação de que o responsável precisa para decidir entre disponibilidade e contenção"
+     }
+    ]
+   },
+   {
+    "nome": "Coleta de evidências",
+    "central": "O que precisa ser guardado antes que alguém reinicie ou limpe?",
+    "itens": [
+     {
+      "id": "CRISE-17",
+      "n": 17,
+      "verificacao": "Os logs dos ativos envolvidos estão fora deles?",
+      "registrar": "Onde estão. Se não estavam em um destino central, quem copiou, quando e para onde",
+      "porque": "Um invasor com privilégio apaga os logs locais. Ver [LS-RHEL-002](catalogo/rhel/LS-RHEL-002-syslog-central.md), [LS-OCP-003](catalogo/openshift/LS-OCP-003-log-de-acesso-do-ingress-em-syslog.md), [LS-OCP-006](catalogo/openshift/LS-OCP-006-auditoria-da-api-fora-do-cluster.md), [LS-JBOSS-004](catalogo/jboss-eap/LS-JBOSS-004-logs-do-jboss-em-syslog.md) e [LS-AAP-007](catalogo/aap/LS-AAP-007-logs-e-activity-stream-em-agregador.md)"
+     },
+     {
+      "id": "CRISE-18",
+      "n": 18,
+      "verificacao": "A retenção dos logs cobre o período do incidente?",
+      "registrar": "Retenção atual no destino central e até quando foi ampliada",
+      "porque": "A rotação normal apaga o período de interesse enquanto a investigação ainda está em curso"
+     },
+     {
+      "id": "CRISE-19",
+      "n": 19,
+      "verificacao": "Foi tirado um snapshot do disco ou da máquina virtual antes de qualquer reinício ou limpeza?",
+      "registrar": "Ativo, horário e onde a cópia está guardada",
+      "porque": "Depois da reinstalação ou da restauração de backup, não há mais o que analisar"
+     },
+     {
+      "id": "CRISE-20",
+      "n": 20,
+      "verificacao": "O estado em execução foi registrado antes de isolar ou desligar?",
+      "registrar": "Processos, conexões de rede, usuários conectados e tarefas agendadas de cada ativo, com horário",
+      "porque": "Memória e processos em execução se perdem no reinício e costumam ser a melhor evidência"
+     },
+     {
+      "id": "CRISE-21",
+      "n": 21,
+      "verificacao": "No OpenShift, os registros do período foram guardados e os pods suspeitos, preservados?",
+      "registrar": "Log de auditoria da API, eventos e definição dos workloads suspeitos. O pod é retirado do tráfego, e não apagado",
+      "porque": "Apagar o pod destrói a evidência, e os eventos do cluster são guardados por pouco tempo"
+     },
+     {
+      "id": "CRISE-22",
+      "n": 22,
+      "verificacao": "As evidências estão fora do ambiente afetado, com acesso restrito?",
+      "registrar": "Onde estão, quem tem acesso, e quem coletou cada item e quando",
+      "porque": "Snapshots e logs contêm dados sensíveis e credenciais. Evidência sem registro de coleta perde valor em uma apuração formal. Ver [Preservar evidências](docs/recomendacoes-para-incidentes.md#preservar-evidências-antes-de-limpar)"
+     }
+    ]
+   },
+   {
+    "nome": "Bloqueios e contenção",
+    "central": "O que o invasor ainda alcança, e onde isso é cortado?",
+    "itens": [
+     {
+      "id": "CRISE-23",
+      "n": 23,
+      "verificacao": "Os componentes suspeitos foram isolados sem ser desligados?",
+      "registrar": "Ativo, como foi isolado e quem aprovou a indisponibilidade",
+      "porque": "[Isolar sem desligar](docs/recomendacoes-para-incidentes.md#isolar-o-componente-suspeito-sem-desligá-lo) corta o caminho para os vizinhos e mantém a evidência"
+     },
+     {
+      "id": "CRISE-24",
+      "n": 24,
+      "verificacao": "As interfaces administrativas expostas à internet foram fechadas?",
+      "registrar": "O que estava exposto e o que foi restrito: SSH, consoles de gerenciamento, API e console do OpenShift, interface do Ansible Automation Platform",
+      "porque": "[Fechar interfaces administrativas](docs/recomendacoes-para-incidentes.md#fechar-interfaces-administrativas-expostas-à-internet) tira do invasor o caminho mais direto de volta"
+     },
+     {
+      "id": "CRISE-25",
+      "n": 25,
+      "verificacao": "A saída dos servidores para a internet foi restrita, e as tentativas estão sendo registradas?",
+      "registrar": "Segmentos afetados, destinos liberados e onde ficam os registros de bloqueio",
+      "porque": "[Restringir a saída](docs/recomendacoes-para-incidentes.md#restringir-a-saída-dos-servidores-para-a-internet) dificulta comando remoto e saída de dados, e as tentativas registradas mostram outros servidores com o mesmo comportamento"
+     },
+     {
+      "id": "CRISE-26",
+      "n": 26,
+      "verificacao": "A entrada no perímetro foi reduzida ao necessário?",
+      "registrar": "Regra aplicada, exceções criadas e data de revisão",
+      "porque": "[Aceitar entrada apenas do Brasil](docs/recomendacoes-para-incidentes.md#aceitar-entrada-apenas-do-brasil-no-perímetro) reduz o volume e ganha tempo. Não contém quem já entrou"
+     },
+     {
+      "id": "CRISE-27",
+      "n": 27,
+      "verificacao": "As contas e as sessões suspeitas foram bloqueadas?",
+      "registrar": "Contas bloqueadas, sessões e tokens encerrados, e a que horas",
+      "porque": "Uma sessão aberta continua valendo depois do bloqueio da conta ou da troca da senha"
+     },
+     {
+      "id": "CRISE-28",
+      "n": 28,
+      "verificacao": "Cada bloqueio foi registrado com dono, prazo e forma de desfazer?",
+      "registrar": "Uma entrada na linha do tempo por bloqueio",
+      "porque": "Medida de emergência sem prazo vira configuração permanente que ninguém sabe explicar"
+     },
+     {
+      "id": "CRISE-29",
+      "n": 29,
+      "verificacao": "A contenção foi conferida?",
+      "registrar": "O teste que mostra que o ativo isolado não alcança mais os vizinhos, e o horário da última atividade suspeita observada",
+      "porque": "Bloqueio aplicado no lugar errado dá a sensação de contenção com o caminho ainda aberto"
+     }
+    ]
+   },
+   {
+    "nome": "Erradicação e credenciais",
+    "central": "Por onde ele entrou e o que deixou para voltar?",
+    "itens": [
+     {
+      "id": "CRISE-30",
+      "n": 30,
+      "verificacao": "O ponto de entrada foi fechado?",
+      "registrar": "Falha corrigida, serviço retirado ou caminho contido, e como isso foi conferido",
+      "porque": "Sem isso, o invasor volta pelo mesmo caminho"
+     },
+     {
+      "id": "CRISE-31",
+      "n": 31,
+      "verificacao": "As credenciais ao alcance foram trocadas, depois da contenção e começando pelas de maior alcance?",
+      "registrar": "Lista das credenciais, ordem da troca e sessões encerradas",
+      "porque": "[Trocar credenciais na ordem certa](docs/recomendacoes-para-incidentes.md#trocar-credenciais-na-ordem-certa): trocar a senha enquanto o invasor ainda lê o arquivo só entrega a senha nova"
+     },
+     {
+      "id": "CRISE-32",
+      "n": 32,
+      "verificacao": "Foi procurado o que o invasor deixou para voltar?",
+      "registrar": "Contas e chaves SSH novas, tarefas agendadas, regras de `sudo`, permissões e service accounts criadas no cluster, workloads desconhecidos e alterações em projetos e credenciais do Ansible Automation Platform",
+      "porque": "Um acesso esquecido desfaz todo o trabalho de contenção"
+     },
+     {
+      "id": "CRISE-33",
+      "n": 33,
+      "verificacao": "Os componentes comprometidos serão reconstruídos a partir de fonte confiável?",
+      "registrar": "De onde vem a reconstrução: imagem, automação ou mídia de instalação, e quem conferiu a origem",
+      "porque": "Não há como provar que um sistema invadido com privilégio de administrador foi limpo por completo"
+     }
+    ]
+   },
+   {
+    "nome": "Voltar os serviços com segurança",
+    "central": "O que precisa ser verdade para o serviço voltar?",
+    "itens": [
+     {
+      "id": "CRISE-34",
+      "n": 34,
+      "verificacao": "O critério para voltar está definido e foi aprovado pelo responsável pelo incidente?",
+      "registrar": "O que precisa ser verdade para o serviço voltar, e quem aprovou",
+      "porque": "Sob pressão, o serviço volta antes de o caminho estar fechado"
+     },
+     {
+      "id": "CRISE-35",
+      "n": 35,
+      "verificacao": "O backup usado é anterior ao comprometimento e foi conferido?",
+      "registrar": "Data do backup, data do evento mais antigo encontrado e como a cópia foi conferida",
+      "porque": "Restaurar um backup já comprometido devolve o acesso ao invasor"
+     },
+     {
+      "id": "CRISE-36",
+      "n": 36,
+      "verificacao": "O caminho usado pelo invasor está fechado nos componentes que voltam?",
+      "registrar": "Correção ou controle aplicado, e a avaliação que confirma",
+      "porque": "Um componente reconstruído igual ao anterior tem a mesma falha. Procure o controle correspondente no [catálogo](catalogo/INDICE.md)"
+     },
+     {
+      "id": "CRISE-37",
+      "n": 37,
+      "verificacao": "O retorno é gradual e com monitoramento reforçado?",
+      "registrar": "Ordem de retorno, quem acompanha os logs e os alertas, e por quanto tempo",
+      "porque": "Os primeiros dias depois do retorno mostram se sobrou algum acesso"
+     },
+     {
+      "id": "CRISE-38",
+      "n": 38,
+      "verificacao": "As partes interessadas foram comunicadas?",
+      "registrar": "Usuários, áreas de negócio e, quando exigido, autoridades e titulares de dados, com data",
+      "porque": "As obrigações de comunicação podem ter prazo: confirme com a área jurídica"
+     }
+    ]
+   },
+   {
+    "nome": "Encerramento",
+    "central": "O que fica permanente, o que é removido e o que se aprende?",
+    "itens": [
+     {
+      "id": "CRISE-39",
+      "n": 39,
+      "verificacao": "Cada medida de emergência foi tornada permanente ou removida?",
+      "registrar": "A decisão, a data e o responsável, medida por medida",
+      "porque": "Ver [Encerrar o incidente](docs/recomendacoes-para-incidentes.md#encerrar-o-incidente): a medida que fica passa a ser tratada como controle"
+     },
+     {
+      "id": "CRISE-40",
+      "n": 40,
+      "verificacao": "O destino das evidências foi definido?",
+      "registrar": "Prazo de retenção, responsável pela guarda e data de descarte",
+      "porque": "Cópias de disco e de log esquecidas guardam credenciais e dados sensíveis sem dono"
+     },
+     {
+      "id": "CRISE-41",
+      "n": 41,
+      "verificacao": "O relatório do incidente foi escrito?",
+      "registrar": "Linha do tempo, causa, impacto e ações, cada uma com responsável e prazo",
+      "porque": "É o que transforma o caminho percorrido pelo invasor em controle permanente"
+     },
+     {
+      "id": "CRISE-42",
+      "n": 42,
+      "verificacao": "As avaliações do catálogo foram rodadas nos componentes envolvidos?",
+      "registrar": "Controles avaliados e lacunas levadas ao plano de ação",
+      "porque": "O caminho que o invasor percorreu indica quais controles de contenção e de detecção faltavam"
+     }
+    ]
    }
   ]
  },

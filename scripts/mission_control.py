@@ -171,18 +171,80 @@ def ler_processos():
     return {"arquivo": arquivo, "chave": chave, "blocos": blocos}
 
 
+def ancora(titulo):
+    """Âncora que o GitHub gera para um título Markdown."""
+    return re.sub(r"\s", "-", re.sub(r"[^\w\s-]", "", titulo.strip().lower()))
+
+
 def ler_incidentes():
+    """Medidas de emergência, com o texto completo de cada uma, para a página não depender de links externos."""
     arquivo = "docs/recomendacoes-para-incidentes.md"
-    texto = (RAIZ / arquivo).read_text(encoding="utf-8")
-    itens = []
-    for linha in linhas_de_tabela(secoes(texto).get("Resumo", "")):
-        if len(linha) != 3:
-            continue
-        m = re.match(r"\[([^\]]+)\]\((#[^)]+)\)", linha[0])
+    sec = secoes((RAIZ / arquivo).read_text(encoding="utf-8"))
+
+    resumo = {}
+    for linha in linhas_de_tabela(sec.get("Resumo", "")):
+        m = re.match(r"\[([^\]]+)\]\(#([^)]+)\)", linha[0]) if len(linha) == 3 else None
         if not m:
+            falhar(f"{arquivo}: linha inesperada no resumo: {linha}")
+        resumo[m.group(2)] = {"curto": m.group(1), "efeito": linha[1], "tipo": linha[2]}
+
+    itens = []
+    for grupo, corpo in sec.items():
+        partes = re.split(r"^### (.+)$", corpo, flags=re.M)
+        for i in range(1, len(partes), 2):
+            titulo = partes[i].strip()
+            chave = ancora(titulo)
+            if chave not in resumo:
+                falhar(f"{arquivo}: a recomendação '{titulo}' não está na tabela de resumo")
+            itens.append({
+                "id": f"REC-{len(itens) + 1:02d}",
+                "ancora": chave,
+                "grupo": grupo,
+                "titulo": titulo,
+                "link": f"{arquivo}#{chave}",
+                "corpo": links_para_raiz(partes[i + 1].strip(), arquivo),
+                **resumo.pop(chave),
+            })
+    if resumo:
+        falhar(f"{arquivo}: o resumo cita recomendações que não existem: {', '.join(resumo)}")
+    if not itens:
+        falhar(f"{arquivo}: nenhuma recomendação encontrada")
+    regras = links_para_raiz(sec.get("Regras para qualquer medida de emergência", ""), arquivo)
+    return {"arquivo": arquivo, "regras": regras, "itens": itens}
+
+
+def ler_crise():
+    """Guia de crise: seções e itens do checklist da sala de crise."""
+    arquivo = "docs/guia-de-crise.md"
+    sec = secoes((RAIZ / arquivo).read_text(encoding="utf-8"))
+
+    centrais = {}
+    for linha in linhas_de_tabela(sec.get("Resumo", "")):
+        if len(linha) == 3:
+            centrais[re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", linha[0])] = linha[1]
+
+    blocos, esperado = [], 1
+    for nome, corpo in sec.items():
+        if not re.search(r"^\| # \| Verificação \|", corpo, re.M):
             continue
-        itens.append({"titulo": m.group(1), "link": arquivo + m.group(2), "efeito": linha[1], "tipo": linha[2]})
-    return {"arquivo": arquivo, "itens": itens}
+        itens = []
+        for linha in linhas_de_tabela(corpo):
+            if len(linha) != 4 or linha[0] != str(esperado):
+                falhar(f"{arquivo}: linha inesperada na seção '{nome}' (esperado o item {esperado}): {linha}")
+            itens.append({
+                "id": f"CRISE-{esperado:02d}",
+                "n": esperado,
+                "verificacao": linha[1],
+                "registrar": links_para_raiz(linha[2], arquivo),
+                "porque": links_para_raiz(linha[3], arquivo),
+            })
+            esperado += 1
+        if nome not in centrais:
+            falhar(f"{arquivo}: a seção '{nome}' não está na tabela de resumo")
+        blocos.append({"nome": nome, "central": centrais[nome], "itens": itens})
+    if not blocos:
+        falhar(f"{arquivo}: nenhuma tabela de itens encontrada")
+    return {"arquivo": arquivo, "como_usar": links_para_raiz(sec.get("Como usar", ""), arquivo), "secoes": blocos}
 
 
 def ler_ameacas(controles):
@@ -219,6 +281,7 @@ def gerar_dados():
         "logs": ler_logs(),
         "processos": ler_processos(),
         "incidentes": ler_incidentes(),
+        "crise": ler_crise(),
         "ameacas": ler_ameacas(controles),
     }
     corpo = json.dumps(dados, ensure_ascii=False, indent=1)

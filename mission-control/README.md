@@ -10,7 +10,7 @@ Painel de avaliação do LateralShield: uma página única, com menu fixo à esq
 | **Matriz 80/20** | Impacto × esforço, com a cor de cada controle indicando a situação registrada |
 | **Processos** | As perguntas de pessoas e processos, com resposta `sim`, `parcial` ou `não`. Sem nota e sem nível de maturidade |
 | **Plano de ação** | Controles expostos ou em implantação e perguntas com resposta `não` ou `parcial`, com responsável, prazo e destaque para o que venceu |
-| **Incidentes** | Resumo das [recomendações gerais para incidentes](../docs/recomendacoes-para-incidentes.md) |
+| **Sala de crise** | O [guia de crise](../docs/guia-de-crise.md) como checklist marcável, com situação, responsável e registro por item, e o texto completo das [recomendações gerais para incidentes](../docs/recomendacoes-para-incidentes.md), sem sair da página |
 | **Relatório e dados** | Relatório em PDF e Excel, cópia dos dados em JSON e troca de senha |
 
 A situação registrada aqui é a do **ambiente avaliado**. Ela não muda o status do controle no catálogo, que continua `rascunho` até a validação em laboratório.
@@ -40,6 +40,15 @@ O desenho parte de cinco pontos de entrada já invadidos e mostra até onde o in
 Um clique em um escudo ou em um sinal de detecção abre os controles do caminho, e a situação pode ser registrada ali mesmo. Os botões "Com a prioridade 1 aplicada" e seguintes simulam o resultado sem gravar nada.
 
 O desenho reflete a situação registrada, e não um teste do ambiente: não há varredura nem verificação automática.
+
+## Sala de crise
+
+A seção tem duas abas. **Guia de crise** é o checklist: cada item recebe uma situação (`pendente`, `em andamento`, `feito` ou `não se aplica`), um responsável e um registro do que foi apurado ou feito. **Medidas de emergência** traz as recomendações completas, com quando usar, o que fazer, cuidados e como desfazer.
+
+- "Imprimir o registro" gera o registro da crise pela impressão do navegador, que também salva em PDF. Na instalação com servidor, a planilha Excel traz a aba `Guia de crise`. O relatório em PDF do servidor cobre só a avaliação do ambiente.
+- "Zerar para um novo incidente" limpa a situação e os registros do guia. Imprima ou exporte antes.
+- O guia guarda um incidente por vez.
+- **Use o guia fora do ambiente afetado.** Se o cluster onde o Mission Control está instalado faz parte do incidente, abra `web/index.html` em uma estação fora dele, ou use o guia impresso.
 
 ## Três formas de usar
 
@@ -116,7 +125,7 @@ oc exec -n lateralshield deploy/mission-control-mysql -- /bin/sh -c \
 | Formato | Conteúdo |
 |---|---|
 | PDF | Dados da avaliação, resumo por tecnologia, primeira verificação, plano de ação, controles por tecnologia e perguntas de processo |
-| Excel (`.xlsx`) | Planilhas `Resumo`, `Plano de ação`, `Controles` e `Processos`, com filtro e cabeçalho fixo |
+| Excel (`.xlsx`) | Planilhas `Resumo`, `Plano de ação`, `Controles`, `Processos` e `Guia de crise`, com filtro e cabeçalho fixo |
 | JSON | Cópia das respostas, para guardar ou levar a outra instalação. Importar substitui as respostas atuais |
 
 O relatório mostra onde o ambiente é mais frágil. **Guarde-o com acesso restrito** e não o versione com dados reais.
@@ -133,7 +142,7 @@ Dois arquivos são **gerados** e não devem ser editados à mão:
 
 | Arquivo | Gerado a partir de |
 |---|---|
-| `web/data.js` | `catalogo/`, `docs/avaliacao-de-processos.md`, `docs/recomendacoes-para-incidentes.md`, a tabela de logs de `docs/metodologia.md` e a tabela de caminhos de `docs/modelo-de-ameaca.md` |
+| `web/data.js` | `catalogo/`, `docs/avaliacao-de-processos.md`, `docs/guia-de-crise.md`, `docs/recomendacoes-para-incidentes.md`, a tabela de logs de `docs/metodologia.md` e a tabela de caminhos de `docs/modelo-de-ameaca.md` |
 | `openshift/mission-control.yaml` | `openshift/base.yaml` e os arquivos de `web/` |
 
 ```bash
@@ -160,6 +169,6 @@ Para desenvolver sem contêiner: `cd mission-control/web && php -S 127.0.0.1:808
 
 Testado em contêineres locais, com a imagem `ubi9/php-82` e um MySQL 8.0, simulando o usuário sem privilégio do OpenShift: autenticação, troca de senha, gravação, relatórios e importação. O MySQL do teste foi a imagem comunitária equivalente (`quay.io/sclorg/mysql-80-c9s`), e não a `rhel9/mysql-80` do manifesto.
 
-O nível de proteção, os gráficos e a topologia foram conferidos no Chrome, em modo local. Não foram conferidos em Firefox nem em Safari.
+O nível de proteção, os gráficos, a topologia e a sala de crise foram conferidos no Chrome, em modo local; a gravação dos itens do guia e a planilha foram testadas com o servidor PHP local e SQLite. Não foram conferidos em Firefox nem em Safari.
 
 **O manifesto ainda não foi aplicado em um cluster OpenShift.** Rota, NetworkPolicies, volume persistente e a leitura dos ConfigMaps pelo pod dependem de teste em laboratório.

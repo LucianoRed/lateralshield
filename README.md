@@ -107,7 +107,7 @@ Outras tecnologias Red Hat podem entrar no escopo conforme a relevância dos ris
 7. Use a [automação Ansible](automacao/README.md) para repetir avaliação e aplicação em escala.
 8. Registre a situação de cada controle e de cada pergunta no [Mission Control](mission-control/README.md), que guarda o checklist e emite o relatório em PDF e Excel. Ele abre direto no navegador ou é instalado no OpenShift: veja [Instalação do Mission Control](#instalação-do-mission-control).
 
-Está com um incidente em andamento? As [recomendações gerais para incidentes](docs/recomendacoes-para-incidentes.md) reúnem medidas de emergência, como restringir a entrada no perímetro a endereços do Brasil, com os cuidados e a forma de desfazer cada uma.
+Está com um incidente em andamento? O [guia de crise](docs/guia-de-crise.md) é um checklist para organizar a sala de crise, do levantamento do incidente à volta dos serviços. As [recomendações gerais para incidentes](docs/recomendacoes-para-incidentes.md) reúnem as medidas de emergência, como restringir a entrada no perímetro a endereços do Brasil, com os cuidados e a forma de desfazer cada uma. Os dois estão na seção "Sala de crise" do Mission Control, onde cada item do guia pode ser marcado e registrado.
 
 ## Instalação do Mission Control
 
@@ -141,7 +141,7 @@ Pré-requisitos, execução em contêiner fora do OpenShift e como recuperar a s
 
 | Caminho | Conteúdo |
 |---|---|
-| [docs/](docs/) | Metodologia, modelo de ameaça, roadmap, avaliação básica de processos e recomendações gerais para incidentes |
+| [docs/](docs/) | Metodologia, modelo de ameaça, roadmap, avaliação básica de processos, guia de crise e recomendações gerais para incidentes |
 | [catalogo/](catalogo/) | Controles, um arquivo por controle, organizados por tecnologia |
 | [automacao/](automacao/) | Playbooks e roles Ansible de avaliação e aplicação |
 | [mission-control/](mission-control/) | Painel de avaliação: checklist dos controles e dos processos, plano de ação e relatório |

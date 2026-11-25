@@ -2,6 +2,8 @@
 
 O [catálogo](../catalogo/INDICE.md) reúne controles para aplicar **antes** de um incidente. Esta página reúne medidas de emergência para aplicar **durante** um incidente em andamento: ações rápidas, em geral temporárias, que reduzem a exposição enquanto a equipe investiga.
 
+Para saber o que conferir e em que ordem durante a crise, use o [guia de crise](guia-de-crise.md): um checklist da sala de crise que cita estas recomendações nos pontos em que cada uma se aplica.
+
 Três diferenças em relação ao catálogo:
 
 - **Não são controles.** Não têm identificador, status nem passam pelo validador. São recomendações, e cada ambiente decide se e como aplicá-las.

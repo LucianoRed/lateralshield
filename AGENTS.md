@@ -15,6 +15,7 @@ Antes de escrever qualquer coisa, leia [README.md](README.md), [docs/metodologia
 | `docs/` | Metodologia, modelo de ameaça, roadmap | Atualize o roadmap quando um candidato virar controle |
 | `docs/avaliacao-de-processos.md` | Avaliação básica de pessoas e processos, em 20 perguntas | Não são controles nem medem maturidade |
 | `docs/recomendacoes-para-incidentes.md` | Medidas de emergência para incidentes em andamento | Não são controles: sem identificador, status ou validador |
+| `docs/guia-de-crise.md` | Checklist da sala de crise, por seção | Diz o que conferir e em que ordem; o "como" fica nas recomendações |
 | `catalogo/<tecnologia>/` | Um arquivo Markdown por controle | Segue `catalogo/_MODELO.md` |
 | `catalogo/INDICE.md` | Índice do catálogo | **Gerado. Nunca edite à mão** |
 | `automacao/playbooks/` | Playbooks `avaliar_*` (somente leitura) e `aplicar_*` | |
@@ -86,17 +87,28 @@ A existência de syslog central é a primeira verificação em qualquer ambiente
 - atualize o número de recomendações no slide "Incidentes" de `apresentacao/index.html`;
 - se a medida for específica de uma tecnologia Red Hat e fizer sentido de forma permanente, ela é um controle e vai para o catálogo.
 
+## Guia de crise
+
+[docs/guia-de-crise.md](docs/guia-de-crise.md) é o checklist da sala de crise, e faz parte da mesma área das recomendações para incidentes. Ele diz **o que conferir e em que ordem**; como aplicar cada medida fica nas recomendações. Ao acrescentar ou alterar um item:
+
+- mantenha as quatro colunas: **#**, **Verificação** (uma pergunta que se responde com um registro), **O que registrar** e **Por que importa**;
+- mantenha a numeração contínua entre as seções e atualize a coluna "Itens" da tabela de resumo. O gerador recusa numeração fora de ordem;
+- mantenha o guia curto: antes de acrescentar um item, veja se ele substitui um existente;
+- não escreva comandos nem sintaxe de fabricante no guia: cite a recomendação ou o controle do catálogo que traz o procedimento;
+- uma seção nova entra também na tabela de resumo, com a pergunta central.
+
 ## Mission Control
 
 [mission-control/](mission-control/README.md) é o painel que transforma o catálogo e a avaliação de processos em checklist, com relatório em PDF e Excel. Ao mexer nele:
 
-- os dados exibidos vêm do catálogo e dos documentos. Não escreva controle, pergunta ou recomendação diretamente na página: altere a fonte e rode `python3 scripts/mission_control.py`;
+- os dados exibidos vêm do catálogo e dos documentos. Não escreva controle, pergunta, item do guia de crise ou recomendação diretamente na página: altere a fonte e rode `python3 scripts/mission_control.py`;
 - rode o mesmo script depois de alterar qualquer arquivo de `mission-control/web/` ou `mission-control/openshift/base.yaml`, para regenerar o manifesto;
 - mantenha a aplicação sem dependências externas e sem etapa de build: ela roda na imagem UBI de PHP, com o código em ConfigMaps;
 - o nível de proteção da visão geral mede só a cobertura dos **controles** do catálogo, ponderada pela prioridade 80/20, e é apresentado como cobertura, nunca como certificação ou garantia. As perguntas de processo não entram na conta e continuam sem nota, pontuação ou nível de maturidade, na página e no relatório;
 - os caminhos da topologia de ataque vêm da tabela "Como o catálogo responde" de `docs/modelo-de-ameaca.md`. Ao acrescentar uma linha a essa tabela, inclua-a também em `TOPO`, no `mission-control/web/index.html`, ou ela aparece só na tabela de caminhos;
 - a situação registrada no painel é a do ambiente avaliado e não altera o `status` do controle no catálogo;
-- nunca versione respostas, relatórios ou exportações de um ambiente real.
+- a seção "Sala de crise" mostra o guia de crise e o texto completo das recomendações dentro da página, sem depender de links para o repositório. Mantenha assim: durante um incidente a equipe pode estar sem acesso à internet;
+- nunca versione respostas, relatórios, registros de crise ou exportações de um ambiente real.
 
 ## Como escrever automação
 

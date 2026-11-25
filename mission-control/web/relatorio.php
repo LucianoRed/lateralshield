@@ -15,6 +15,9 @@ const MC_ROTULOS = [
     'sim' => 'Sim',
     'parcial' => 'Parcial',
     'nao' => 'Não',
+    'pendente' => 'Pendente',
+    'em-andamento' => 'Em andamento',
+    'feito' => 'Feito',
 ];
 const MC_CORES = [
     'exposto' => [0.70, 0, 0],
@@ -52,6 +55,7 @@ function montar_relatorio(array $dados, array $estado): array
         'tecnologias' => $tecnologias,
         'controles' => [],
         'processos' => [],
+        'crise' => [],
         'plano' => [],
         'logs' => [],
         'contagem' => ['controle' => [], 'processo' => [], 'tecnologia' => []],
@@ -87,6 +91,14 @@ function montar_relatorio(array $dados, array $estado): array
                     'vencido' => $item['prazo'] !== '' && $item['prazo'] < $hoje,
                 ];
             }
+        }
+    }
+
+    foreach ($dados['crise']['secoes'] ?? [] as $secao) {
+        foreach ($secao['itens'] as $k) {
+            $k['secao'] = $secao['nome'];
+            $k['item'] = ($itens[$k['id']] ?? []) + ['status' => 'pendente'] + $vazio;
+            $r['crise'][] = $k;
         }
     }
 
@@ -641,6 +653,14 @@ function relatorio_xlsx(array $r): string
         ];
     }
 
+    $crise = [['#', 'Seção', 'Verificação', 'O que registrar', 'Situação', 'Registro', 'Responsável', 'Prazo', 'Atualizado em (UTC)']];
+    foreach ($r['crise'] as $k) {
+        $crise[] = [
+            (int) $k['n'], $k['secao'], sem_markdown($k['verificacao']), sem_markdown($k['registrar']), MC_ROTULOS[$k['item']['status']],
+            $k['item']['nota'], $k['item']['responsavel'], data_br($k['item']['prazo']), $k['item']['atualizado_em'],
+        ];
+    }
+
     $plano = [['Item', 'Lacuna', 'Situação', 'Prioridade', 'Responsável', 'Prazo', 'Vencido', 'Evidência e observações']];
     foreach ($r['plano'] as $p) {
         $plano[] = [$p['id'], $p['descricao'], MC_ROTULOS[$p['status']], $p['prioridade'], $p['responsavel'], data_br($p['prazo']), $p['vencido'] ? 'sim' : '', $p['nota']];
@@ -651,5 +671,6 @@ function relatorio_xlsx(array $r): string
         ['nome' => 'Plano de ação', 'larguras' => [14, 60, 18, 11, 26, 12, 10, 60], 'linhas' => $plano, 'filtro' => true],
         ['nome' => 'Controles', 'larguras' => [14, 56, 30, 11, 10, 10, 11, 20, 26, 12, 60, 20, 16], 'linhas' => $controles, 'filtro' => true],
         ['nome' => 'Processos', 'larguras' => [5, 24, 56, 44, 14, 60, 26, 12, 20], 'linhas' => $processos, 'filtro' => true],
+        ['nome' => 'Guia de crise', 'larguras' => [5, 28, 56, 50, 14, 60, 26, 12, 20], 'linhas' => $crise, 'filtro' => true],
     ]);
 }

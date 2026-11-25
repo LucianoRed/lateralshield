@@ -65,8 +65,8 @@
 
   .pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;border-radius:999px;padding:3px 9px;border:1px solid var(--g300);white-space:nowrap;vertical-align:middle;color:#6E6E6E;background:#F5F5F5}
   .pill.exposto,.pill.nao,.pill.late{color:var(--rh-red-dark);background:var(--red-bg);border-color:var(--red-bd)}
-  .pill.em-implantacao,.pill.conter{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-bd)}
-  .pill.aplicado,.pill.sim,.pill.detectar{color:var(--teal);background:var(--teal-bg);border-color:var(--teal-bd)}
+  .pill.em-implantacao,.pill.em-andamento,.pill.conter{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-bd)}
+  .pill.aplicado,.pill.sim,.pill.feito,.pill.detectar{color:var(--teal);background:var(--teal-bg);border-color:var(--teal-bd)}
   .pill.parcial,.pill.prevenir{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-bd)}
   .pill.p1{color:#fff;background:var(--ink);border-color:var(--ink)}
   .pill.nao-se-aplica{border-style:dashed}
@@ -103,8 +103,8 @@
   .grpsub{font-size:13.5px;color:var(--g700);margin-bottom:8px}
   .it{background:#fff;border:1px solid var(--g300);border-left:4px solid var(--g300);border-radius:10px;margin-top:6px}
   .it.exposto,.it.nao{border-left-color:var(--rh-red)}
-  .it.em-implantacao{border-left-color:var(--blue)}
-  .it.aplicado,.it.sim{border-left-color:var(--teal)}
+  .it.em-implantacao,.it.em-andamento{border-left-color:var(--blue)}
+  .it.aplicado,.it.sim,.it.feito{border-left-color:var(--teal)}
   .it.parcial{border-left-color:#D9A100}
   .it .hd{display:grid;grid-template-columns:108px 1fr 168px 20px;gap:12px;align-items:center;padding:9px 14px;cursor:pointer}
   .it .hd .id{font-family:ui-monospace,Menlo,monospace;font-weight:700;font-size:12.5px;white-space:nowrap}
@@ -116,14 +116,22 @@
   .it .dono:empty{display:none}
   select.st{font:inherit;font-size:12.5px;font-weight:700;border:1.5px solid var(--g300);border-radius:999px;padding:5px 10px;background:#fff;color:var(--g700);cursor:pointer;width:100%}
   select.st.exposto,select.st.nao{color:var(--rh-red-dark);background:var(--red-bg);border-color:var(--red-bd)}
-  select.st.em-implantacao{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-bd)}
-  select.st.aplicado,select.st.sim{color:var(--teal);background:var(--teal-bg);border-color:var(--teal-bd)}
+  select.st.em-implantacao,select.st.em-andamento{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-bd)}
+  select.st.aplicado,select.st.sim,select.st.feito{color:var(--teal);background:var(--teal-bg);border-color:var(--teal-bd)}
   select.st.parcial{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-bd)}
   .it .bd{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr);gap:24px;padding:6px 16px 18px;border-top:1px solid #ECECEC}
   .it .bd h4{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--g400);margin:14px 0 5px}
   .it .bd p,.it .bd li{font-size:13.5px;color:#2b2b2b}
   .it .bd p{margin-bottom:8px}
-  .it .bd ul{margin:0 0 8px 18px}
+  .it .bd ul,.it .bd ol,.prosa ul,.prosa ol{margin:0 0 8px 20px}
+  .prosa p,.prosa li{font-size:13.5px;color:#2b2b2b}
+  .prosa p{margin-bottom:8px}
+  .prosa li{margin-bottom:4px}
+  .it.rec .hd{grid-template-columns:minmax(0,1fr) auto 20px}
+  .it.rec .bd{grid-template-columns:minmax(0,1fr)}
+  .dobra{padding:12px 20px}
+  .dobra summary{cursor:pointer;font-weight:700;font-size:14px}
+  .dobra[open] summary{margin-bottom:10px}
   .it .bd li{margin-bottom:3px}
   pre.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;background:var(--g100);border:1px solid var(--g300);border-radius:10px;padding:10px 12px;overflow:auto;margin:0 0 8px;white-space:pre}
   .form label{display:block;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--g400);margin-top:14px}
@@ -139,12 +147,12 @@
   .sbar{display:flex;gap:2px;height:10px;min-width:120px}
   .sbar i{display:block;flex:0 0 0;min-width:5px;border-radius:5px;position:relative;background:var(--c-trilha)}
   .sbar i::before{content:'';position:absolute;left:0;right:0;top:-9px;bottom:-9px}
-  .sbar .aplicado,.sbar .sim,.sw.aplicado,.sw.sim{background:var(--c-aplicado)}
-  .sbar .em-implantacao,.sw.em-implantacao{background:var(--c-impl)}
+  .sbar .aplicado,.sbar .sim,.sbar .feito,.sw.aplicado,.sw.sim,.sw.feito{background:var(--c-aplicado)}
+  .sbar .em-implantacao,.sbar .em-andamento,.sw.em-implantacao,.sw.em-andamento{background:var(--c-impl)}
   .sbar .exposto,.sbar .nao,.sw.exposto,.sw.nao{background:var(--c-exposto)}
   .sbar .parcial,.sw.parcial{background:var(--c-parcial)}
   .sbar .nao-se-aplica,.sw.nao-se-aplica{background:repeating-linear-gradient(135deg,#BDBDBD 0 3px,#E4E4E4 3px 6px)}
-  .sw.nao-avaliado,.sw.sem-resposta{background:var(--c-trilha)}
+  .sw.nao-avaliado,.sw.sem-resposta,.sw.pendente{background:var(--c-trilha)}
   .crow{display:grid;grid-template-columns:var(--lb,104px) 1fr 122px;gap:12px;align-items:center;padding:7px 0;font-size:13px}
   .crow .cl a{text-decoration:none;font-weight:700}
   .crow .cv{text-align:right;color:var(--g700);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -254,6 +262,7 @@
     main{margin-left:0;padding:22px 16px 50px}
     .g2,.g4,.meta{grid-template-columns:1fr 1fr}
     .hero,.nv,.tpr{grid-template-columns:1fr}
+    .it.rec .hd{grid-template-columns:minmax(0,1fr) auto 16px}
     .gauge{max-width:230px;margin:0 auto}
     .tpr .r{text-align:left}
     .it .hd{grid-template-columns:1fr 150px 16px}
@@ -327,16 +336,18 @@
   const $ = (s, el) => (el || document).querySelector(s);
   const ROT = {
     'nao-avaliado': 'Não avaliado', 'exposto': 'Exposto', 'em-implantacao': 'Em implantação', 'aplicado': 'Aplicado',
-    'nao-se-aplica': 'Não se aplica', 'sem-resposta': 'Sem resposta', 'sim': 'Sim', 'parcial': 'Parcial', 'nao': 'Não'
+    'nao-se-aplica': 'Não se aplica', 'sem-resposta': 'Sem resposta', 'sim': 'Sim', 'parcial': 'Parcial', 'nao': 'Não',
+    'pendente': 'Pendente', 'em-andamento': 'Em andamento', 'feito': 'Feito'
   };
   const SITUACOES = {
     controle: ['nao-avaliado', 'exposto', 'em-implantacao', 'aplicado', 'nao-se-aplica'],
-    processo: ['sem-resposta', 'sim', 'parcial', 'nao']
+    processo: ['sem-resposta', 'sim', 'parcial', 'nao'],
+    crise: ['pendente', 'em-andamento', 'feito', 'nao-se-aplica']
   };
   const LACUNA = ['exposto', 'em-implantacao', 'nao', 'parcial'];
   const SECOES = [
     ['visao', 'Visão geral'], ['topologia', 'Topologia de ataque'], ['controles', 'Controles'], ['prioridades', 'Matriz 80/20'], ['processos', 'Processos'],
-    ['plano', 'Plano de ação'], ['incidentes', 'Incidentes'], ['relatorio', 'Relatório e dados']
+    ['plano', 'Plano de ação'], ['incidentes', 'Sala de crise'], ['relatorio', 'Relatório e dados']
   ];
   const CHAVE = 'lateralshield-mission-control-v1';
   const BASE = location.protocol === 'file:' ? '../../' : D.repositorio + '/blob/main/';
@@ -351,6 +362,10 @@
   const CONTROLE = {}, PERGUNTA = {}, TIPO = {};
   D.controles.forEach(c => { CONTROLE[c.id] = c; TIPO[c.id] = 'controle'; });
   D.processos.blocos.forEach(b => b.perguntas.forEach(p => { PERGUNTA[p.id] = p; TIPO[p.id] = 'processo'; }));
+  // Guia de crise (itens marcáveis) e medidas de emergência (texto de consulta, sem situação).
+  const CRISE = {}, REC = {}, REC_ANCORA = {};
+  D.crise.secoes.forEach(b => b.itens.forEach(k => { CRISE[k.id] = k; TIPO[k.id] = 'crise'; }));
+  D.incidentes.itens.forEach(r => { REC[r.id] = r; REC_ANCORA[r.ancora] = r; TIPO[r.id] = 'rec'; });
   const TEC = {};
   D.tecnologias.forEach(t => { TEC[t.id] = t; });
 
@@ -371,6 +386,11 @@
     if (/^https?:\/\//.test(url)) return { href: url, externo: true };
     const m = /^catalogo\/[a-z-]+\/(LS-[A-Z]+-\d{3})-/.exec(url);
     if (m && CONTROLE[m[1]]) return { href: '#controles/' + m[1] };
+    // O que já está embutido na página abre aqui mesmo, e não no repositório.
+    const rec = /^docs\/recomendacoes-para-incidentes\.md(?:#(.+))?$/.exec(url);
+    if (rec) { const r = rec[1] && REC_ANCORA[rec[1]]; return { href: '#incidentes' + (r ? '/' + r.id : '') }; }
+    if (/^docs\/guia-de-crise\.md/.test(url)) return { href: '#incidentes' };
+    if (url === 'catalogo/INDICE.md') return { href: '#controles' };
     if (/^[a-z][a-z0-9+.-]*:/i.test(url)) return null;
     return { href: BASE + url, externo: true };
   }
@@ -380,7 +400,7 @@
     return '<a href="' + d.href + '"' + (d.externo ? ' target="_blank" rel="noopener"' : '') + '>' + textoHtml + '</a>';
   }
 
-  // Markdown mínimo: parágrafos, listas, tabelas, blocos de código, `código`, **negrito**, *itálico* e links.
+  // Markdown mínimo: parágrafos, listas com marcador e numeradas, tabelas, blocos de código, `código`, **negrito**, *itálico* e links.
   function emLinha(texto) {
     const codigos = [];
     let s = esc(texto).replace(/`([^`]+)`/g, (m, c) => { codigos.push(c); return '\u0001' + (codigos.length - 1) + '\u0001'; });
@@ -402,6 +422,10 @@
           const itens = [];
           linhas.forEach(l => { if (/^\s*[-*] /.test(l)) itens.push(l.replace(/^\s*[-*] /, '')); else itens[itens.length - 1] += ' ' + l.trim(); });
           html += '<ul>' + itens.map(x => '<li>' + emLinha(x) + '</li>').join('') + '</ul>';
+        } else if (/^\s*\d+\. /.test(linhas[0])) {
+          const itens = [];
+          linhas.forEach(l => { if (/^\s*\d+\. /.test(l)) itens.push(l.replace(/^\s*\d+\. /, '')); else itens[itens.length - 1] += ' ' + l.trim(); });
+          html += '<ol>' + itens.map(x => '<li>' + emLinha(x) + '</li>').join('') + '</ol>';
         } else {
           html += '<p>' + emLinha(linhas.join(' ')) + '</p>';
         }
@@ -514,11 +538,11 @@
     return '<select class="st ' + it.status + '" data-campo="status" aria-label="Situação de ' + esc(id) + '">'
       + SITUACOES[TIPO[id]].map(s => '<option value="' + s + '"' + (s === it.status ? ' selected' : '') + '>' + ROT[s] + '</option>').join('') + '</select>';
   }
-  function formulario(id, it, rotuloNota) {
+  function formulario(id, it, rotuloNota, dica) {
     return '<div class="form">'
       + '<label>Responsável<input data-campo="responsavel" maxlength="200" value="' + esc(it.responsavel) + '" placeholder="Pessoa ou time"></label>'
       + '<label>Prazo<input type="date" data-campo="prazo" value="' + esc(it.prazo) + '"></label>'
-      + '<label>' + rotuloNota + '<textarea data-campo="nota" maxlength="4000" placeholder="O que foi verificado, onde está a evidência, o que falta">' + esc(it.nota) + '</textarea></label>'
+      + '<label>' + rotuloNota + '<textarea data-campo="nota" maxlength="4000" placeholder="' + (dica || 'O que foi verificado, onde está a evidência, o que falta') + '">' + esc(it.nota) + '</textarea></label>'
       + '<div class="muted quando">' + esc(textoQuando(it)) + '</div></div>';
   }
   function textoDono(it) {
@@ -532,7 +556,14 @@
     ? 'Atualizado em ' + dataBR(it.atualizado_em) + ' ' + it.atualizado_em.slice(11, 16) + ' UTC' + (it.atualizado_por ? ' por ' + it.atualizado_por : '')
     : 'Ainda sem registro';
   function linha(id) {
-    const it = item(id), aberto = abertos.has(id);
+    const aberto = abertos.has(id);
+    if (TIPO[id] === 'rec') {
+      const r = REC[id];
+      const tipo = /cont/i.test(r.tipo) ? pill('aplicado', r.tipo) : /ru/i.test(r.tipo) ? pill('parcial', r.tipo) : '<span></span>';
+      return '<div class="it rec' + (aberto ? ' open' : '') + '" data-id="' + id + '"><div class="hd"><span class="ti">' + esc(r.titulo) + '<span class="dono">' + esc(r.efeito) + '</span></span>' + tipo + '<span class="chev">&#9662;</span></div>'
+        + (aberto ? '<div class="bd"><div class="prosa">' + md(r.corpo) + '</div></div>' : '') + '</div>';
+    }
+    const it = item(id);
     let titulo, corpo = '';
     if (TIPO[id] === 'controle') {
       const c = CONTROLE[id];
@@ -545,6 +576,15 @@
           + '<p class="muted">' + link(c.arquivo, 'Abrir o controle completo', true) + ' · implementação, validação, reversão e detecção<br>'
           + esc(TEC[c.tecnologia].nome) + ' · ' + esc(c.versoes) + ' · impacto ' + c.impacto + ', esforço ' + c.esforco + ' · no catálogo: ' + c.status + '</p>'
           + '</div>' + formulario(id, it, 'Evidência e observações') + '</div>';
+      }
+    } else if (TIPO[id] === 'crise') {
+      const k = CRISE[id];
+      titulo = '<span class="id">Item ' + k.n + '</span><span class="ti">' + emLinha(k.verificacao) + resumoDono(it) + '</span>';
+      if (aberto) {
+        corpo = '<div class="bd"><div>'
+          + '<h4>O que registrar</h4>' + md(k.registrar)
+          + '<h4>Por que importa</h4>' + md(k.porque)
+          + '</div>' + formulario(id, it, 'Registro', 'O que foi apurado ou feito, por quem e a que horas. Separe fato de hipótese') + '</div>';
       }
     } else {
       const p = PERGUNTA[id];
@@ -1035,12 +1075,68 @@
     $('#s-plano').innerHTML = h;
   }
 
+  // ---------------------------------------------------------------- sala de crise
+  let ABA = 'guia';
+  const ORDEM_CRISE = ['feito', 'em-andamento', 'pendente', 'nao-se-aplica'];
+  function contarCrise(ids) {
+    const x = {};
+    ids.forEach(id => { const s = item(id).status; x[s] = (x[s] || 0) + 1; });
+    return x;
+  }
+  const feitosDe = (x, total) => (x.feito || 0) + ' de ' + (total - (x['nao-se-aplica'] || 0));
+  function resumoCrise() {
+    const el = $('#cr-resumo');
+    if (!el) return;
+    const ids = Object.keys(CRISE), x = contarCrise(ids);
+    el.innerHTML = '<div class="tpr"><div><span class="big">' + feitosDe(x, ids.length) + '</span><span class="s">itens feitos</span></div><div>'
+      + barra(ORDEM_CRISE.map(s => [s, x[s] || 0, ROT[s]]), 'Guia de crise') + legenda(ORDEM_CRISE.map(s => [s, ROT[s], x[s] || 0])) + '</div>'
+      + '<div class="btns"><button type="button" class="btn" data-acao="imprimir-crise">Imprimir o registro</button><button type="button" class="btn" data-acao="zerar-crise">Zerar para um novo incidente</button></div></div>';
+    D.crise.secoes.forEach((b, i) => { $('#cr-sec-' + i).textContent = feitosDe(contarCrise(b.itens.map(k => k.id)), b.itens.length) + ' feitos'; });
+  }
   function incidentes() {
-    let h = cabecalho('Em crise', 'Recomendações <em>para incidentes</em>', 'Medidas de emergência para um incidente em andamento. Não são controles: toda medida tem dono, prazo e forma de desfazer. Algumas apenas reduzem o volume de ataque, e a tabela indica quais.');
-    h += '<div class="tw"><table class="t"><tr><th>Recomendação</th><th>Efeito</th><th>Reduz ruído ou contém?</th></tr>'
-      + D.incidentes.itens.map(i => '<tr><td>' + link(i.link, esc(i.titulo)) + '</td><td>' + esc(i.efeito) + '</td><td class="nw">' + (/cont/i.test(i.tipo) ? pill('aplicado', i.tipo) : /ru/i.test(i.tipo) ? pill('parcial', i.tipo) : '&mdash;') + '</td></tr>').join('')
-      + '</table></div><p style="margin-top:14px">' + link(D.incidentes.arquivo, 'Abrir as recomendações completas') + ', com quando usar, o que fazer, cuidados e como desfazer.</p>';
+    let h = cabecalho('Em crise', 'Sala <em>de crise</em>', 'Um guia para organizar a resposta a um incidente em andamento: o que levantar, o que preservar, o que bloquear e como voltar. Marque cada item e registre o que foi apurado, por quem e a que horas.');
+    h += '<div class="bar">' + [['guia', 'Guia de crise'], ['medidas', 'Medidas de emergência']].map(x => '<button type="button" class="chip' + (ABA === x[0] ? ' on' : '') + '" data-aba="' + x[0] + '">' + x[1] + '<small>' + (x[0] === 'guia' ? Object.keys(CRISE).length : D.incidentes.itens.length) + '</small></button>').join('') + '</div>';
+    if (ABA === 'guia') {
+      h += '<div class="aviso"><b>Use o guia fora do ambiente afetado.</b> Se este Mission Control está instalado em um cluster que faz parte do incidente, abra a página em modo local em uma estação fora dele, ou imprima o guia. O registro mostra o que está exposto: guarde com acesso restrito.</div>';
+      h += '<div class="card" style="margin-bottom:16px" id="cr-resumo"></div>';
+      h += '<details class="card dobra"><summary>Como usar o guia</summary><div class="prosa">' + md(D.crise.como_usar) + '</div></details>';
+      D.crise.secoes.forEach((b, i) => {
+        h += '<h3 class="grp">' + (i + 1) + '. ' + esc(b.nome) + '<small id="cr-sec-' + i + '"></small></h3><div class="grpsub">' + esc(b.central) + '</div>' + b.itens.map(k => linha(k.id)).join('');
+      });
+    } else {
+      h += '<div class="aviso">Medidas rápidas e, em geral, temporárias, para aplicar enquanto a equipe investiga. Não são controles: cada uma precisa de dono, prazo e forma de desfazer. Algumas só reduzem o volume de ataque, e a etiqueta de cada uma indica quais.</div>';
+      h += '<div class="card mark"><h3>Regras para qualquer medida de emergência</h3><div class="prosa">' + md(D.incidentes.regras) + '</div></div>';
+      let grupo = '';
+      D.incidentes.itens.forEach(r => {
+        if (r.grupo !== grupo) { grupo = r.grupo; h += '<h3 class="grp">' + esc(grupo) + '</h3>'; }
+        h += linha(r.id);
+      });
+    }
     $('#s-incidentes').innerHTML = h;
+    resumoCrise();
+  }
+  function imprimirCrise() {
+    const m = E.meta;
+    let h = '<div class="eyebrow">LateralShield · Mission Control</div><h1>Registro da sala de crise</h1>'
+      + [['Organização', m.organizacao], ['Ambiente', m.ambiente], ['Gerado em', new Date().toLocaleString('pt-BR')]].filter(x => x[1]).map(x => '<p><b>' + x[0] + ':</b> ' + esc(x[1]) + '</p>').join('')
+      + '<p class="muted">Este registro mostra o que está exposto: guarde-o com acesso restrito. Os horários de atualização estão em UTC.</p>';
+    D.crise.secoes.forEach((b, i) => {
+      h += '<h2>' + (i + 1) + '. ' + esc(b.nome) + '</h2><table><tr><th>#</th><th>Verificação</th><th>Situação</th><th>Registro</th><th>Responsável</th><th>Prazo</th><th>Atualizado em</th></tr>'
+        + b.itens.map(k => {
+          const it = item(k.id);
+          return '<tr><td>' + k.n + '</td><td>' + emLinha(k.verificacao) + '<br><i>Registrar: ' + emLinha(k.registrar) + '</i></td><td>' + pill(it.status, ROT[it.status]) + '</td><td>' + esc(it.nota).replace(/\n/g, '<br>') + '</td><td>' + esc(it.responsavel) + '</td><td>' + dataBR(it.prazo) + '</td><td>' + esc(it.atualizado_em) + '</td></tr>';
+        }).join('') + '</table>';
+    });
+    $('#impressao').innerHTML = h;
+    window.print();
+  }
+  async function zerarCrise() {
+    if (!confirm('Zerar apaga a situação e o registro de todos os itens do guia de crise. Imprima ou exporte antes. Continuar?')) return;
+    for (const id of Object.keys(CRISE)) {
+      if (E.itens[id]) await salvarItem(id, { status: 'pendente', responsavel: '', prazo: '', nota: '' });
+    }
+    Object.keys(CRISE).forEach(id => abertos.delete(id));
+    incidentes();
   }
 
   function relatorio() {
@@ -1074,6 +1170,8 @@
     if (alvo && TIPO[alvo]) {
       abertos.add(alvo);
       if (TIPO[alvo] === 'controle') { F.tec = F.pilar = F.pri = F.st = F.q = ''; }
+      if (TIPO[alvo] === 'rec') ABA = 'medidas';
+      if (TIPO[alvo] === 'crise') ABA = 'guia';
     }
     document.querySelectorAll('.sec').forEach(s => s.classList.toggle('on', s.id === 's-' + secao));
     DESENHAR[secao]();
@@ -1125,6 +1223,7 @@
     const linhas = [['Tipo', 'Item', 'Descrição', 'Tecnologia ou bloco', 'Pilar', 'Prioridade', 'Situação', 'Responsável', 'Prazo', 'Evidência e observações', 'Atualizado em (UTC)']];
     D.controles.forEach(c => { const it = item(c.id); linhas.push(['Controle', c.id, c.titulo, TEC[c.tecnologia].nome, c.pilar, c.prioridade, ROT[it.status], it.responsavel, dataBR(it.prazo), it.nota, it.atualizado_em]); });
     D.processos.blocos.forEach(b => b.perguntas.forEach(p => { const it = item(p.id); linhas.push(['Processo', 'Pergunta ' + p.n, p.pergunta, b.nome, '', '', ROT[it.status], it.responsavel, dataBR(it.prazo), it.nota, it.atualizado_em]); }));
+    D.crise.secoes.forEach(b => b.itens.forEach(k => { const it = item(k.id); linhas.push(['Crise', 'Item ' + k.n, k.verificacao, b.nome, '', '', ROT[it.status], it.responsavel, dataBR(it.prazo), it.nota, it.atualizado_em]); }));
     baixar('lateralshield-avaliacao-' + hoje() + '.csv', 'text/csv;charset=utf-8', '﻿' + linhas.map(l => l.map(cel).join(';')).join('\r\n') + '\r\n');
   }
   async function importar(arquivo) {
@@ -1190,6 +1289,9 @@
     if (tec) { F.tec = tec.dataset.tec; F.pilar = F.pri = F.st = F.q = ''; }
     const pri = alvo.closest('[data-pri]');
     if (pri) { F.pri = pri.dataset.pri; F.tec = F.pilar = F.st = F.q = ''; }
+    const aba = alvo.closest('[data-aba]');
+    // Trocar de aba limpa o item do endereço, para a página não voltar a ele ao ser redesenhada.
+    if (aba) { ABA = aba.dataset.aba; history.replaceState(null, '', '#incidentes'); incidentes(); return; }
     const sim = alvo.closest('[data-sim]');
     if (sim) { SIM = +sim.dataset.sim; topologia(); return; }
     const cam = alvo.closest('[data-caminho]');
@@ -1202,6 +1304,8 @@
       if (a === 'exportar') baixar('lateralshield-avaliacao-' + hoje() + '.json', 'application/json', JSON.stringify({ formato: 'lateralshield-mission-control', versao: 1, exportado_em: agoraUTC(), meta: E.meta, itens: E.itens }, null, 1));
       if (a === 'importar') $('#arquivo').click();
       if (a === 'senha') abrirSenha(false);
+      if (a === 'imprimir-crise') imprimirCrise();
+      if (a === 'zerar-crise') zerarCrise();
       if (a === 'pausar') {
         pausado = !pausado;
         const svg = $('#tp-svg svg');
@@ -1228,6 +1332,7 @@
       salvarItem(id, { [campo]: alvo.value.trim() }).then(() => {
         atualizarLinha(id);
         if ($('#s-topologia').classList.contains('on')) desenharTopologia();
+        if (TIPO[id] === 'crise') resumoCrise();
       });
     }
   });

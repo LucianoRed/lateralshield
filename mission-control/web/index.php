@@ -13,6 +13,7 @@ require __DIR__ . '/relatorio.php';
 const MC_STATUS = [
     'controle' => ['nao-avaliado', 'exposto', 'em-implantacao', 'aplicado', 'nao-se-aplica'],
     'processo' => ['sem-resposta', 'sim', 'parcial', 'nao'],
+    'crise' => ['pendente', 'em-andamento', 'feito', 'nao-se-aplica'],
 ];
 const MC_META = ['organizacao' => 200, 'ambiente' => 200, 'responsavel' => 200, 'inicio' => 10, 'observacoes' => 2000];
 const MC_SENHA_MINIMA = 10;
@@ -68,6 +69,11 @@ function tipos_de_item(): array
         foreach (dados()['processos']['blocos'] as $bloco) {
             foreach ($bloco['perguntas'] as $p) {
                 $tipos[$p['id']] = 'processo';
+            }
+        }
+        foreach (dados()['crise']['secoes'] ?? [] as $secao) {
+            foreach ($secao['itens'] as $k) {
+                $tipos[$k['id']] = 'crise';
             }
         }
     }

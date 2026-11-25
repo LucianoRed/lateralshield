@@ -38,7 +38,7 @@ Três diferenças em relação ao catálogo:
 | 3 | Existe um plano de resposta escrito, e ele já foi usado? | Um documento que a equipe sabe localizar e a data do último simulado ou incidente real em que foi seguido | Plano nunca exercitado falha nos detalhes: contato desatualizado, acesso que não funciona, canal que depende do ambiente afetado |
 | 4 | Depois de um incidente, alguém registra o que aconteceu e o que muda? | O relatório do último incidente, com ações, responsáveis e prazos | É o que transforma o caminho percorrido pelo invasor em controle permanente |
 
-As [recomendações gerais para incidentes](recomendacoes-para-incidentes.md) partem do princípio de que as perguntas 1 e 2 têm resposta. Veja as seções [Organizar a resposta](recomendacoes-para-incidentes.md#organizar-a-resposta) e [Encerrar o incidente](recomendacoes-para-incidentes.md#encerrar-o-incidente).
+As [recomendações gerais para incidentes](recomendacoes-para-incidentes.md) e o [guia de crise](guia-de-crise.md) partem do princípio de que as perguntas 1 e 2 têm resposta. Veja as seções [Organizar a resposta](recomendacoes-para-incidentes.md#organizar-a-resposta) e [Encerrar o incidente](recomendacoes-para-incidentes.md#encerrar-o-incidente).
 
 ## Segurança e políticas
 
