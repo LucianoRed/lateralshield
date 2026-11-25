@@ -906,5 +906,155 @@ window.LS_DADOS = {
     "tipo": "—"
    }
   ]
+ },
+ "ameacas": {
+  "arquivo": "docs/modelo-de-ameaca.md",
+  "caminhos": [
+   {
+    "caminho": "Saída irrestrita do JBoss",
+    "controles": [
+     "LS-JBOSS-002"
+    ]
+   },
+   {
+    "caminho": "Interfaces de gerenciamento do JBoss expostas",
+    "controles": [
+     "LS-JBOSS-001"
+    ]
+   },
+   {
+    "caminho": "Invasão do JBoss passa despercebida",
+    "controles": [
+     "LS-JBOSS-003",
+     "LS-JBOSS-004"
+    ]
+   },
+   {
+    "caminho": "Ponto de entrada pela web não fica registrado",
+    "controles": [
+     "LS-OCP-003"
+    ]
+   },
+   {
+    "caminho": "Machine Config Server acessível",
+    "controles": [
+     "LS-OCP-001"
+    ]
+   },
+   {
+    "caminho": "Rede de pods plana",
+    "controles": [
+     "LS-OCP-002",
+     "LS-OCP-012"
+    ]
+   },
+   {
+    "caminho": "Contêiner com root, SCC privilegiada ou acesso ao host",
+    "controles": [
+     "LS-OCP-008",
+     "LS-OCP-009"
+    ]
+   },
+   {
+    "caminho": "Token de service account e Secrets com alcance além do necessário",
+    "controles": [
+     "LS-OCP-010",
+     "LS-OCP-011",
+     "LS-OCP-013"
+    ]
+   },
+   {
+    "caminho": "Conta administrativa do OpenShift excessiva ou sem dono",
+    "controles": [
+     "LS-OCP-004",
+     "LS-OCP-005"
+    ]
+   },
+   {
+    "caminho": "Ações na API do OpenShift passam despercebidas",
+    "controles": [
+     "LS-OCP-006",
+     "LS-OCP-007"
+    ]
+   },
+   {
+    "caminho": "SSH livre entre servidores",
+    "controles": [
+     "LS-RHEL-001",
+     "LS-RHEL-007"
+    ]
+   },
+   {
+    "caminho": "Root direto, contas compartilhadas e `sudo` amplo",
+    "controles": [
+     "LS-RHEL-004",
+     "LS-RHEL-005"
+    ]
+   },
+   {
+    "caminho": "Serviço invadido sem confinamento no host",
+    "controles": [
+     "LS-RHEL-006",
+     "LS-RHEL-010"
+    ]
+   },
+   {
+    "caminho": "Portas abertas além do necessário e host usado como roteador",
+    "controles": [
+     "LS-RHEL-008",
+     "LS-RHEL-011"
+    ]
+   },
+   {
+    "caminho": "Invasor apaga os logs do host invadido",
+    "controles": [
+     "LS-RHEL-002"
+    ]
+   },
+   {
+    "caminho": "Ações privilegiadas e troca de binários passam despercebidas",
+    "controles": [
+     "LS-RHEL-003",
+     "LS-RHEL-009",
+     "LS-RHEL-012"
+    ]
+   },
+   {
+    "caminho": "Chave da automação aceita de qualquer origem",
+    "controles": [
+     "LS-AAP-001"
+    ]
+   },
+   {
+    "caminho": "Tomada do AAP por uma conta de usuário",
+    "controles": [
+     "LS-AAP-002",
+     "LS-AAP-003",
+     "LS-AAP-008"
+    ]
+   },
+   {
+    "caminho": "Extração das credenciais do AAP pelo sistema operacional, pelo banco ou pelo instalador",
+    "controles": [
+     "LS-AAP-004",
+     "LS-AAP-005",
+     "LS-AAP-006",
+     "LS-AAP-010"
+    ]
+   },
+   {
+    "caminho": "Uma credencial do AAP abre todos os ambientes",
+    "controles": [
+     "LS-AAP-009",
+     "LS-AAP-011"
+    ]
+   },
+   {
+    "caminho": "Uso indevido do AAP passa despercebido",
+    "controles": [
+     "LS-AAP-007"
+    ]
+   }
+  ]
  }
 };

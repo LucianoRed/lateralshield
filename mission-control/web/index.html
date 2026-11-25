@@ -12,6 +12,7 @@
     --rh-red:#EE0000;--rh-red-dark:#B30000;--ink:#151515;--g700:#4A4A4A;--g400:#8A8A8A;--g300:#D2D2D2;--g100:#F5F5F5;--bg:#FFFFFF;
     --teal:#1A7A75;--teal-bg:#E6F4F3;--teal-bd:#BFE3E1;--amber:#9A6B00;--amber-bg:#FFF7E6;--amber-bd:#F0DCA8;--blue:#1D5FA8;--blue-bg:#EAF2FC;--blue-bd:#BFD6F2;
     --red-bg:#FFF1F1;--red-bd:#FFD9D9;--sb:264px;
+    --c-aplicado:#118A6E;--c-impl:#3B6FE0;--c-exposto:#EE0000;--c-parcial:#D98A00;--c-trilha:#E4E4E4;--c-fundo:#DCEFEA;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   [hidden]{display:none !important}
@@ -134,16 +135,91 @@
   .meta label,.pw label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--g400)}
   .meta .wide{grid-column:1/-1}
 
-  /* ---- visão geral ---- */
-  .stack{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--g100);min-width:140px}
-  .stack i{display:block;height:100%}
-  .stack .exposto{background:var(--rh-red)}.stack .em-implantacao{background:#3B82C4}.stack .aplicado{background:var(--teal)}.stack .nao-se-aplica{background:#B8B8B8}
+  /* ---- gráficos ---- */
+  .sbar{display:flex;gap:2px;height:10px;min-width:120px}
+  .sbar i{display:block;flex:0 0 0;min-width:5px;border-radius:5px;position:relative;background:var(--c-trilha)}
+  .sbar i::before{content:'';position:absolute;left:0;right:0;top:-9px;bottom:-9px}
+  .sbar .aplicado,.sbar .sim,.sw.aplicado,.sw.sim{background:var(--c-aplicado)}
+  .sbar .em-implantacao,.sw.em-implantacao{background:var(--c-impl)}
+  .sbar .exposto,.sbar .nao,.sw.exposto,.sw.nao{background:var(--c-exposto)}
+  .sbar .parcial,.sw.parcial{background:var(--c-parcial)}
+  .sbar .nao-se-aplica,.sw.nao-se-aplica{background:repeating-linear-gradient(135deg,#BDBDBD 0 3px,#E4E4E4 3px 6px)}
+  .sw.nao-avaliado,.sw.sem-resposta{background:var(--c-trilha)}
+  .crow{display:grid;grid-template-columns:var(--lb,104px) 1fr 122px;gap:12px;align-items:center;padding:7px 0;font-size:13px}
+  .crow .cl a{text-decoration:none;font-weight:700}
+  .crow .cv{text-align:right;color:var(--g700);font-variant-numeric:tabular-nums;white-space:nowrap}
   ul.lst{list-style:none;display:grid;gap:8px}
   ul.lst li{display:flex;gap:10px;align-items:baseline;font-size:13.5px}
   ul.lst li .id{font-family:ui-monospace,Menlo,monospace;font-weight:700;font-size:12px;min-width:98px;text-decoration:none}
   ul.lst li .x{flex:1}
-  .leg{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--g700);margin-top:12px}
+  .leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--g700);margin-top:12px}
   .leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  .leg svg{vertical-align:-5px;margin-right:4px}
+  .leg b{color:var(--ink);margin-left:4px}
+  #tip{position:fixed;z-index:60;pointer-events:none;display:none;background:var(--ink);color:#fff;font-size:12px;line-height:1.4;padding:6px 10px;border-radius:6px;max-width:320px;white-space:pre-line}
+
+  /* ---- nível de proteção ---- */
+  .hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;margin-bottom:16px}
+  .nv{display:grid;grid-template-columns:230px minmax(0,1fr);gap:24px;align-items:center}
+  .gauge{display:block;width:100%}
+  .gnum{font-family:'Red Hat Display',sans-serif;font-weight:900;font-size:52px;fill:var(--ink)}
+  .gsub{font-size:10.5px;font-weight:700;letter-spacing:1.5px;fill:var(--g400)}
+  .gfill{animation:gfill .9s ease-out}
+  @keyframes gfill{from{stroke-dasharray:0 271}}
+  .nvn{font-family:'Red Hat Display',sans-serif;font-weight:900;font-size:20px;text-align:center;margin-top:4px}
+  .nvn small{display:block;font-family:'Red Hat Text',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--g400)}
+  .degraus{display:flex;gap:3px;justify-content:center;margin-top:8px}
+  .degraus i{width:28px;height:5px;border-radius:3px;background:var(--c-fundo)}
+  .degraus i.on{background:var(--c-aplicado)}
+  .nvp{font-size:14.5px;margin-bottom:12px}
+  h4.mini{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--g400);margin-bottom:8px}
+  .ganho{font-size:12px;font-weight:700;background:var(--c-fundo);border-radius:999px;padding:1px 8px;white-space:nowrap}
+  .marco{display:grid;grid-template-columns:20px minmax(0,1fr) 58px;gap:10px;align-items:center;padding:8px 0;border-top:1px solid #ECECEC}
+  .marco.um{border-top:0;padding-top:0}
+  .marco .ck{width:20px;height:20px;border-radius:50%;border:2px solid var(--g300);color:#fff;font-size:12px;font-weight:700;line-height:16px;text-align:center}
+  .marco.ok .ck{background:var(--c-aplicado);border-color:var(--c-aplicado)}
+  .marco a{display:block;color:inherit;text-decoration:none}
+  .marco b{display:block;font-size:13.5px}
+  .marco .d{display:block;font-size:12px;color:var(--g700)}
+  .marco .n{text-align:right;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .meter{height:6px;border-radius:3px;background:var(--c-fundo);margin-top:5px;overflow:hidden}
+  .meter i{display:block;height:100%;border-radius:3px;background:var(--c-aplicado)}
+  .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
+  .rings svg{width:96px;display:block;margin:0 auto 6px}
+  .rings b{display:block;font-size:13.5px}
+  .rnum{font-family:'Red Hat Display',sans-serif;font-weight:900;font-size:17px;fill:var(--ink)}
+
+  /* ---- topologia de ataque ---- */
+  .tpr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:28px;align-items:center}
+  .tpr .big{font-family:'Red Hat Display',sans-serif;font-weight:900;font-size:30px;line-height:1.1;display:block}
+  .tpr .s{font-size:12.5px;color:var(--g700)}
+  .tpr .r{text-align:right}
+  #tp-svg svg{display:block;width:100%;height:auto;min-width:900px}
+  .tz{fill:#FAFAFA;stroke:#E6E6E6}
+  .tzl{font-size:10.5px;font-weight:700;letter-spacing:1.5px;fill:var(--g400)}
+  .tinv{font-size:11px;font-weight:700;letter-spacing:2.5px;fill:#fff}
+  .tstub{fill:none;stroke:#6E6E6E;stroke-width:1.5}
+  .te{fill:none;stroke-width:2;stroke-linecap:round}
+  .thit{fill:none;stroke:transparent;stroke-width:14;cursor:pointer}
+  .tn rect{fill:#fff;stroke:var(--g300);stroke-width:1.5}
+  .tn text{font-size:12.5px;font-weight:700;fill:var(--ink)}
+  .tn.ent rect{fill:var(--ink);stroke:var(--ink)}
+  .tn.ent text{fill:#fff}
+  .tn.aberto rect{fill:var(--red-bg);stroke:var(--c-exposto)}
+  .tn.parcial rect{fill:var(--amber-bg);stroke:var(--c-parcial)}
+  .tn.mitigado rect{fill:var(--c-fundo);stroke:var(--c-aplicado)}
+  .tn.desconhecido rect{stroke:#8A8A8A}
+  .tn.fora rect{fill:#FAFAFA;stroke-dasharray:4 3}
+  .tn.fora text{fill:var(--g400)}
+  .tsh,.tsn{cursor:pointer;outline:none}
+  .foco{fill:none;stroke:none;stroke-width:2}
+  .sel .foco,.tsh:focus-visible .foco,.tsn:focus-visible .foco{stroke:var(--ink)}
+  .tpl tr[data-caminho]{cursor:pointer}
+  .tpl tr[data-caminho]:hover td{background:#FAFAFA}
+  .tpl tr.sel td{background:var(--g100)}
+  #tp-detalhe{margin-top:16px}
+  #tp-detalhe h3 .pill{margin-left:8px}
+  @media (prefers-reduced-motion:reduce){.gfill{animation:none}}
 
   /* ---- matriz 80/20 ---- */
   .mx{display:grid;grid-template-columns:120px repeat(3,1fr);gap:10px}
@@ -177,6 +253,9 @@
     .sb .foot{display:none}
     main{margin-left:0;padding:22px 16px 50px}
     .g2,.g4,.meta{grid-template-columns:1fr 1fr}
+    .hero,.nv,.tpr{grid-template-columns:1fr}
+    .gauge{max-width:230px;margin:0 auto}
+    .tpr .r{text-align:left}
     .it .hd{grid-template-columns:1fr 150px 16px}
     .it .hd .id{grid-column:1/-1}
     .it .bd{grid-template-columns:1fr}
@@ -212,6 +291,7 @@
 
 <main>
   <section class="sec" id="s-visao"></section>
+  <section class="sec" id="s-topologia"></section>
   <section class="sec" id="s-controles"></section>
   <section class="sec" id="s-prioridades"></section>
   <section class="sec" id="s-processos"></section>
@@ -236,6 +316,7 @@
   </form>
 </div>
 
+<div id="tip" role="tooltip"></div>
 <div id="impressao"></div>
 
 <script src="data.js"></script>
@@ -254,7 +335,7 @@
   };
   const LACUNA = ['exposto', 'em-implantacao', 'nao', 'parcial'];
   const SECOES = [
-    ['visao', 'Visão geral'], ['controles', 'Controles'], ['prioridades', 'Matriz 80/20'], ['processos', 'Processos'],
+    ['visao', 'Visão geral'], ['topologia', 'Topologia de ataque'], ['controles', 'Controles'], ['prioridades', 'Matriz 80/20'], ['processos', 'Processos'],
     ['plano', 'Plano de ação'], ['incidentes', 'Incidentes'], ['relatorio', 'Relatório e dados']
   ];
   const CHAVE = 'lateralshield-mission-control-v1';
@@ -503,23 +584,117 @@
     return '<div class="eyebrow">' + olho + '</div><h1 class="t">' + titulo + '</h1><p class="lead">' + lead + '</p>';
   }
 
+  // ---------------------------------------------------------------- nível de proteção e gráficos
+  // O nível mede só a cobertura dos controles do catálogo. As perguntas de processo não entram e continuam sem nota.
+  const real = id => item(id).status;
+  const PESO = { 1: 3, 2: 2, 3: 1 };
+  const NIVEIS = [[0, 'Inicial'], [20, 'Básico'], [40, 'Intermediário'], [65, 'Avançado'], [90, 'Consolidado']];
+  const COR = { aplicado: '#118A6E', impl: '#3B6FE0', exposto: '#EE0000', parcial: '#D98A00', neutro: '#8A8A8A', fundo: '#DCEFEA' };
+
+  function nivel(st) {
+    let total = 0, soma = 0, andamento = 0;
+    const faltam = [];
+    D.controles.forEach(c => {
+      const s = st(c.id), p = PESO[c.prioridade] || 1;
+      if (s === 'nao-se-aplica') return;
+      total += p;
+      if (s === 'aplicado') soma += p; else faltam.push(c);
+      if (s === 'em-implantacao') andamento += p;
+    });
+    const pontos = total ? Math.floor(100 * soma / total) : 0;
+    let n = 0;
+    NIVEIS.forEach((x, i) => { if (pontos >= x[0]) n = i; });
+    // O que falta, na ordem em que mais vale a pena: prioridade, lacuna já conhecida, logs centralizados e ordem do catálogo.
+    const ordem = { 'exposto': 0, 'em-implantacao': 1, 'nao-avaliado': 2 }, logs = D.logs.map(l => l.id);
+    const pos = c => (logs.includes(c.id) ? 0 : 1000) + D.controles.indexOf(c);
+    faltam.sort((a, b) => a.prioridade - b.prioridade || ordem[st(a.id)] - ordem[st(b.id)] || pos(a) - pos(b));
+    return {
+      total: total, pontos: pontos, n: n, nome: NIVEIS[n][1], proximo: NIVEIS[n + 1] || null, faltam: faltam,
+      andamento: total ? Math.round(100 * andamento / total) : 0,
+      ganho: c => Math.max(1, Math.round(100 * (PESO[c.prioridade] || 1) / total))
+    };
+  }
+  function medidor(nv) {
+    const r = 86, cx = 110, cy = 106, comp = Math.PI * r;
+    const arco = 'M' + (cx - r) + ' ' + cy + 'A' + r + ' ' + r + ' 0 0 1 ' + (cx + r) + ' ' + cy;
+    const marcas = NIVEIS.slice(1).map(x => {
+      const a = Math.PI * (1 - x[0] / 100), c = Math.cos(a), s = Math.sin(a);
+      return '<line x1="' + (cx + (r - 10) * c).toFixed(1) + '" y1="' + (cy - (r - 10) * s).toFixed(1) + '" x2="' + (cx + (r + 10) * c).toFixed(1) + '" y2="' + (cy - (r + 10) * s).toFixed(1) + '" stroke="#fff" stroke-width="2"/>';
+    }).join('');
+    return '<svg class="gauge" viewBox="0 0 220 124" role="img" aria-label="Nível de proteção: ' + nv.pontos + ' de 100. Nível ' + (nv.n + 1) + ' de ' + NIVEIS.length + ', ' + nv.nome + '.">'
+      + '<path d="' + arco + '" fill="none" stroke="' + COR.fundo + '" stroke-width="16" stroke-linecap="round"/>'
+      + (nv.pontos ? '<path class="gfill" d="' + arco + '" fill="none" stroke="' + COR.aplicado + '" stroke-width="16" stroke-linecap="round" stroke-dasharray="' + (comp * nv.pontos / 100).toFixed(1) + ' ' + comp.toFixed(1) + '"/>' : '')
+      + marcas
+      + '<text x="110" y="98" text-anchor="middle" class="gnum">' + nv.pontos + '</text><text x="110" y="117" text-anchor="middle" class="gsub">DE 100</text></svg>';
+  }
+  function anel(n, total) {
+    const r = 30, comp = 2 * Math.PI * r;
+    return '<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="' + r + '" fill="none" stroke="' + COR.fundo + '" stroke-width="9"/>'
+      + (n ? '<circle cx="40" cy="40" r="' + r + '" fill="none" stroke="' + COR.aplicado + '" stroke-width="9" stroke-linecap="round" stroke-dasharray="' + (comp * n / total).toFixed(1) + ' ' + comp.toFixed(1) + '" transform="rotate(-90 40 40)"/>' : '')
+      + '<text x="40" y="46" text-anchor="middle" class="rnum">' + (total ? Math.round(100 * n / total) + '%' : '&ndash;') + '</text></svg>';
+  }
+  // Barra segmentada: partes = [[classe, quantidade, nome]].
+  function barra(partes, nome) {
+    const total = partes.reduce((a, p) => a + p[1], 0);
+    const texto = p => p[2] + ': ' + p[1] + ' de ' + total + ' (' + Math.round(100 * p[1] / total) + '%)';
+    const visiveis = partes.filter(p => p[1]);
+    return '<div class="sbar" role="img" aria-label="' + esc(nome + '. ' + visiveis.map(texto).join('; ')) + '">'
+      + visiveis.map(p => '<i class="' + p[0] + '" style="flex-grow:' + p[1] + '" data-tip="' + esc(texto(p)) + '"></i>').join('') + '</div>';
+  }
+  function legenda(itens) {
+    return '<div class="leg">' + itens.map(x => '<span><i class="sw ' + x[0] + '"></i>' + x[1] + (x[2] != null ? '<b>' + x[2] + '</b>' : '') + '</span>').join('') + '</div>';
+  }
+  function linhasDeBarra(linhas, largura) {
+    return '<div style="--lb:' + largura + 'px">' + linhas.map(l => '<div class="crow"><span class="cl">' + l[0] + '</span>' + barra(l[1], l[2]) + '<span class="cv">' + l[3] + '</span></div>').join('') + '</div>';
+  }
+  const ORDEM_CONTROLE = ['aplicado', 'em-implantacao', 'exposto', 'nao-avaliado', 'nao-se-aplica'];
+  const partesControle = x => ORDEM_CONTROLE.map(s => [s, x[s] || 0, ROT[s]]);
+  const aplicadosDe = x => (x.aplicado || 0) + ' de ' + (Object.values(x).reduce((a, b) => a + b, 0) - (x['nao-se-aplica'] || 0)) + ' aplicados';
+  function marcos(st, cam) {
+    const ap = ids => { const a = ids.filter(id => st(id) !== 'nao-se-aplica'); return [a.filter(id => st(id) === 'aplicado').length, a.length]; };
+    const ids = D.controles.map(c => c.id), pri = n => D.controles.filter(c => c.prioridade === n).map(c => c.id);
+    const ce = contarEstados(cam);
+    return [
+      ['Tudo avaliado', 'Cada controle com a situação registrada', ids.filter(id => st(id) !== 'nao-avaliado').length, ids.length, '#controles', ''],
+      ['Logs centralizados', 'A primeira verificação: sem eles, os alertas não chegam a ninguém'].concat(ap(D.logs.map(l => l.id)), ['#controles', '']),
+      ['Prioridade 1 aplicada', 'Impacto alto com esforço baixo'].concat(ap(pri(1)), ['#controles', '1']),
+      ['Prioridade 2 aplicada', 'O passo seguinte da matriz 80/20'].concat(ap(pri(2)), ['#controles', '2']),
+      ['Prioridade 3 aplicada', 'O que fecha o catálogo'].concat(ap(pri(3)), ['#controles', '3']),
+      ['Caminhos de ataque fechados', 'Mitigados ou gerando alerta na topologia', ce.mitigado, cam.length - ce.fora, '#topologia', '']
+    ].filter(m => m[3] > 0);
+  }
+
   function visao() {
     const c = contar(), total = D.controles.length, cc = c.controle, cp = c.processo;
     const avaliados = total - (cc['nao-avaliado'] || 0);
     const gaps = lacunas();
     const semDono = gaps.filter(g => !g.it.responsavel).length;
     const atrasados = gaps.filter(g => vencido(g.it));
-    const m = E.meta;
-    let h = cabecalho('Mission Control', 'Avaliação <em>do ambiente</em>', 'Assuma o comprometimento, contenha o impacto. Registre aqui a situação de cada controle e de cada pergunta de processo, e acompanhe o que falta fechar.');
+    const m = E.meta, nv = nivel(real), cam = caminhos(real), ce = contarEstados(cam);
+    let h = cabecalho('Mission Control', 'Avaliação <em>do ambiente</em>', 'Assuma o comprometimento, contenha o impacto. Cada controle aplicado fecha um caminho do invasor: acompanhe aqui o nível de proteção do ambiente e o que falta fechar.');
     if (modo === 'local') h += '<div class="aviso"><b>Modo local.</b> As respostas ficam só neste navegador. Para guardar em banco de dados e gerar o relatório em PDF e Excel, instale o Mission Control no OpenShift (veja <a href="#relatorio">Relatório e dados</a>).</div>';
 
-    h += '<div class="card" style="margin-bottom:16px"><h3>Esta avaliação</h3><div class="meta">'
-      + '<label>Organização<input data-meta="organizacao" maxlength="200" value="' + esc(m.organizacao) + '"></label>'
-      + '<label>Ambiente<input data-meta="ambiente" maxlength="200" value="' + esc(m.ambiente) + '" placeholder="Produção, homologação..."></label>'
-      + '<label>Responsável<input data-meta="responsavel" maxlength="200" value="' + esc(m.responsavel) + '"></label>'
-      + '<label>Início<input type="date" data-meta="inicio" value="' + esc(m.inicio) + '"></label>'
-      + '<label class="wide">Observações<input data-meta="observacoes" maxlength="2000" value="' + esc(m.observacoes) + '" placeholder="Escopo, quem participou, o que ficou de fora"></label>'
-      + '</div></div>';
+    h += '<div class="hero"><div class="card mark"><h3>Nível de proteção</h3><div class="nv"><div>' + medidor(nv)
+      + '<div class="nvn">' + nv.nome + '<small>Nível ' + (nv.n + 1) + ' de ' + NIVEIS.length + '</small></div>'
+      + '<div class="degraus">' + NIVEIS.map((x, i) => '<i' + (i <= nv.n ? ' class="on"' : '') + ' data-tip="Nível ' + (i + 1) + ' · ' + x[1] + ': a partir de ' + x[0] + ' pontos"></i>').join('') + '</div></div><div>';
+    if (!nv.total) {
+      h += '<p class="nvp">Nenhum controle do catálogo se aplica a este ambiente.</p>';
+    } else {
+      h += '<p class="nvp">' + (nv.proximo
+        ? (nv.proximo[0] - nv.pontos === 1 ? 'Falta <b>1 ponto</b>' : 'Faltam <b>' + (nv.proximo[0] - nv.pontos) + ' pontos</b>') + ' para o nível ' + (nv.n + 2) + ' · ' + nv.proximo[1] + '.'
+        : (nv.faltam.length ? 'Nível mais alto. Faltam ' + nv.faltam.length + ' controles para fechar o catálogo.' : 'Todos os controles aplicáveis estão aplicados. Repita a avaliação periodicamente: configuração de segurança se degrada com o tempo.'))
+        + (nv.andamento ? ' Há <b>' + nv.andamento + (nv.andamento === 1 ? ' ponto' : ' pontos') + ' a caminho</b> nos controles em implantação.' : '') + '</p>';
+      if (nv.faltam.length) {
+        h += '<h4 class="mini">O que mais soma agora</h4><ul class="lst">'
+          + nv.faltam.slice(0, 3).map(x => '<li><a class="id" href="#controles/' + x.id + '">' + x.id + '</a><span class="x">' + esc(x.titulo) + '</span><span class="ganho" data-tip="Pontos que este controle soma quando aplicado">+' + nv.ganho(x) + '</span></li>').join('') + '</ul>';
+      }
+    }
+    h += '<p class="muted" style="margin-top:12px">Parcela dos controles aplicáveis que já está aplicada, com peso 3, 2 e 1 para as prioridades 1, 2 e 3. Controle não avaliado conta como não aplicado, e as perguntas de processo não entram. Mede a cobertura do catálogo neste ambiente: não é certificação nem garantia de segurança.</p></div></div></div>';
+
+    h += '<div class="card"><h3>Marcos</h3>' + marcos(real, cam).map((mc, i) => {
+      const ok = mc[2] >= mc[3];
+      return '<div class="marco' + (ok ? ' ok' : '') + (i ? '' : ' um') + '"><span class="ck">' + (ok ? '&#10003;' : '') + '</span><a href="' + mc[4] + '"' + (mc[5] ? ' data-pri="' + mc[5] + '"' : '') + '><b>' + mc[0] + '</b><span class="d">' + mc[1] + '</span><div class="meter"><i style="width:' + (100 * mc[2] / mc[3]) + '%"></i></div></a><span class="n">' + mc[2] + ' / ' + mc[3] + '</span></div>';
+    }).join('') + '</div></div>';
 
     h += '<div class="grid g4">'
       + '<div class="kpi"><div class="l">Controles avaliados</div><div class="v">' + avaliados + '<small> / ' + total + '</small></div><div class="s">' + (cc['nao-avaliado'] || 0) + ' ainda sem avaliação</div></div>'
@@ -528,6 +703,24 @@
       + '<div class="kpi"><div class="l">Lacunas de processo</div><div class="v amber">' + ((cp.nao || 0) + (cp.parcial || 0)) + '</div><div class="s">' + (cp['sem-resposta'] || 0) + ' perguntas sem resposta</div></div>'
       + '</div>';
 
+    h += '<div class="grid g2"><div class="card"><h3>Aplicados por pilar</h3><p class="sub">Controles aplicados entre os que se aplicam ao ambiente.</p><div class="rings">'
+      + ['prevenir', 'conter', 'detectar'].map(p => {
+        const ids = D.controles.filter(x => x.pilar === p && real(x.id) !== 'nao-se-aplica'), n = ids.filter(x => real(x.id) === 'aplicado').length;
+        return '<div>' + anel(n, ids.length) + '<b>' + maiuscula(p) + '</b><span class="muted">' + n + ' de ' + ids.length + ' aplicados</span></div>';
+      }).join('') + '</div></div>';
+    h += '<div class="card"><h3>Caminhos de ataque</h3><p class="sub"><b>' + ce.mitigado + ' de ' + (cam.length - ce.fora) + '</b> caminhos de movimentação lateral do modelo de ameaça estão mitigados ou geram alerta.</p>'
+      + barra(partesCaminho(ce), 'Caminhos de ataque') + legendaCaminhos(ce)
+      + '<p style="margin-top:16px"><a class="btn pri" href="#topologia">Ver a topologia de ataque</a></p></div></div>';
+
+    const porPri = {};
+    D.controles.forEach(x => { const p = porPri[x.prioridade] = porPri[x.prioridade] || {}, s = real(x.id); p[s] = (p[s] || 0) + 1; });
+    h += '<div class="grid g2"><div class="card"><h3>Situação por tecnologia</h3>'
+      + linhasDeBarra(D.tecnologias.map(t => { const x = c.tec[t.id] || {}; return ['<a href="#controles" data-tec="' + t.id + '">' + esc(t.curto) + '</a>', partesControle(x), t.nome, aplicadosDe(x)]; }), 86)
+      + legenda(ORDEM_CONTROLE.map(s => [s, ROT[s]])) + '</div>';
+    h += '<div class="card"><h3>Situação por prioridade</h3>'
+      + linhasDeBarra(Object.keys(porPri).sort().map(p => ['<a href="#controles" data-pri="' + p + '">Prioridade ' + p + '</a>', partesControle(porPri[p]), 'Prioridade ' + p, aplicadosDe(porPri[p])]), 86)
+      + legenda(ORDEM_CONTROLE.map(s => [s, ROT[s]])) + '</div></div>';
+
     h += '<div class="grid g2"><div class="card mark"><h3>Primeira verificação: os logs saem do servidor?</h3><p class="sub">Sem destino central, os alertas dos demais controles não chegam a ninguém.</p><ul class="lst">'
       + D.logs.map(l => '<li><a class="id" href="#controles/' + l.id + '">' + l.id + '</a><span class="x">' + esc(l.camada) + '</span>' + pill(item(l.id).status, ROT[item(l.id).status]) + '</li>').join('')
       + '</ul></div>';
@@ -535,13 +728,14 @@
       + D.processos.chave.map(n => { const p = PERGUNTA['PROC-' + String(n).padStart(2, '0')]; if (!p) return ''; const it = item(p.id); return '<li><a class="id" href="#processos/' + p.id + '">Pergunta ' + p.n + '</a><span class="x">' + esc(p.pergunta) + '</span>' + pill(it.status, ROT[it.status]) + '</li>'; }).join('')
       + '</ul></div></div>';
 
-    h += '<div class="grid g2"><div class="card"><h3>Por tecnologia</h3><div class="tw"><table class="t"><tr><th>Tecnologia</th><th>Controles</th><th>Situação</th><th>Expostos</th></tr>'
-      + D.tecnologias.map(t => {
-        const x = c.tec[t.id] || {}, n = Object.values(x).reduce((a, b) => a + b, 0) || 1;
-        const barras = ['exposto', 'em-implantacao', 'aplicado', 'nao-se-aplica'].map(s => x[s] ? '<i class="' + s + '" style="width:' + (100 * x[s] / n) + '%" title="' + ROT[s] + ': ' + x[s] + '"></i>' : '').join('');
-        return '<tr><td><a href="#controles" data-tec="' + t.id + '">' + esc(t.curto) + '</a></td><td class="n">' + Object.values(x).reduce((a, b) => a + b, 0) + '</td><td><div class="stack">' + barras + '</div></td><td class="n">' + (x.exposto || 0) + '</td></tr>';
-      }).join('')
-      + '</table></div><div class="leg"><span><i style="background:var(--rh-red)"></i>Exposto</span><span><i style="background:#3B82C4"></i>Em implantação</span><span><i style="background:var(--teal)"></i>Aplicado</span><span><i style="background:#B8B8B8"></i>Não se aplica</span><span><i style="background:var(--g100);border:1px solid var(--g300)"></i>Não avaliado</span></div></div>';
+    h += '<div class="grid g2"><div class="card"><h3>Respostas de processo por bloco</h3><p class="sub">Contagem das respostas. Elas não são somadas nem viram nota.</p>'
+      + linhasDeBarra(D.processos.blocos.map(b => {
+        const x = {};
+        b.perguntas.forEach(p => { const s = item(p.id).status; x[s] = (x[s] || 0) + 1; });
+        const lac = (x.nao || 0) + (x.parcial || 0);
+        return [esc(b.nome), ['sim', 'parcial', 'nao', 'sem-resposta'].map(s => [s, x[s] || 0, ROT[s]]), b.nome, lac + (lac === 1 ? ' lacuna' : ' lacunas')];
+      }), 176)
+      + legenda(['sim', 'parcial', 'nao', 'sem-resposta'].map(s => [s, ROT[s]])) + '</div>';
 
     h += '<div class="card"><h3>Próximos passos</h3>';
     if (!avaliados) {
@@ -554,7 +748,215 @@
         + '</ul><p style="margin-top:12px"><a class="btn" href="#plano">Ver o plano de ação</a></p>';
     }
     h += '</div></div>';
+
+    h += '<div class="card"><h3>Esta avaliação</h3><div class="meta">'
+      + '<label>Organização<input data-meta="organizacao" maxlength="200" value="' + esc(m.organizacao) + '"></label>'
+      + '<label>Ambiente<input data-meta="ambiente" maxlength="200" value="' + esc(m.ambiente) + '" placeholder="Produção, homologação..."></label>'
+      + '<label>Responsável<input data-meta="responsavel" maxlength="200" value="' + esc(m.responsavel) + '"></label>'
+      + '<label>Início<input type="date" data-meta="inicio" value="' + esc(m.inicio) + '"></label>'
+      + '<label class="wide">Observações<input data-meta="observacoes" maxlength="2000" value="' + esc(m.observacoes) + '" placeholder="Escopo, quem participou, o que ficou de fora"></label>'
+      + '</div></div>';
     $('#s-visao').innerHTML = h;
+  }
+
+  // ---------------------------------------------------------------- topologia de ataque
+  // Os caminhos e os controles de cada um vêm do modelo de ameaça (D.ameacas). Aqui fica só o desenho:
+  // cada linha da tabela é ligada, por um dos seus controles, a uma aresta (bloqueio) ou a um sinal em um nó (detecção).
+  const TOPO = {
+    w: 1160, h: 886, alt: 36,
+    zonas: [['JBoss EAP', 16, 146], ['OpenShift', 160, 446], ['RHEL', 460, 694], ['Ansible Automation Platform', 708, 870]],
+    // nó: [x do centro, y do centro, largura, rótulo, 'e' quando é ponto de entrada]
+    nos: {
+      jboss: [290, 84, 190, 'JBoss EAP legado', 'e'],
+      pod: [290, 306, 190, 'Pod de aplicação', 'e'],
+      conta: [290, 410, 190, 'Conta do OpenShift', 'e'],
+      rhel: [290, 580, 190, 'Servidor RHEL', 'e'],
+      automacao: [290, 776, 190, 'Conta ou chave do AAP', 'e'],
+      consoles: [660, 58, 230, 'Consoles de outros JBoss'],
+      rede: [660, 110, 230, 'Rede interna além do banco'],
+      mcs: [660, 202, 230, 'Machine Config Server'],
+      pods: [660, 254, 230, 'Outros pods e namespaces'],
+      no: [660, 306, 230, 'Nó do OpenShift'],
+      secrets: [660, 358, 230, 'Secrets e API do cluster'],
+      plano: [660, 410, 230, 'Plano de controle'],
+      ssh: [660, 502, 230, 'Outros servidores por SSH'],
+      root: [660, 554, 230, 'Root no servidor'],
+      processos: [660, 606, 230, 'Outros processos do host'],
+      redes: [660, 658, 230, 'Outras portas e redes'],
+      gerenciados: [660, 750, 230, 'Servidores gerenciados'],
+      aap: [660, 802, 230, 'Ansible Automation Platform'],
+      credenciais: [1040, 776, 200, 'Credenciais guardadas'],
+      ambientes: [1040, 836, 200, 'Todos os ambientes']
+    },
+    arestas: {
+      'LS-JBOSS-001': ['jboss', 'consoles'], 'LS-JBOSS-002': ['jboss', 'rede'], 'LS-OCP-001': ['jboss', 'mcs'],
+      'LS-OCP-002': ['pod', 'pods'], 'LS-OCP-008': ['pod', 'no'], 'LS-OCP-010': ['pod', 'secrets'], 'LS-OCP-004': ['conta', 'plano'],
+      'LS-RHEL-001': ['rhel', 'ssh'], 'LS-RHEL-004': ['rhel', 'root'], 'LS-RHEL-006': ['rhel', 'processos'], 'LS-RHEL-008': ['rhel', 'redes'],
+      'LS-AAP-001': ['automacao', 'gerenciados'], 'LS-AAP-002': ['automacao', 'aap'], 'LS-AAP-004': ['aap', 'credenciais'], 'LS-AAP-009': ['aap', 'ambientes']
+    },
+    sensores: { 'LS-JBOSS-003': 'jboss', 'LS-OCP-003': 'pod', 'LS-OCP-006': 'plano', 'LS-RHEL-002': 'rhel', 'LS-RHEL-003': 'rhel', 'LS-AAP-007': 'aap' }
+  };
+  const ESTADOS = ['mitigado', 'parcial', 'aberto', 'desconhecido', 'fora'];
+  const ROT_ESTADO = {
+    bloqueio: { mitigado: 'Mitigado', parcial: 'Parcial', aberto: 'Aberto', desconhecido: 'Não avaliado', fora: 'Não se aplica' },
+    deteccao: { mitigado: 'Com alerta', parcial: 'Parcial', aberto: 'Sem alerta', desconhecido: 'Não avaliado', fora: 'Não se aplica' }
+  };
+  const PILL_ESTADO = { mitigado: 'aplicado', parcial: 'parcial', aberto: 'exposto', desconhecido: '', fora: 'nao-se-aplica' };
+  const COR_ESTADO = { mitigado: COR.aplicado, parcial: COR.parcial, aberto: COR.exposto, desconhecido: COR.neutro, fora: '#C8C8C8' };
+  const semMovimento = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  let SIM = 0, caminhoSel = null, pausado = false;
+  // Situação mostrada no desenho: a registrada ou, na simulação, com as prioridades escolhidas já aplicadas.
+  const stVisao = id => { const s = real(id); return SIM && s !== 'nao-se-aplica' && CONTROLE[id].prioridade <= SIM ? 'aplicado' : s; };
+
+  function caminhos(st) {
+    return D.ameacas.caminhos.map((c, n) => {
+      const ss = c.controles.map(st).filter(s => s !== 'nao-se-aplica'), ap = ss.filter(s => s === 'aplicado').length;
+      let estado = 'desconhecido', aresta = null, no = null;
+      if (!ss.length) estado = 'fora';
+      else if (ap === ss.length) estado = 'mitigado';
+      else if (ap || ss.includes('em-implantacao')) estado = 'parcial';
+      else if (ss.includes('exposto')) estado = 'aberto';
+      c.controles.some(id => { aresta = TOPO.arestas[id] || null; no = aresta ? null : (TOPO.sensores[id] || null); return aresta || no; });
+      return { n: n, texto: c.caminho, controles: c.controles, estado: estado, aresta: aresta, no: no, tipo: c.controles.every(id => CONTROLE[id].pilar === 'detectar') ? 'deteccao' : 'bloqueio' };
+    });
+  }
+  function contarEstados(lista) {
+    const ce = {};
+    ESTADOS.forEach(e => { ce[e] = lista.filter(c => c.estado === e).length; });
+    return ce;
+  }
+  const rotEstado = c => ROT_ESTADO[c.tipo][c.estado];
+  const pillEstado = c => pill(PILL_ESTADO[c.estado], rotEstado(c));
+  const partesCaminho = ce => [['aplicado', ce.mitigado, 'Mitigados ou com alerta'], ['parcial', ce.parcial, 'Parciais'], ['exposto', ce.aberto, 'Abertos ou sem alerta'], ['nao-avaliado', ce.desconhecido, 'Não avaliados'], ['nao-se-aplica', ce.fora, 'Não se aplicam']];
+  const legendaCaminhos = ce => legenda(partesCaminho(ce).filter(p => p[1] || p[0] !== 'nao-se-aplica').map(p => [p[0], p[2], p[1]]));
+  const dica = c => c.texto.replace(/`/g, '') + '\n' + rotEstado(c) + ' · ' + c.controles.map(id => id + ' ' + ROT[stVisao(id)].toLowerCase()).join(', ');
+
+  function escudo(estado) {
+    const forma = 'M0 -10L8 -7V0C8 5.5 4 9 0 10.5C-4 9 -8 5.5 -8 0V-7Z', cor = COR_ESTADO[estado];
+    const cheio = estado === 'mitigado' || estado === 'parcial';
+    const sinais = {
+      mitigado: '<path d="M-3.5 0.5L-1 3L3.5 -2.5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+      parcial: '<path d="M-3 0.5H3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
+      aberto: '<path d="M-2.5 -2.5L2.5 2.5M2.5 -2.5L-2.5 2.5" fill="none" stroke="' + cor + '" stroke-width="2" stroke-linecap="round"/>',
+      desconhecido: '<text y="4" text-anchor="middle" font-size="10" font-weight="700" fill="#6E6E6E">?</text>',
+      fora: ''
+    };
+    return '<path d="' + forma + '" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>'
+      + '<path d="' + forma + '" fill="' + (cheio ? cor : '#fff') + '" stroke="' + cor + '" stroke-width="2" stroke-linejoin="round"' + (estado === 'fora' ? ' stroke-dasharray="3 2"' : '') + '/>' + sinais[estado];
+  }
+  function sinal(estado, anima) {
+    const cor = COR_ESTADO[estado];
+    let h = '';
+    if (estado === 'mitigado' && anima) h += '<circle r="8" fill="none" stroke="' + cor + '" stroke-width="1.5"><animate attributeName="r" values="8;18" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.8;0" dur="1.8s" repeatCount="indefinite"/></circle>';
+    h += '<circle r="8" fill="#fff" stroke="' + cor + '" stroke-width="2"/>';
+    if (estado === 'mitigado' || estado === 'parcial') h += '<circle r="3.5" fill="' + cor + '"/>';
+    if (estado === 'aberto') h += '<path d="M-3.5 3.5L3.5 -3.5" stroke="' + cor + '" stroke-width="2" stroke-linecap="round"/>';
+    return h;
+  }
+  const alvoDoDesenho = (classe, c, x, y, raio, conteudo) => '<g class="' + classe + (c.n === caminhoSel ? ' sel' : '') + '" transform="translate(' + x + ' ' + y + ')" data-caminho="' + c.n + '" data-tip="' + esc(dica(c)) + '" tabindex="0" role="button" aria-label="' + esc(dica(c)) + '">'
+    + '<circle r="' + raio + '" fill="transparent"/><circle r="' + raio + '" class="foco"/>' + conteudo + '</g>';
+
+  function svgTopologia(lista) {
+    const T = TOPO, anima = !semMovimento, pior = {}, porNo = {};
+    const grau = ['fora', 'mitigado', 'desconhecido', 'parcial', 'aberto'];
+    const ponto = (cor, caminho, dur, atraso, some) => '<circle r="4" fill="' + cor + '" stroke="#fff" stroke-width="1.5">'
+      + '<animateMotion dur="' + dur + 's" begin="-' + atraso.toFixed(2) + 's" repeatCount="indefinite" path="' + caminho + '"/>'
+      + (some ? '<animate attributeName="opacity" values="1;1;0" keyTimes="0;0.8;1" dur="' + dur + 's" begin="-' + atraso.toFixed(2) + 's" repeatCount="indefinite"/>' : '') + '</circle>';
+    let fundo = '', linhas = '', pontos = '', marcas = '', caixas = '';
+
+    T.zonas.forEach(z => { fundo += '<rect x="64" y="' + z[1] + '" width="' + (T.w - 72) + '" height="' + (z[2] - z[1]) + '" rx="12" class="tz"/><text x="78" y="' + (z[1] + 20) + '" class="tzl">' + esc(z[0].toUpperCase()) + '</text>'; });
+    fundo += '<rect x="12" y="16" width="40" height="' + (T.h - 32) + '" rx="10" fill="#151515"/><text transform="translate(36 ' + (T.h / 2) + ') rotate(-90)" text-anchor="middle" class="tinv">INVASOR · ASSUMA O COMPROMETIMENTO</text>';
+    Object.keys(T.nos).forEach((k, i) => {
+      const n = T.nos[k];
+      if (n[4] !== 'e') return;
+      const d = 'M52 ' + n[1] + 'H' + (n[0] - n[2] / 2);
+      fundo += '<path d="' + d + '" class="tstub"/>';
+      if (anima) pontos += '<circle r="3" fill="#151515"><animateMotion dur="2.4s" begin="-' + (i * 0.5).toFixed(2) + 's" repeatCount="indefinite" path="' + d + '"/></circle>';
+    });
+
+    lista.forEach(c => {
+      if (c.no) { (porNo[c.no] = porNo[c.no] || []).push(c); return; }
+      if (!c.aresta) return;
+      const a = T.nos[c.aresta[0]], b = T.nos[c.aresta[1]], k = c.aresta[1];
+      if (pior[k] == null || grau.indexOf(c.estado) > grau.indexOf(pior[k])) pior[k] = c.estado;
+      const x1 = a[0] + a[2] / 2, y1 = a[1], x2 = b[0] - b[2] / 2, y2 = b[1], mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      const inteiro = 'M' + x1 + ' ' + y1 + 'C' + mx + ' ' + y1 + ' ' + mx + ' ' + y2 + ' ' + x2 + ' ' + y2;
+      const ate = 'M' + x1 + ' ' + y1 + 'C' + (x1 + mx) / 2 + ' ' + y1 + ' ' + (x1 + 3 * mx) / 4 + ' ' + (3 * y1 + y2) / 4 + ' ' + mx + ' ' + my;
+      const depois = 'M' + mx + ' ' + my + 'C' + (3 * mx + x2) / 4 + ' ' + (y1 + 3 * y2) / 4 + ' ' + (mx + x2) / 2 + ' ' + y2 + ' ' + x2 + ' ' + y2;
+      const cor = COR_ESTADO[c.estado], atraso = (c.n * 0.37) % 1.4;
+      if (c.estado === 'mitigado') {
+        // O ataque continua saindo do componente invadido, mas para no escudo.
+        linhas += '<path class="te" d="' + ate + '" stroke="#C4C4C4"/><path class="te" d="' + depois + '" stroke="' + cor + '" stroke-opacity="0.5"/>';
+        if (anima) pontos += ponto(COR.exposto, ate, 1.6, atraso, true);
+      } else if (c.estado === 'fora') {
+        linhas += '<path class="te" d="' + inteiro + '" stroke="#D6D6D6" stroke-width="1" stroke-dasharray="3 4"/>';
+      } else {
+        linhas += '<path class="te" d="' + inteiro + '" stroke="' + cor + '"' + (c.estado === 'desconhecido' ? ' stroke-dasharray="1 6"' : '') + '/>';
+        if (anima) pontos += ponto(cor, inteiro, 2.8, atraso) + ponto(cor, inteiro, 2.8, atraso + 1.4);
+      }
+      linhas += '<path class="thit" d="' + inteiro + '" data-caminho="' + c.n + '" data-tip="' + esc(dica(c)) + '"/>';
+      marcas += alvoDoDesenho('tsh', c, mx, my, 15, escudo(c.estado));
+    });
+
+    Object.keys(T.nos).forEach(k => {
+      const n = T.nos[k], x = n[0] - n[2] / 2, y = n[1] - T.alt / 2;
+      caixas += '<g class="tn ' + (n[4] === 'e' ? 'ent' : (pior[k] || 'fora')) + '"><rect x="' + x + '" y="' + y + '" width="' + n[2] + '" height="' + T.alt + '" rx="8"/><text x="' + (x + 12) + '" y="' + (n[1] + 4.5) + '">' + esc(n[3]) + '</text></g>';
+      (porNo[k] || []).forEach((c, i) => { marcas += alvoDoDesenho('tsn', c, x + n[2] - 14 - 22 * i, y, 13, sinal(c.estado, anima)); });
+    });
+
+    const ce = contarEstados(lista);
+    return '<svg viewBox="0 0 ' + T.w + ' ' + T.h + '" role="img" aria-label="Topologia de ataque: ' + ce.mitigado + ' de ' + (lista.length - ce.fora) + ' caminhos mitigados ou com alerta. A tabela abaixo lista todos os caminhos.">'
+      + fundo + linhas + caixas + pontos + marcas + '</svg>';
+  }
+
+  function desenharTopologia() {
+    const lista = caminhos(stVisao), ce = contarEstados(lista), nv = nivel(stVisao);
+    $('#tp-resumo').innerHTML = (SIM ? '<div class="aviso"><b>Simulação.</b> O desenho mostra como o ambiente ficaria com esses controles aplicados. Nada é gravado, e a situação registrada não muda.</div>' : '')
+      + '<div class="card" style="margin-bottom:16px"><div class="tpr"><div><span class="big">' + ce.mitigado + ' de ' + (lista.length - ce.fora) + '</span><span class="s">caminhos mitigados ou com alerta</span></div>'
+      + '<div>' + barra(partesCaminho(ce), 'Caminhos de ataque') + legendaCaminhos(ce) + '</div>'
+      + '<div class="r"><span class="big">' + nv.pontos + '</span><span class="s">nível de proteção · ' + nv.nome + '</span></div></div></div>';
+    $('#tp-svg').innerHTML = svgTopologia(lista);
+    const svg = $('#tp-svg svg');
+    if (pausado && svg.pauseAnimations) svg.pauseAnimations();
+    $('#tp-lista').innerHTML = '<div class="tw"><table class="t tpl"><tr><th>Caminho</th><th>Resposta</th><th>Controles</th><th>Situação</th></tr>'
+      + lista.map(c => '<tr data-caminho="' + c.n + '"' + (c.n === caminhoSel ? ' class="sel"' : '') + '><td>' + emLinha(c.texto) + '</td><td class="nw">' + (c.tipo === 'deteccao' ? 'Detecção' : 'Bloqueio') + '</td><td>'
+        + c.controles.map(id => '<a class="cid ' + stVisao(id) + '" href="#controles/' + id + '" title="' + esc(CONTROLE[id].titulo) + ' · ' + ROT[stVisao(id)] + '">' + id + '</a>').join('') + '</td><td class="nw">' + pillEstado(c) + '</td></tr>').join('')
+      + '</table></div>';
+    const marca = $('#tp-pill');
+    if (marca && caminhoSel != null) marca.innerHTML = pillEstado(lista[caminhoSel]);
+  }
+  function detalheCaminho() {
+    const el = $('#tp-detalhe');
+    if (caminhoSel == null) {
+      el.innerHTML = '<p class="muted">Clique em um escudo, em um sinal de detecção ou em uma linha da tabela para ver os controles do caminho e registrar a situação aqui mesmo.</p>';
+      return;
+    }
+    const c = caminhos(stVisao)[caminhoSel];
+    el.innerHTML = '<div class="card mark"><h3>' + emLinha(c.texto) + '<span id="tp-pill">' + pillEstado(c) + '</span></h3><p class="sub">'
+      + (c.tipo === 'deteccao' ? 'Controles que fazem este caminho gerar alerta.' : 'Controles que fecham este caminho.')
+      + (SIM ? ' As situações abaixo são as registradas; o desenho mostra a simulação.' : ' Mude a situação de um controle e o desenho acompanha.') + '</p>'
+      + c.controles.map(linha).join('') + '</div>';
+  }
+  function selecionarCaminho(n, rolar) {
+    caminhoSel = n;
+    desenharTopologia();
+    detalheCaminho();
+    if (rolar) $('#tp-detalhe').scrollIntoView({ block: 'nearest', behavior: semMovimento ? 'auto' : 'smooth' });
+  }
+  function topologia() {
+    const mini = e => '<svg viewBox="-12 -13 24 26" width="18" height="20" aria-hidden="true">' + e + '</svg>';
+    let h = cabecalho('Movimentação lateral', 'Topologia <em>de ataque</em>', 'Um componente foi invadido: o desenho mostra até onde o invasor consegue ir a partir dele. Cada controle aplicado fecha um caminho ou faz com que ele gere alerta. Os caminhos vêm do ' + link(D.ameacas.arquivo, 'modelo de ameaça') + '.');
+    h += '<div class="bar"><span class="lb">Mostrar</span>'
+      + [[0, 'Situação registrada'], [1, 'Com a prioridade 1 aplicada'], [2, 'Com as prioridades 1 e 2'], [3, 'Com todo o catálogo']].map(x => '<button type="button" class="chip' + (SIM === x[0] ? ' on' : '') + '" data-sim="' + x[0] + '">' + x[1] + '</button>').join('')
+      + (semMovimento ? '' : '<button type="button" class="btn" data-acao="pausar" style="margin-left:auto">' + (pausado ? 'Retomar a animação' : 'Pausar a animação') + '</button>') + '</div>';
+    h += '<div id="tp-resumo"></div><div class="card tp"><div class="tw" id="tp-svg"></div><div class="leg">'
+      + '<span>' + mini(escudo('mitigado')) + 'Mitigado: o ataque para no escudo</span><span>' + mini(escudo('parcial')) + 'Parcial: falta controle</span><span>' + mini(escudo('aberto')) + 'Aberto: o invasor alcança o destino</span><span>' + mini(escudo('desconhecido')) + 'Não avaliado</span>'
+      + '<span>' + mini(sinal('mitigado', false)) + 'Detecção: o componente gera alerta</span><span>' + mini(sinal('aberto', false)) + 'Sem alerta</span></div>'
+      + '<p class="muted" style="margin-top:10px">O desenho reflete a situação registrada, e não um teste do ambiente. Os controles do catálogo estão em rascunho: só a validação de cada um confirma o bloqueio.</p></div>';
+    h += '<div id="tp-detalhe"></div><h3 class="grp">Todos os caminhos</h3><div id="tp-lista"></div>';
+    $('#s-topologia').innerHTML = h;
+    detalheCaminho();
+    desenharTopologia();
   }
 
   function filtrados() {
@@ -663,7 +1065,7 @@
     $('#s-relatorio').innerHTML = h;
   }
 
-  const DESENHAR = { visao: visao, controles: controles, prioridades: prioridades, processos: processos, plano: plano, incidentes: incidentes, relatorio: relatorio };
+  const DESENHAR = { visao: visao, topologia: topologia, controles: controles, prioridades: prioridades, processos: processos, plano: plano, incidentes: incidentes, relatorio: relatorio };
 
   function navegar() {
     const partes = location.hash.slice(1).split('/');
@@ -786,6 +1188,12 @@
     if (filtro) { F[filtro.dataset.filtro] = filtro.dataset.valor; controles(); return; }
     const tec = alvo.closest('[data-tec]');
     if (tec) { F.tec = tec.dataset.tec; F.pilar = F.pri = F.st = F.q = ''; }
+    const pri = alvo.closest('[data-pri]');
+    if (pri) { F.pri = pri.dataset.pri; F.tec = F.pilar = F.st = F.q = ''; }
+    const sim = alvo.closest('[data-sim]');
+    if (sim) { SIM = +sim.dataset.sim; topologia(); return; }
+    const cam = alvo.closest('[data-caminho]');
+    if (cam && !alvo.closest('a')) { selecionarCaminho(+cam.dataset.caminho, !!alvo.closest('svg')); return; }
     const acao = alvo.closest('[data-acao]');
     if (acao) {
       const a = acao.dataset.acao;
@@ -794,6 +1202,12 @@
       if (a === 'exportar') baixar('lateralshield-avaliacao-' + hoje() + '.json', 'application/json', JSON.stringify({ formato: 'lateralshield-mission-control', versao: 1, exportado_em: agoraUTC(), meta: E.meta, itens: E.itens }, null, 1));
       if (a === 'importar') $('#arquivo').click();
       if (a === 'senha') abrirSenha(false);
+      if (a === 'pausar') {
+        pausado = !pausado;
+        const svg = $('#tp-svg svg');
+        if (svg && svg.pauseAnimations) { if (pausado) svg.pauseAnimations(); else svg.unpauseAnimations(); }
+        acao.textContent = pausado ? 'Retomar a animação' : 'Pausar a animação';
+      }
       if (a === 'apagar' && confirm('Apagar todas as respostas guardadas neste navegador?')) { E.meta = {}; E.itens = {}; marcar(gravarLocal(), 'Dados apagados'); navegar(); }
       return;
     }
@@ -811,12 +1225,38 @@
     const linhaEl = alvo.closest('.it');
     if (alvo.dataset.campo && linhaEl) {
       const id = linhaEl.dataset.id, campo = alvo.dataset.campo;
-      salvarItem(id, { [campo]: alvo.value.trim() }).then(() => atualizarLinha(id));
+      salvarItem(id, { [campo]: alvo.value.trim() }).then(() => {
+        atualizarLinha(id);
+        if ($('#s-topologia').classList.contains('on')) desenharTopologia();
+      });
     }
   });
   document.addEventListener('input', ev => {
     if (ev.target.id === 'q') { F.q = ev.target.value; listaControles(); }
   });
+  document.addEventListener('keydown', ev => {
+    const cam = ev.target.closest && ev.target.closest('g[data-caminho]');
+    if (cam && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); selecionarCaminho(+cam.dataset.caminho, true); }
+  });
+  // Dica flutuante dos gráficos e da topologia: qualquer elemento com data-tip.
+  const tip = $('#tip');
+  function mostrarDica(el, x, y) {
+    tip.textContent = el.dataset.tip;
+    tip.style.display = 'block';
+    const l = tip.offsetWidth, a = tip.offsetHeight;
+    tip.style.left = Math.max(8, Math.min(x + 14, window.innerWidth - l - 8)) + 'px';
+    tip.style.top = (y + a + 26 > window.innerHeight ? y - a - 12 : y + 18) + 'px';
+  }
+  document.addEventListener('mousemove', ev => {
+    const el = ev.target.closest && ev.target.closest('[data-tip]');
+    if (el) mostrarDica(el, ev.clientX, ev.clientY); else tip.style.display = 'none';
+  });
+  document.addEventListener('focusin', ev => {
+    const el = ev.target.closest && ev.target.closest('[data-tip]');
+    if (el) { const r = el.getBoundingClientRect(); mostrarDica(el, r.left + r.width / 2, r.bottom - 8); }
+  });
+  document.addEventListener('focusout', () => { tip.style.display = 'none'; });
+  document.addEventListener('scroll', () => { tip.style.display = 'none'; }, true);
   $('#pw').addEventListener('submit', trocarSenha);
   $('#pw-cancelar').addEventListener('click', () => $('#veu').classList.remove('on'));
   window.addEventListener('hashchange', navegar);

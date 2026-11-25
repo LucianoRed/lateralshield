@@ -185,7 +185,29 @@ def ler_incidentes():
     return {"arquivo": arquivo, "itens": itens}
 
 
+def ler_ameacas(controles):
+    """Caminhos de movimentação lateral e os controles que respondem a cada um, do modelo de ameaça."""
+    arquivo = "docs/modelo-de-ameaca.md"
+    texto = (RAIZ / arquivo).read_text(encoding="utf-8")
+    conhecidos = {c["id"] for c in controles}
+    caminhos = []
+    for linha in linhas_de_tabela(secoes(texto).get("Como o catálogo responde", "")):
+        if len(linha) != 2:
+            falhar(f"{arquivo}: linha inesperada na tabela de caminhos: {linha}")
+        ids = re.findall(r"\[(LS-[A-Z]+-\d{3})\]", linha[1])
+        if not ids:
+            falhar(f"{arquivo}: caminho sem controle: {linha[0]}")
+        for ident in ids:
+            if ident not in conhecidos:
+                falhar(f"{arquivo}: o caminho '{linha[0]}' cita {ident}, que não está no catálogo")
+        caminhos.append({"caminho": linha[0], "controles": ids})
+    if not caminhos:
+        falhar(f"{arquivo}: tabela 'Como o catálogo responde' não encontrada")
+    return {"arquivo": arquivo, "caminhos": caminhos}
+
+
 def gerar_dados():
+    controles = ler_controles()
     dados = {
         "aviso": "Gerado por scripts/mission_control.py a partir de catalogo/ e docs/. Não edite manualmente.",
         "repositorio": REPOSITORIO,
@@ -193,10 +215,11 @@ def gerar_dados():
             {"id": tec, "nome": nome, "curto": NOMES_CURTOS[tec]}
             for tec, (nome, _) in catalogo.TECNOLOGIAS.items()
         ],
-        "controles": ler_controles(),
+        "controles": controles,
         "logs": ler_logs(),
         "processos": ler_processos(),
         "incidentes": ler_incidentes(),
+        "ameacas": ler_ameacas(controles),
     }
     corpo = json.dumps(dados, ensure_ascii=False, indent=1)
     # "</" não pode aparecer cru dentro de um <script>.

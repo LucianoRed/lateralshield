@@ -4,7 +4,8 @@ Painel de avaliação do LateralShield: uma página única, com menu fixo à esq
 
 | Seção | Conteúdo |
 |---|---|
-| **Visão geral** | Dados da avaliação, contagens, a primeira verificação (logs centralizados), as perguntas de processo por onde começar e os próximos passos |
+| **Visão geral** | O nível de proteção, os marcos, gráficos por pilar, tecnologia e prioridade, a primeira verificação (logs centralizados), as perguntas de processo por onde começar e os próximos passos |
+| **Topologia de ataque** | Desenho animado dos caminhos de movimentação lateral do [modelo de ameaça](../docs/modelo-de-ameaca.md): cada caminho aparece aberto, parcial ou mitigado conforme a situação dos seus controles |
 | **Controles** | Os controles do catálogo, com filtros por tecnologia, pilar, prioridade e situação. Cada um abre com o problema, o benefício e os comandos de avaliação, que são somente leitura |
 | **Matriz 80/20** | Impacto × esforço, com a cor de cada controle indicando a situação registrada |
 | **Processos** | As perguntas de pessoas e processos, com resposta `sim`, `parcial` ou `não`. Sem nota e sem nível de maturidade |
@@ -13,6 +14,32 @@ Painel de avaliação do LateralShield: uma página única, com menu fixo à esq
 | **Relatório e dados** | Relatório em PDF e Excel, cópia dos dados em JSON e troca de senha |
 
 A situação registrada aqui é a do **ambiente avaliado**. Ela não muda o status do controle no catálogo, que continua `rascunho` até a validação em laboratório.
+
+## Nível de proteção
+
+A visão geral mostra um índice de 0 a 100 e um nível de 1 a 5, para acompanhar a evolução do ambiente e mostrar o que mais vale aplicar em seguida.
+
+- O índice é a parcela dos controles aplicáveis que já está aplicada, com peso 3, 2 e 1 para as prioridades 1, 2 e 3 da matriz 80/20.
+- Controle `não avaliado`, `exposto` ou `em implantação` conta como não aplicado. Controle marcado como `não se aplica` sai da conta.
+- Os níveis começam em 0, 20, 40, 65 e 90 pontos: Inicial, Básico, Intermediário, Avançado e Consolidado. As faixas são uma convenção do painel, e não uma escala de mercado.
+- As perguntas de processo **não entram** no índice e continuam sem nota.
+
+O índice mede a cobertura do catálogo no ambiente, a partir do que foi registrado. **Não é certificação nem garantia de segurança**, e não aparece no relatório em PDF e Excel.
+
+## Topologia de ataque
+
+O desenho parte de cinco pontos de entrada já invadidos e mostra até onde o invasor chega. Cada linha da tabela "Como o catálogo responde" do [modelo de ameaça](../docs/modelo-de-ameaca.md) é um caminho:
+
+| Situação do caminho | Quando |
+|---|---|
+| Mitigado, ou com alerta | Todos os controles aplicáveis do caminho estão aplicados |
+| Parcial | Há controle aplicado ou em implantação, mas não todos |
+| Aberto, ou sem alerta | Nenhum aplicado e ao menos um exposto |
+| Não avaliado | Nenhum controle do caminho foi avaliado |
+
+Um clique em um escudo ou em um sinal de detecção abre os controles do caminho, e a situação pode ser registrada ali mesmo. Os botões "Com a prioridade 1 aplicada" e seguintes simulam o resultado sem gravar nada.
+
+O desenho reflete a situação registrada, e não um teste do ambiente: não há varredura nem verificação automática.
 
 ## Três formas de usar
 
@@ -91,7 +118,7 @@ Dois arquivos são **gerados** e não devem ser editados à mão:
 
 | Arquivo | Gerado a partir de |
 |---|---|
-| `web/data.js` | `catalogo/`, `docs/avaliacao-de-processos.md`, `docs/recomendacoes-para-incidentes.md` e a tabela de logs de `docs/metodologia.md` |
+| `web/data.js` | `catalogo/`, `docs/avaliacao-de-processos.md`, `docs/recomendacoes-para-incidentes.md`, a tabela de logs de `docs/metodologia.md` e a tabela de caminhos de `docs/modelo-de-ameaca.md` |
 | `openshift/mission-control.yaml` | `openshift/base.yaml` e os arquivos de `web/` |
 
 ```bash
@@ -110,10 +137,14 @@ Rode o script sempre que um controle, uma pergunta ou um arquivo de `web/` mudar
 | `openshift/base.yaml` | Secrets, MySQL, Deployment, Service, Route e NetworkPolicies |
 | `Containerfile` | Imagem única, para uso fora do OpenShift |
 
+Os caminhos da topologia vêm do modelo de ameaça, mas a posição de cada um no desenho fica em `TOPO`, no `web/index.html`: cada linha da tabela é ligada a uma aresta ou a um sinal por um dos seus controles. Uma linha nova que não for incluída em `TOPO` aparece na tabela de caminhos e nas contagens, mas não no desenho.
+
 Para desenvolver sem contêiner: `cd mission-control/web && php -S 127.0.0.1:8080 index.php` (usa SQLite em um arquivo temporário).
 
 ## Estado
 
 Testado em contêineres locais, com a imagem `ubi9/php-82` e um MySQL 8.0, simulando o usuário sem privilégio do OpenShift: autenticação, troca de senha, gravação, relatórios e importação. O MySQL do teste foi a imagem comunitária equivalente (`quay.io/sclorg/mysql-80-c9s`), e não a `rhel9/mysql-80` do manifesto.
+
+O nível de proteção, os gráficos e a topologia foram conferidos no Chrome, em modo local. Não foram conferidos em Firefox nem em Safari.
 
 **O manifesto ainda não foi aplicado em um cluster OpenShift.** Rota, NetworkPolicies, volume persistente e a leitura dos ConfigMaps pelo pod dependem de teste em laboratório.

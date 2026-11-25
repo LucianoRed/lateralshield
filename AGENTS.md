@@ -93,7 +93,8 @@ A existência de syslog central é a primeira verificação em qualquer ambiente
 - os dados exibidos vêm do catálogo e dos documentos. Não escreva controle, pergunta ou recomendação diretamente na página: altere a fonte e rode `python3 scripts/mission_control.py`;
 - rode o mesmo script depois de alterar qualquer arquivo de `mission-control/web/` ou `mission-control/openshift/base.yaml`, para regenerar o manifesto;
 - mantenha a aplicação sem dependências externas e sem etapa de build: ela roda na imagem UBI de PHP, com o código em ConfigMaps;
-- não crie nota, pontuação nem nível de maturidade na página ou no relatório, pela mesma regra da avaliação de processos;
+- o nível de proteção da visão geral mede só a cobertura dos **controles** do catálogo, ponderada pela prioridade 80/20, e é apresentado como cobertura, nunca como certificação ou garantia. As perguntas de processo não entram na conta e continuam sem nota, pontuação ou nível de maturidade, na página e no relatório;
+- os caminhos da topologia de ataque vêm da tabela "Como o catálogo responde" de `docs/modelo-de-ameaca.md`. Ao acrescentar uma linha a essa tabela, inclua-a também em `TOPO`, no `mission-control/web/index.html`, ou ela aparece só na tabela de caminhos;
 - a situação registrada no painel é a do ambiente avaliado e não altera o `status` do controle no catálogo;
 - nunca versione respostas, relatórios ou exportações de um ambiente real.
 
