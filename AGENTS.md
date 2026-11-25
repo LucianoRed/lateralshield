@@ -20,6 +20,8 @@ Antes de escrever qualquer coisa, leia [README.md](README.md), [docs/metodologia
 | `automacao/playbooks/` | Playbooks `avaliar_*` (somente leitura) e `aplicar_*` | |
 | `automacao/roles/` | Uma role por controle aplicável | |
 | `scripts/catalogo.py` | Valida controles e gera o índice | Fonte da verdade das regras de metadados |
+| `mission-control/` | Painel de avaliação: página, API em PHP e manifesto do OpenShift | Segue `mission-control/README.md` |
+| `mission-control/web/data.js`, `mission-control/openshift/mission-control.yaml` | Dados da página e manifesto pronto para `oc apply` | **Gerados por `scripts/mission_control.py`. Nunca edite à mão** |
 | `apresentacao/` | Deck HTML de apresentação do projeto | Atualize os números quando o catálogo ou o roadmap mudarem |
 
 ## Regras que não se negociam
@@ -84,6 +86,17 @@ A existência de syslog central é a primeira verificação em qualquer ambiente
 - atualize o número de recomendações no slide "Incidentes" de `apresentacao/index.html`;
 - se a medida for específica de uma tecnologia Red Hat e fizer sentido de forma permanente, ela é um controle e vai para o catálogo.
 
+## Mission Control
+
+[mission-control/](mission-control/README.md) é o painel que transforma o catálogo e a avaliação de processos em checklist, com relatório em PDF e Excel. Ao mexer nele:
+
+- os dados exibidos vêm do catálogo e dos documentos. Não escreva controle, pergunta ou recomendação diretamente na página: altere a fonte e rode `python3 scripts/mission_control.py`;
+- rode o mesmo script depois de alterar qualquer arquivo de `mission-control/web/` ou `mission-control/openshift/base.yaml`, para regenerar o manifesto;
+- mantenha a aplicação sem dependências externas e sem etapa de build: ela roda na imagem UBI de PHP, com o código em ConfigMaps;
+- não crie nota, pontuação nem nível de maturidade na página ou no relatório, pela mesma regra da avaliação de processos;
+- a situação registrada no painel é a do ambiente avaliado e não altera o `status` do controle no catálogo;
+- nunca versione respostas, relatórios ou exportações de um ambiente real.
+
 ## Como escrever automação
 
 - Playbooks `avaliar_*` **nunca alteram** o alvo: toda tarefa `command`/`shell` leva `changed_when: false`.
@@ -100,6 +113,8 @@ Execute a partir da raiz e só considere o trabalho pronto quando tudo passar:
 ```bash
 python3 scripts/catalogo.py            # valida os controles e regenera catalogo/INDICE.md
 python3 scripts/catalogo.py --check    # confirma que o índice está atualizado
+python3 scripts/mission_control.py     # regenera os dados e o manifesto do Mission Control
+python3 scripts/mission_control.py --check
 yamllint .
 ( cd automacao && ansible-playbook --syntax-check playbooks/*.yml && ansible-lint )
 ```

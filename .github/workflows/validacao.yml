@@ -19,6 +19,8 @@ jobs:
           python-version: "3.12"
       - name: Validar o catálogo e o índice
         run: python3 scripts/catalogo.py --check
+      - name: Conferir os arquivos gerados do Mission Control
+        run: python3 scripts/mission_control.py --check
       - name: Instalar ferramentas de lint
         run: pip install ansible-core ansible-lint yamllint
       - name: Lint de YAML

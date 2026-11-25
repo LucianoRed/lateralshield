@@ -1,0 +1,26 @@
+# Mission Control do LateralShield em uma imagem única.
+#
+# Opcional: no OpenShift, o manifesto openshift/mission-control.yaml dispensa o
+# build. Esta imagem serve para executar em um host com Podman, guardando as
+# respostas em SQLite (padrão) ou em um MySQL externo (variáveis MC_DB_*).
+#
+#   podman build -t lateralshield-mission-control mission-control/
+#   podman run -d --name mission-control -p 8080:8080 \
+#     -v mission-control-dados:/dados lateralshield-mission-control
+FROM registry.access.redhat.com/ubi9/php-82:latest
+
+COPY --chown=1001:0 web/ /opt/app-root/src/
+
+USER 0
+RUN mkdir -p /dados && chown 1001:0 /dados && chmod 770 /dados
+USER 1001
+
+# PHP_CLEAR_ENV=OFF deixa o PHP ler as variáveis de ambiente do contêiner.
+ENV PHP_CLEAR_ENV=OFF \
+    DISPLAY_ERRORS=OFF \
+    HTTPD_START_SERVERS=2 \
+    MC_SQLITE=/dados/mission-control.sqlite
+
+VOLUME /dados
+EXPOSE 8080
+CMD ["/usr/libexec/s2i/run"]
