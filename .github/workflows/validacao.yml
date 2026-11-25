@@ -21,6 +21,8 @@ jobs:
         run: python3 scripts/catalogo.py --check
       - name: Conferir os arquivos gerados do Mission Control
         run: python3 scripts/mission_control.py --check
+      - name: Conferir o manifesto gerado do app vulnerável de demonstração
+        run: python3 scripts/app_vulneravel.py --check
       - name: Instalar ferramentas de lint
         run: pip install ansible-core ansible-lint yamllint
       - name: Lint de YAML

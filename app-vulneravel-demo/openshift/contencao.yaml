@@ -1,0 +1,100 @@
+---
+# Contenção para a demonstração: as políticas de rede do LateralShield aplicadas
+# ao projeto da app vulnerável. Aplique DEPOIS da base para mostrar a diferença
+# com a aplicação comprometida: o que o invasor alcançava deixa de ser alcançável.
+#
+#   oc apply -f app-vulneravel-demo/openshift/contencao.yaml
+#
+# As políticas seguem LS-OCP-002 (negação padrão) e acrescentam uma política de
+# saída que limita a aplicação a falar apenas com o banco e o DNS, contendo a
+# requisição forjada (SSRF) e o comando remoto. A política de saída exige um
+# provedor de rede que a suporte, como o OVN-Kubernetes padrão do OpenShift.
+#
+# A contenção de rede não cobre o token da service account nem o reforço do
+# contêiner. Para isso, veja os comandos "oc patch" no README (LS-OCP-009 e
+# LS-OCP-010). Para remover a contenção e voltar à linha de base:
+#
+#   oc delete -f app-vulneravel-demo/openshift/contencao.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ls-negar-tudo-por-padrao
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/part-of: app-vulneravel-demo
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# Permite que o roteador de ingress alcance a aplicação (caso haja uma rota).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ls-permitir-ingress-para-a-aplicacao
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/part-of: app-vulneravel-demo
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: app-vulneravel-web
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              policy-group.network.openshift.io/ingress: ""
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+# Permite que a aplicação alcance o banco.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ls-permitir-aplicacao-para-o-banco
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/part-of: app-vulneravel-demo
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: app-vulneravel-mysql
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: app-vulneravel-web
+      ports:
+        - protocol: TCP
+          port: 3306
+---
+# Saída da aplicação: apenas o banco e a resolução de nomes. Todo o resto é
+# negado, o que contém a requisição forjada (SSRF) e a saída para a internet.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ls-saida-da-aplicacao-so-o-necessario
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/part-of: app-vulneravel-demo
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: app-vulneravel-web
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: app-vulneravel-mysql
+      ports:
+        - protocol: TCP
+          port: 3306
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53

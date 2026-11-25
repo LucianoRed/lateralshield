@@ -1,0 +1,636 @@
+# GERADO por scripts/app_vulneravel.py. Não edite manualmente.
+# Fontes: app-vulneravel-demo/openshift/base.yaml e app-vulneravel-demo/web/.
+#
+# ATENÇÃO: aplicação deliberadamente vulnerável. Só para laboratório isolado.
+#
+#   oc new-project app-vulneravel-demo
+#   oc apply -f app-vulneravel-demo/openshift/app-vulneravel-demo.yaml
+---
+# App vulnerável de demonstração do LateralShield no OpenShift: aplicação e banco.
+#
+# ATENÇÃO: a aplicação é DELIBERADAMENTE VULNERÁVEL. Instale apenas em um cluster
+# ou projeto de laboratório, isolado e descartável. Não publique uma rota para a
+# internet e não coloque dados reais.
+#
+# Este arquivo é a parte escrita à mão. O manifesto que se aplica é o
+# app-vulneravel-demo.yaml, gerado por scripts/app_vulneravel.py, que junta este
+# arquivo ao ConfigMap com o código (app-vulneravel-demo/web/).
+#
+# O projeto não é criado aqui: crie-o antes, com
+# "oc new-project app-vulneravel-demo". De propósito, o manifesto não traz
+# NetworkPolicy nem reforço de segurança: é a linha de base "sem defesa". Para
+# demonstrar a contenção, aplique depois openshift/contencao.yaml (veja o README).
+#
+# Credenciais do banco. O usuário tem mais privilégios do que precisaria, de
+# propósito, para a demonstração de roubo de credenciais.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-vulneravel-db
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/part-of: app-vulneravel-demo
+type: Opaque
+stringData:
+  database-name: appvuln
+  database-user: appvuln
+  database-password: troque-esta-senha
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-vulneravel-mysql
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/part-of: app-vulneravel-demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-vulneravel-mysql
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/name: app-vulneravel-mysql
+    app.kubernetes.io/part-of: app-vulneravel-demo
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app-vulneravel-mysql
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: app-vulneravel-mysql
+        app.kubernetes.io/part-of: app-vulneravel-demo
+    spec:
+      containers:
+        - name: mysql
+          image: registry.redhat.io/rhel9/mysql-80:latest
+          ports:
+            - name: mysql
+              containerPort: 3306
+          env:
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: app-vulneravel-db
+                  key: database-name
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-vulneravel-db
+                  key: database-user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-vulneravel-db
+                  key: database-password
+          volumeMounts:
+            - name: dados
+              mountPath: /var/lib/mysql/data
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - MYSQL_PWD="$MYSQL_PASSWORD" mysqladmin -u "$MYSQL_USER" -h 127.0.0.1 ping
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              memory: 512Mi
+      volumes:
+        - name: dados
+          persistentVolumeClaim:
+            claimName: app-vulneravel-mysql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-vulneravel-mysql
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/part-of: app-vulneravel-demo
+spec:
+  selector:
+    app.kubernetes.io/name: app-vulneravel-mysql
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: mysql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-vulneravel-web
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/name: app-vulneravel-web
+    app.kubernetes.io/part-of: app-vulneravel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app-vulneravel-web
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: app-vulneravel-web
+        app.kubernetes.io/part-of: app-vulneravel-demo
+    spec:
+      containers:
+        - name: app
+          image: registry.access.redhat.com/ubi9/php-82:latest
+          # Inicia o httpd e o PHP da imagem, sem etapa de build.
+          args:
+            - /usr/libexec/s2i/run
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            # Deixa o PHP ler as variáveis de ambiente do contêiner.
+            - name: PHP_CLEAR_ENV
+              value: "OFF"
+            - name: DISPLAY_ERRORS
+              value: "OFF"
+            - name: HTTPD_START_SERVERS
+              value: "2"
+            - name: AVD_DB_HOST
+              value: app-vulneravel-mysql
+            - name: AVD_DB_PORT
+              value: "3306"
+            - name: AVD_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-vulneravel-db
+                  key: database-name
+            - name: AVD_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-vulneravel-db
+                  key: database-user
+            - name: AVD_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-vulneravel-db
+                  key: database-password
+          volumeMounts:
+            - name: codigo
+              mountPath: /opt/app-root/src
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /index.php?p=healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 384Mi
+      volumes:
+        - name: codigo
+          configMap:
+            name: app-vulneravel-web
+            # O ConfigMap guarda os arquivos com chaves planas (ConfigMap não
+            # aceita "/" na chave); aqui cada um volta ao seu caminho de origem.
+            items:
+              - key: index.php
+                path: index.php
+              - key: lib.php
+                path: lib.php
+              - key: .htaccess
+                path: .htaccess
+              - key: arquivos-leia-me.txt
+                path: arquivos/leia-me.txt
+              - key: arquivos-politica.txt
+                path: arquivos/politica.txt
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-vulneravel-web
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/part-of: app-vulneravel-demo
+spec:
+  selector:
+    app.kubernetes.io/name: app-vulneravel-web
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-vulneravel-web
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/part-of: app-vulneravel-demo
+data:
+  index.php: |
+    <?php
+
+    // APLICAÇÃO DELIBERADAMENTE VULNERÁVEL — LateralShield · app-vulneravel-demo
+    // Controlador único. As falhas são propositais; veja o cabeçalho de lib.php.
+    // Execução local, sem contêiner:  php -S 127.0.0.1:8080 index.php
+
+    declare(strict_types=1);
+
+    require __DIR__ . '/lib.php';
+    sessao();
+
+    // Endpoint de saúde, sem autenticação, para a sonda do OpenShift.
+    if (($_GET['p'] ?? '') === 'healthz') {
+        header('Content-Type: text/plain');
+        echo "ok\n";
+        exit;
+    }
+
+    $pagina = (string) ($_GET['p'] ?? 'inicio');
+    $u = usuario_atual();
+
+    // A maioria das páginas exige "login". A autenticação é fraca de propósito.
+    $abertas = ['inicio', 'login', 'sair'];
+    if (!$u && !in_array($pagina, $abertas, true)) {
+        $pagina = 'login';
+    }
+
+    switch ($pagina) {
+
+        case 'login':
+            $erro = '';
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $usuario = (string) ($_POST['usuario'] ?? '');
+                $senha = (string) ($_POST['senha'] ?? '');
+                // VULNERÁVEL DE PROPÓSITO: injeção de SQL. A consulta concatena a entrada do usuário.
+                $sql = "SELECT * FROM usuarios WHERE usuario = '$usuario' AND senha = '$senha'";
+                try {
+                    $linha = banco()->query($sql)->fetch(PDO::FETCH_ASSOC);
+                } catch (Throwable $e) {
+                    $linha = false;
+                    $erro = 'Erro na consulta: ' . $e->getMessage(); // VULNERÁVEL: devolve o erro do banco.
+                }
+                if ($linha) {
+                    $_SESSION['usuario'] = ['id' => (int) $linha['id'], 'usuario' => $linha['usuario'], 'papel' => $linha['papel']];
+                    header('Location: ?p=inicio');
+                    exit;
+                }
+                if ($erro === '') {
+                    $erro = 'Usuário ou senha inválidos.';
+                }
+            }
+            $corpo = '<h1>Entrar</h1><div class="card"><form method="post">'
+                . ($erro ? '<p class="erro">' . h($erro) . '</p>' : '')
+                . '<label>Usuário</label><input name="usuario" autofocus>'
+                . '<label>Senha</label><input name="senha" type="password">'
+                . '<p><button type="submit">Entrar</button></p>'
+                . '<p class="muted">Acesso de demonstração: <code>admin</code> / <code>admin</code>.</p></form></div>';
+            echo layout('Entrar', $corpo);
+            break;
+
+        case 'sair':
+            $_SESSION = [];
+            session_destroy();
+            header('Location: ?p=inicio');
+            break;
+
+        case 'inicio':
+            $corpo = '<h1>Portal Interno</h1>'
+                . '<div class="card"><p>' . h(AVD_AVISO) . '</p>'
+                . '<p class="muted">Este portal reúne notas, uma busca, ferramentas de rede e arquivos. '
+                . 'Serve para demonstrar, em laboratório, até onde um invasor chega a partir de uma aplicação web comprometida '
+                . 'e o quanto os controles do LateralShield contêm esse avanço.</p></div>';
+            if ($u) {
+                $corpo .= '<div class="card"><p>Autenticado como <b>' . h($u['usuario']) . '</b> (' . h($u['papel']) . ').</p>'
+                    . '<p><a class="btn" href="?p=notas">Minhas notas</a></p></div>';
+            } else {
+                $corpo .= '<div class="card"><p><a class="btn" href="?p=login">Entrar</a></p></div>';
+            }
+            echo layout('Início', $corpo);
+            break;
+
+        case 'notas':
+            // Criação de nota.
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['titulo'])) {
+                $ins = banco()->prepare('INSERT INTO notas (usuario_id, titulo, corpo, privada) VALUES (?, ?, ?, ?)');
+                $ins->execute([(int) $u['id'], (string) $_POST['titulo'], (string) ($_POST['corpo'] ?? ''), 1]);
+                header('Location: ?p=notas');
+                exit;
+            }
+            $corpo = '<h1>Notas</h1>';
+            if (isset($_GET['id'])) {
+                // VULNERÁVEL DE PROPÓSITO: IDOR + injeção de SQL. Sem checar o dono e concatenando o id.
+                $id = (string) $_GET['id'];
+                $nota = banco()->query("SELECT * FROM notas WHERE id = $id")->fetch(PDO::FETCH_ASSOC);
+                if ($nota) {
+                    // VULNERÁVEL DE PROPÓSITO: XSS armazenado. O conteúdo é impresso sem escapar.
+                    $corpo .= '<div class="card"><h2>' . $nota['titulo'] . '</h2><p>' . $nota['corpo'] . '</p>'
+                        . '<p class="muted">Nota #' . h((string) $nota['id']) . ' · dono ' . h((string) $nota['usuario_id']) . '</p>'
+                        . '<p><a href="?p=notas">Voltar</a></p></div>';
+                } else {
+                    $corpo .= '<p>Nota não encontrada.</p>';
+                }
+            } else {
+                $minhas = banco()->query('SELECT id, titulo FROM notas WHERE usuario_id = ' . (int) $u['id'])->fetchAll(PDO::FETCH_ASSOC);
+                $corpo .= '<div class="card"><table><tr><th>#</th><th>Título</th></tr>';
+                foreach ($minhas as $n) {
+                    $corpo .= '<tr><td>' . h((string) $n['id']) . '</td><td><a href="?p=notas&id=' . h((string) $n['id']) . '">' . h($n['titulo']) . '</a></td></tr>';
+                }
+                $corpo .= '</table></div>'
+                    . '<div class="card"><h2>Nova nota</h2><form method="post">'
+                    . '<label>Título</label><input name="titulo">'
+                    . '<label>Conteúdo</label><textarea name="corpo"></textarea>'
+                    . '<p><button type="submit">Salvar</button></p></form></div>';
+            }
+            echo layout('Notas', $corpo);
+            break;
+
+        case 'busca':
+            $q = (string) ($_GET['q'] ?? '');
+            $corpo = '<h1>Busca de notas</h1><div class="card"><form method="get">'
+                . '<input type="hidden" name="p" value="busca">'
+                // VULNERÁVEL DE PROPÓSITO: XSS refletido. O termo volta para a página sem escapar.
+                . '<label>Termo</label><input name="q" value="' . $q . '">'
+                . '<p><button type="submit">Buscar</button></p></form></div>';
+            if ($q !== '') {
+                // VULNERÁVEL DE PROPÓSITO: injeção de SQL no filtro de busca.
+                $sql = "SELECT id, titulo, corpo FROM notas WHERE titulo LIKE '%$q%' OR corpo LIKE '%$q%'";
+                $corpo .= '<div class="card"><p>Resultados para <b>' . $q . '</b>:</p><table><tr><th>#</th><th>Título</th></tr>';
+                try {
+                    foreach (banco()->query($sql)->fetchAll(PDO::FETCH_ASSOC) as $n) {
+                        $corpo .= '<tr><td>' . h((string) $n['id']) . '</td><td><a href="?p=notas&id=' . h((string) $n['id']) . '">' . h($n['titulo']) . '</a></td></tr>';
+                    }
+                } catch (Throwable $e) {
+                    $corpo .= '<tr><td colspan="2" class="erro">' . h($e->getMessage()) . '</td></tr>';
+                }
+                $corpo .= '</table></div>';
+            }
+            echo layout('Busca', $corpo);
+            break;
+
+        case 'diagnostico':
+            $host = (string) ($_GET['host'] ?? '');
+            $saida = '';
+            if ($host !== '') {
+                // VULNERÁVEL DE PROPÓSITO: injeção de comando. A entrada vai direto para o shell.
+                $saida = (string) shell_exec('ping -c 1 -W 1 ' . $host . ' 2>&1');
+            }
+            $corpo = '<h1>Diagnóstico de rede</h1><div class="card"><form method="get">'
+                . '<input type="hidden" name="p" value="diagnostico">'
+                . '<label>Host para testar (ping)</label><input name="host" value="' . h($host) . '" placeholder="192.0.2.10">'
+                . '<p><button type="submit">Testar</button></p></form>'
+                . ($saida !== '' ? '<pre>' . h($saida) . '</pre>' : '') . '</div>';
+            echo layout('Diagnóstico', $corpo);
+            break;
+
+        case 'abrir':
+            $url = (string) ($_GET['url'] ?? '');
+            $conteudo = '';
+            if ($url !== '') {
+                // VULNERÁVEL DE PROPÓSITO: SSRF. Busca qualquer URL informada pelo usuário.
+                try {
+                    $conteudo = (string) @file_get_contents($url, false, stream_context_create(['http' => ['timeout' => 4]]));
+                } catch (Throwable $e) {
+                    $conteudo = 'Erro: ' . $e->getMessage();
+                }
+            }
+            $corpo = '<h1>Abrir URL</h1><div class="card"><p class="muted">Pré-visualiza o conteúdo de um endereço.</p><form method="get">'
+                . '<input type="hidden" name="p" value="abrir">'
+                . '<label>URL</label><input name="url" value="' . h($url) . '" placeholder="http://servico-interno.exemplo.com.br">'
+                . '<p><button type="submit">Abrir</button></p></form>'
+                . ($url !== '' ? '<pre>' . h(substr($conteudo, 0, 4000)) . '</pre>' : '') . '</div>';
+            echo layout('Abrir URL', $corpo);
+            break;
+
+        case 'arquivos':
+            $nome = (string) ($_GET['nome'] ?? '');
+            $corpo = '<h1>Arquivos</h1><div class="card"><p class="muted">Documentos disponíveis para download.</p>'
+                . '<ul><li><a href="?p=arquivos&nome=leia-me.txt">leia-me.txt</a></li>'
+                . '<li><a href="?p=arquivos&nome=politica.txt">politica.txt</a></li></ul></div>';
+            if ($nome !== '') {
+                // VULNERÁVEL DE PROPÓSITO: travessia de caminho. O nome é concatenado sem normalizar.
+                $caminho = __DIR__ . '/arquivos/' . $nome;
+                if (is_file($caminho)) {
+                    $corpo .= '<div class="card"><h2>' . h($nome) . '</h2><pre>' . h((string) file_get_contents($caminho)) . '</pre></div>';
+                } else {
+                    $corpo .= '<div class="card"><p class="erro">Arquivo não encontrado: ' . h($nome) . '</p></div>';
+                }
+            }
+            echo layout('Arquivos', $corpo);
+            break;
+
+        case 'admin':
+            // VULNERÁVEL DE PROPÓSITO: controle de acesso quebrado. Um parâmetro na URL contorna a checagem de papel.
+            $pode = ($u && ($u['papel'] ?? '') === 'admin') || isset($_GET['acesso']);
+            if (!$pode) {
+                echo layout('Administração', '<h1>Administração</h1><p class="erro">Acesso restrito.</p>');
+                break;
+            }
+            $corpo = '<h1>Administração</h1>';
+            $corpo .= '<div class="card"><h2>Usuários</h2><table><tr><th>ID</th><th>Usuário</th><th>Senha</th><th>Papel</th><th>E-mail</th></tr>';
+            foreach (banco()->query('SELECT * FROM usuarios')->fetchAll(PDO::FETCH_ASSOC) as $x) {
+                $corpo .= '<tr><td>' . h((string) $x['id']) . '</td><td>' . h($x['usuario']) . '</td><td>' . h($x['senha']) . '</td><td>' . h($x['papel']) . '</td><td>' . h($x['email']) . '</td></tr>';
+            }
+            $corpo .= '</table></div><div class="card"><h2>Segredos</h2><table><tr><th>Nome</th><th>Valor</th><th>Descrição</th></tr>';
+            foreach (banco()->query('SELECT * FROM segredos')->fetchAll(PDO::FETCH_ASSOC) as $x) {
+                $corpo .= '<tr><td>' . h($x['nome']) . '</td><td>' . h($x['valor']) . '</td><td>' . h($x['descricao']) . '</td></tr>';
+            }
+            $corpo .= '</table></div>';
+            // VULNERÁVEL DE PROPÓSITO: vazamento de ambiente. Expõe as credenciais do banco e o caminho do token da service account.
+            $corpo .= '<div class="card"><h2>Diagnóstico do ambiente</h2><pre>';
+            foreach (['AVD_DB_HOST', 'AVD_DB_PORT', 'AVD_DB_NAME', 'AVD_DB_USER', 'AVD_DB_PASSWORD', 'HOSTNAME'] as $k) {
+                $corpo .= h($k) . '=' . h(env($k)) . "\n";
+            }
+            $corpo .= '</pre></div>';
+            echo layout('Administração', $corpo);
+            break;
+
+        default:
+            http_response_code(404);
+            echo layout('Não encontrado', '<h1>Página não encontrada</h1><p><a href="?p=inicio">Início</a></p>');
+    }
+  lib.php: |
+    <?php
+
+    // ============================================================================
+    //  APLICAÇÃO DELIBERADAMENTE VULNERÁVEL — LateralShield · app-vulneravel-demo
+    // ----------------------------------------------------------------------------
+    //  Este código tem falhas DE PROPÓSITO. Ele existe só como alvo de teste, para
+    //  demonstrar o quanto a defesa do ambiente contém um componente invadido.
+    //
+    //  NÃO use em produção. NÃO exponha à internet. NÃO coloque dados reais.
+    //  Rode apenas em um laboratório isolado e descartável.
+    //
+    //  Cada ponto vulnerável está marcado com "VULNERÁVEL DE PROPÓSITO". Não
+    //  escreva código assim em uma aplicação de verdade.
+    // ============================================================================
+
+    declare(strict_types=1);
+
+    const AVD_AVISO = 'Aplicação deliberadamente vulnerável. Alvo de teste do LateralShield. Não use em produção, não exponha à internet e não coloque dados reais.';
+
+    function env(string $nome, string $padrao = ''): string
+    {
+        $valor = getenv($nome);
+        return ($valor === false || $valor === '') ? $padrao : $valor;
+    }
+
+    /** Conexão com o banco: MySQL quando AVD_DB_HOST está definido, SQLite no desenvolvimento local. */
+    function banco(): PDO
+    {
+        static $pdo = null;
+        if ($pdo !== null) {
+            return $pdo;
+        }
+        $host = env('AVD_DB_HOST');
+        if ($host !== '') {
+            $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4', $host, env('AVD_DB_PORT', '3306'), env('AVD_DB_NAME', 'appvuln'));
+            $pdo = new PDO($dsn, env('AVD_DB_USER', 'appvuln'), env('AVD_DB_PASSWORD', ''), [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        } else {
+            $arquivo = env('AVD_SQLITE', sys_get_temp_dir() . '/app-vulneravel-demo.sqlite');
+            $pdo = new PDO('sqlite:' . $arquivo, '', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        }
+        bootstrap($pdo);
+        return $pdo;
+    }
+
+    /** Cria as tabelas e carrega dados de exemplo na primeira execução. Todos os dados são fictícios. */
+    function bootstrap(PDO $pdo): void
+    {
+        $sqlite = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite';
+        $id = 'id ' . ($sqlite ? 'INTEGER PRIMARY KEY AUTOINCREMENT' : 'INT AUTO_INCREMENT PRIMARY KEY');
+        $pdo->exec("CREATE TABLE IF NOT EXISTS usuarios ($id, usuario VARCHAR(64), senha VARCHAR(64), papel VARCHAR(16), email VARCHAR(128))");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS notas ($id, usuario_id INT, titulo VARCHAR(160), corpo TEXT, privada INT)");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS segredos ($id, nome VARCHAR(80), valor VARCHAR(200), descricao VARCHAR(200))");
+
+        if ((int) $pdo->query('SELECT COUNT(*) FROM usuarios')->fetchColumn() > 0) {
+            return;
+        }
+        // Senhas guardadas em texto claro DE PROPÓSITO, e credenciais fracas, para a demonstração.
+        $usuarios = [
+            ['admin', 'admin', 'admin', 'admin@exemplo.com.br'],
+            ['ana', 'ana123', 'usuario', 'ana@exemplo.com.br'],
+            ['bruno', 'bruno2024', 'usuario', 'bruno@exemplo.com.br'],
+        ];
+        $ins = $pdo->prepare('INSERT INTO usuarios (usuario, senha, papel, email) VALUES (?, ?, ?, ?)');
+        foreach ($usuarios as $u) {
+            $ins->execute($u);
+        }
+        $notas = [
+            [1, 'Acesso ao console', 'Lembrar de revisar quem tem acesso administrativo ao painel.', 0],
+            [1, 'Credenciais de serviço', 'Usuário de relatórios e senha estão na aba Segredos.', 1],
+            [2, 'Pendências da Ana', 'Fechar o chamado 192 sobre o relatório mensal.', 1],
+            [3, 'Rascunho do Bruno', 'Anotações de teste do ambiente de homologação.', 1],
+        ];
+        $ins = $pdo->prepare('INSERT INTO notas (usuario_id, titulo, corpo, privada) VALUES (?, ?, ?, ?)');
+        foreach ($notas as $n) {
+            $ins->execute($n);
+        }
+        // Segredos fictícios, com valores das faixas de documentação, para ilustrar roubo de credenciais.
+        $segredos = [
+            ['banco_relatorios_usuario', 'relatorios', 'Usuário do banco de relatórios'],
+            ['banco_relatorios_senha', 'troque-esta-senha', 'Senha do banco de relatórios (exemplo)'],
+            ['chave_api_parceiro', 'exemplo-nao-use-0000', 'Chave de API de parceiro (exemplo)'],
+            ['host_backup', '192.0.2.50', 'Servidor de backup acessível por SSH (exemplo)'],
+        ];
+        $ins = $pdo->prepare('INSERT INTO segredos (nome, valor, descricao) VALUES (?, ?, ?)');
+        foreach ($segredos as $s) {
+            $ins->execute($s);
+        }
+    }
+
+    function sessao(): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+    }
+
+    function usuario_atual(): ?array
+    {
+        sessao();
+        return $_SESSION['usuario'] ?? null;
+    }
+
+    function h(?string $texto): string
+    {
+        return htmlspecialchars((string) $texto, ENT_QUOTES, 'UTF-8');
+    }
+
+    /** Cabeçalho, aviso e menu comuns a todas as páginas. */
+    function layout(string $titulo, string $conteudo): string
+    {
+        $u = usuario_atual();
+        $nav = [
+            'inicio' => 'Início',
+            'notas' => 'Notas',
+            'busca' => 'Busca',
+            'diagnostico' => 'Diagnóstico',
+            'abrir' => 'Abrir URL',
+            'arquivos' => 'Arquivos',
+        ];
+        if ($u && ($u['papel'] ?? '') === 'admin') {
+            $nav['admin'] = 'Administração';
+        }
+        $menu = '';
+        foreach ($nav as $p => $rotulo) {
+            $menu .= '<a href="?p=' . $p . '">' . h($rotulo) . '</a>';
+        }
+        $direita = $u
+            ? '<span>' . h($u['usuario']) . ' · ' . h($u['papel']) . '</span> <a href="?p=sair">Sair</a>'
+            : '<a href="?p=login">Entrar</a>';
+
+        return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">'
+            . '<meta name="viewport" content="width=device-width, initial-scale=1"><title>' . h($titulo) . ' · Demo vulnerável</title>'
+            . '<style>'
+            . 'body{font-family:system-ui,Arial,sans-serif;margin:0;color:#151515;background:#f5f5f5}'
+            . '.aviso{background:#B30000;color:#fff;padding:8px 16px;font-size:13px;font-weight:700;text-align:center}'
+            . 'header{background:#151515;color:#fff;display:flex;align-items:center;gap:4px;padding:10px 16px;flex-wrap:wrap}'
+            . 'header b{font-size:16px;margin-right:14px}header a{color:#d2d2d2;text-decoration:none;padding:6px 10px;border-radius:6px;font-size:14px}'
+            . 'header a:hover{background:#2a2a2a;color:#fff}header .dir{margin-left:auto;font-size:13px;color:#b9c4ce}header .dir a{color:#ff8a8a}'
+            . 'main{max-width:900px;margin:22px auto;padding:0 16px}h1{font-size:24px}h2{font-size:18px;margin-top:26px}'
+            . '.card{background:#fff;border:1px solid #d2d2d2;border-radius:10px;padding:16px 18px;margin:14px 0}'
+            . 'input,textarea{font:inherit;padding:8px 10px;border:1px solid #c8c8c8;border-radius:6px;width:100%;box-sizing:border-box;margin:4px 0}'
+            . 'textarea{min-height:90px}button,.btn{font:inherit;font-weight:700;background:#ee0000;color:#fff;border:0;border-radius:6px;padding:9px 16px;cursor:pointer;text-decoration:none;display:inline-block}'
+            . 'table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #ececec;font-size:14px;vertical-align:top}'
+            . 'pre{background:#151515;color:#eaeaea;padding:12px;border-radius:8px;overflow:auto;font-size:13px}label{font-size:13px;font-weight:700;color:#4a4a4a}'
+            . '.erro{color:#B30000;font-weight:700}.muted{color:#8a8a8a;font-size:13px}'
+            . '</style></head><body>'
+            . '<div class="aviso">⚠ AMBIENTE DELIBERADAMENTE VULNERÁVEL — alvo de teste. Não use em produção nem exponha à internet.</div>'
+            . '<header><b>Portal Interno</b>' . $menu . '<span class="dir">' . $direita . '</span></header>'
+            . '<main>' . $conteudo . '</main></body></html>';
+    }
+  .htaccess: |
+    RewriteEngine On
+    RewriteRule !^index\.php$ index.php [L]
+  arquivos-leia-me.txt: |
+    Portal Interno — ambiente de demonstração do LateralShield.
+
+    Esta é uma aplicação deliberadamente vulnerável, usada só como alvo de teste.
+    Não contém dados reais. Os nomes, e-mails e endereços são fictícios
+    (faixas de documentação e domínio exemplo.com.br).
+  arquivos-politica.txt: |
+    Política de uso (exemplo fictício)
+
+    - O acesso ao portal é restrito à equipe interna.
+    - As credenciais de serviço ficam registradas na área de administração.
+    - Dúvidas: suporte@exemplo.com.br.
+
+    Documento de exemplo, sem valor real. Serve apenas para a demonstração.

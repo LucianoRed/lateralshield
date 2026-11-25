@@ -1,0 +1,230 @@
+---
+# App vulnerável de demonstração do LateralShield no OpenShift: aplicação e banco.
+#
+# ATENÇÃO: a aplicação é DELIBERADAMENTE VULNERÁVEL. Instale apenas em um cluster
+# ou projeto de laboratório, isolado e descartável. Não publique uma rota para a
+# internet e não coloque dados reais.
+#
+# Este arquivo é a parte escrita à mão. O manifesto que se aplica é o
+# app-vulneravel-demo.yaml, gerado por scripts/app_vulneravel.py, que junta este
+# arquivo ao ConfigMap com o código (app-vulneravel-demo/web/).
+#
+# O projeto não é criado aqui: crie-o antes, com
+# "oc new-project app-vulneravel-demo". De propósito, o manifesto não traz
+# NetworkPolicy nem reforço de segurança: é a linha de base "sem defesa". Para
+# demonstrar a contenção, aplique depois openshift/contencao.yaml (veja o README).
+#
+# Credenciais do banco. O usuário tem mais privilégios do que precisaria, de
+# propósito, para a demonstração de roubo de credenciais.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-vulneravel-db
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/part-of: app-vulneravel-demo
+type: Opaque
+stringData:
+  database-name: appvuln
+  database-user: appvuln
+  database-password: troque-esta-senha
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-vulneravel-mysql
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/part-of: app-vulneravel-demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-vulneravel-mysql
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/name: app-vulneravel-mysql
+    app.kubernetes.io/part-of: app-vulneravel-demo
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app-vulneravel-mysql
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: app-vulneravel-mysql
+        app.kubernetes.io/part-of: app-vulneravel-demo
+    spec:
+      containers:
+        - name: mysql
+          image: registry.redhat.io/rhel9/mysql-80:latest
+          ports:
+            - name: mysql
+              containerPort: 3306
+          env:
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: app-vulneravel-db
+                  key: database-name
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-vulneravel-db
+                  key: database-user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-vulneravel-db
+                  key: database-password
+          volumeMounts:
+            - name: dados
+              mountPath: /var/lib/mysql/data
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - MYSQL_PWD="$MYSQL_PASSWORD" mysqladmin -u "$MYSQL_USER" -h 127.0.0.1 ping
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              memory: 512Mi
+      volumes:
+        - name: dados
+          persistentVolumeClaim:
+            claimName: app-vulneravel-mysql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-vulneravel-mysql
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/part-of: app-vulneravel-demo
+spec:
+  selector:
+    app.kubernetes.io/name: app-vulneravel-mysql
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: mysql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-vulneravel-web
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/name: app-vulneravel-web
+    app.kubernetes.io/part-of: app-vulneravel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app-vulneravel-web
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: app-vulneravel-web
+        app.kubernetes.io/part-of: app-vulneravel-demo
+    spec:
+      containers:
+        - name: app
+          image: registry.access.redhat.com/ubi9/php-82:latest
+          # Inicia o httpd e o PHP da imagem, sem etapa de build.
+          args:
+            - /usr/libexec/s2i/run
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            # Deixa o PHP ler as variáveis de ambiente do contêiner.
+            - name: PHP_CLEAR_ENV
+              value: "OFF"
+            - name: DISPLAY_ERRORS
+              value: "OFF"
+            - name: HTTPD_START_SERVERS
+              value: "2"
+            - name: AVD_DB_HOST
+              value: app-vulneravel-mysql
+            - name: AVD_DB_PORT
+              value: "3306"
+            - name: AVD_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-vulneravel-db
+                  key: database-name
+            - name: AVD_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-vulneravel-db
+                  key: database-user
+            - name: AVD_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-vulneravel-db
+                  key: database-password
+          volumeMounts:
+            - name: codigo
+              mountPath: /opt/app-root/src
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /index.php?p=healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 384Mi
+      volumes:
+        - name: codigo
+          configMap:
+            name: app-vulneravel-web
+            # O ConfigMap guarda os arquivos com chaves planas (ConfigMap não
+            # aceita "/" na chave); aqui cada um volta ao seu caminho de origem.
+            items:
+              - key: index.php
+                path: index.php
+              - key: lib.php
+                path: lib.php
+              - key: .htaccess
+                path: .htaccess
+              - key: arquivos-leia-me.txt
+                path: arquivos/leia-me.txt
+              - key: arquivos-politica.txt
+                path: arquivos/politica.txt
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-vulneravel-web
+  namespace: app-vulneravel-demo
+  labels:
+    app.kubernetes.io/part-of: app-vulneravel-demo
+spec:
+  selector:
+    app.kubernetes.io/name: app-vulneravel-web
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

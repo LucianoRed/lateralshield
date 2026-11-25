@@ -1,0 +1,28 @@
+# App vulnerável de demonstração do LateralShield, em uma imagem única.
+#
+# ATENÇÃO: aplicação deliberadamente vulnerável. Alvo de teste, para laboratório
+# isolado e descartável. Não use em produção nem exponha à internet.
+#
+# Opcional: no OpenShift, o manifesto openshift/app-vulneravel-demo.yaml dispensa
+# o build. Esta imagem serve para executar em um host com Podman, guardando os
+# dados em SQLite (padrão) ou em um MySQL externo (variáveis AVD_DB_*).
+#
+#   podman build -t app-vulneravel-demo app-vulneravel-demo/
+#   podman run -d --name app-vulneravel-demo -p 8080:8080 app-vulneravel-demo
+FROM registry.access.redhat.com/ubi9/php-82:latest
+
+COPY --chown=1001:0 web/ /opt/app-root/src/
+
+USER 0
+RUN mkdir -p /dados && chown 1001:0 /dados && chmod 770 /dados
+USER 1001
+
+# PHP_CLEAR_ENV=OFF deixa o PHP ler as variáveis de ambiente do contêiner.
+ENV PHP_CLEAR_ENV=OFF \
+    DISPLAY_ERRORS=OFF \
+    HTTPD_START_SERVERS=2 \
+    AVD_SQLITE=/dados/app-vulneravel-demo.sqlite
+
+VOLUME /dados
+EXPOSE 8080
+CMD ["/usr/libexec/s2i/run"]

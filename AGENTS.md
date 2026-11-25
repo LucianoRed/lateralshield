@@ -24,6 +24,7 @@ Antes de escrever qualquer coisa, leia [README.md](README.md), [docs/metodologia
 | `mission-control/` | Painel de avaliação: página, API em PHP e manifesto do OpenShift | Segue `mission-control/README.md` |
 | `mission-control/web/data.js`, `mission-control/openshift/mission-control.yaml` | Dados da página e manifesto pronto para `oc apply` | **Gerados por `scripts/mission_control.py`. Nunca edite à mão** |
 | `apresentacao/` | Deck HTML de apresentação do projeto | Atualize os números quando o catálogo ou o roadmap mudarem |
+| `app-vulneravel-demo/` | Aplicação deliberadamente vulnerável, alvo de teste | Fora do catálogo. Veja a seção própria e `app-vulneravel-demo/README.md` |
 
 ## Regras que não se negociam
 
@@ -110,6 +111,18 @@ A existência de syslog central é a primeira verificação em qualquer ambiente
 - a seção "Sala de crise" mostra o guia de crise e o texto completo das recomendações dentro da página, sem depender de links para o repositório. Mantenha assim: durante um incidente a equipe pode estar sem acesso à internet;
 - nunca versione respostas, relatórios, registros de crise ou exportações de um ambiente real.
 
+## App vulnerável de demonstração
+
+[app-vulneravel-demo/](app-vulneravel-demo/README.md) é uma aplicação **deliberadamente vulnerável**, usada só como alvo de teste para demonstrar o quanto a defesa contém um componente invadido. É a exceção à regra "sem material ofensivo": ela existe para ser atacada em laboratório, não para o catálogo. Ao mexer nela:
+
+- é um **alvo**, não uma ferramenta de ataque. Não escreva nela nada que varra, explore ou ataque outros sistemas, nem passo a passo de ataque. As falhas ficam na própria aplicação e são marcadas com "VULNERÁVEL DE PROPÓSITO";
+- mantenha os avisos em destaque (código, README e manifesto) de que é deliberadamente vulnerável e não deve ir para produção nem para a internet;
+- **nenhum dado real**, como em todo o repositório: use as faixas de documentação e `exemplo.com.br`. As credenciais fracas (`admin`/`admin`) são de exemplo e propositais;
+- não publique uma `Route` por padrão no manifesto. O acesso é por `oc port-forward`;
+- sem dependências externas e sem etapa de build: roda na imagem UBI de PHP, com o código em um ConfigMap;
+- o manifesto `openshift/app-vulneravel-demo.yaml` é gerado por `scripts/app_vulneravel.py`. Rode o script e `--check` depois de alterar `web/` ou `openshift/base.yaml`;
+- a `base.yaml` é a linha de base sem defesa; a contenção fica em `openshift/contencao.yaml` e reaproveita as políticas do catálogo (LS-OCP-002). Não misture as duas.
+
 ## Como escrever automação
 
 - Playbooks `avaliar_*` **nunca alteram** o alvo: toda tarefa `command`/`shell` leva `changed_when: false`.
@@ -128,6 +141,7 @@ python3 scripts/catalogo.py            # valida os controles e regenera catalogo
 python3 scripts/catalogo.py --check    # confirma que o índice está atualizado
 python3 scripts/mission_control.py     # regenera os dados e o manifesto do Mission Control
 python3 scripts/mission_control.py --check
+python3 scripts/app_vulneravel.py --check   # confirma o manifesto do app vulnerável de demonstração
 yamllint .
 ( cd automacao && ansible-playbook --syntax-check playbooks/*.yml && ansible-lint )
 ```

@@ -1,0 +1,5 @@
+Portal Interno — ambiente de demonstração do LateralShield.
+
+Esta é uma aplicação deliberadamente vulnerável, usada só como alvo de teste.
+Não contém dados reais. Os nomes, e-mails e endereços são fictícios
+(faixas de documentação e domínio exemplo.com.br).

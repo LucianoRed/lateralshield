@@ -145,6 +145,7 @@ Pré-requisitos, execução em contêiner fora do OpenShift e como recuperar a s
 | [catalogo/](catalogo/) | Controles, um arquivo por controle, organizados por tecnologia |
 | [automacao/](automacao/) | Playbooks e roles Ansible de avaliação e aplicação |
 | [mission-control/](mission-control/) | Painel de avaliação: checklist dos controles e dos processos, plano de ação e relatório |
+| [app-vulneravel-demo/](app-vulneravel-demo/) | Aplicação **deliberadamente vulnerável**, alvo de teste para demonstrar a contenção. Separada do catálogo, para laboratório isolado |
 | [scripts/](scripts/) | Validação do catálogo e geração do índice e dos arquivos do Mission Control |
 | [apresentacao/](apresentacao/) | Deck de apresentação do projeto |
 
