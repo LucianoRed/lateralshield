@@ -105,9 +105,25 @@ Outras tecnologias Red Hat podem entrar no escopo conforme a relevância dos ris
 5. Rode a etapa de **avaliação** de cada controle antes de mudar qualquer coisa.
 6. Aplique em laboratório ou homologação, valide e só então leve para produção. Todo controle traz a reversão.
 7. Use a [automação Ansible](automacao/README.md) para repetir avaliação e aplicação em escala.
-8. Registre a situação de cada controle e de cada pergunta no [Mission Control](mission-control/README.md), que guarda o checklist e emite o relatório em PDF e Excel. Ele abre direto no navegador ou é instalado no OpenShift com `oc new-project lateralshield` e um `oc apply`.
+8. Registre a situação de cada controle e de cada pergunta no [Mission Control](mission-control/README.md), que guarda o checklist e emite o relatório em PDF e Excel. Ele abre direto no navegador ou é instalado no OpenShift: veja [Instalação do Mission Control](#instalação-do-mission-control).
 
 Está com um incidente em andamento? As [recomendações gerais para incidentes](docs/recomendacoes-para-incidentes.md) reúnem medidas de emergência, como restringir a entrada no perímetro a endereços do Brasil, com os cuidados e a forma de desfazer cada uma.
+
+## Instalação do Mission Control
+
+O [Mission Control](mission-control/README.md) é o painel que guarda o checklist dos controles e das perguntas de processo e emite o relatório. Para instalar no OpenShift, com um banco MySQL:
+
+```bash
+oc new-project lateralshield
+oc apply -f https://raw.githubusercontent.com/LucianoRed/lateralshield/main/mission-control/openshift/mission-control.yaml
+oc get route mission-control -n lateralshield
+```
+
+O último comando mostra o endereço da página. Entre com o usuário `admin` e a senha `redhat`: a troca da senha é exigida no primeiro acesso.
+
+A partir de uma cópia do repositório, troque o endereço por `mission-control/openshift/mission-control.yaml`. Para usar sem instalar nada, abra [mission-control/web/index.html](mission-control/web/index.html) no navegador; nesse modo as respostas ficam só naquele navegador.
+
+Pré-requisitos, execução em contêiner fora do OpenShift e como recuperar a senha estão no [README do Mission Control](mission-control/README.md). O manifesto foi testado em contêineres locais e **ainda não foi aplicado em um cluster OpenShift**.
 
 ## Estrutura do repositório
 
