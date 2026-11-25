@@ -13,6 +13,7 @@ Antes de escrever qualquer coisa, leia [README.md](README.md), [docs/metodologia
 | Caminho | Conteúdo | Observações |
 |---|---|---|
 | `docs/` | Metodologia, modelo de ameaça, roadmap | Atualize o roadmap quando um candidato virar controle |
+| `docs/avaliacao-de-processos.md` | Avaliação básica de pessoas e processos, em 20 perguntas | Não são controles nem medem maturidade |
 | `docs/recomendacoes-para-incidentes.md` | Medidas de emergência para incidentes em andamento | Não são controles: sem identificador, status ou validador |
 | `catalogo/<tecnologia>/` | Um arquivo Markdown por controle | Segue `catalogo/_MODELO.md` |
 | `catalogo/INDICE.md` | Índice do catálogo | **Gerado. Nunca edite à mão** |
@@ -63,9 +64,19 @@ Bons controles de referência: [LS-JBOSS-002](catalogo/jboss-eap/LS-JBOSS-002-eg
 
 A existência de syslog central é a primeira verificação em qualquer ambiente (ver [docs/metodologia.md](docs/metodologia.md)). Ao escrever um controle de contenção ou detecção, diga na seção **Detecção** qual mensagem ele gera e assuma que ela precisa chegar ao destino central; referencie LS-RHEL-002, LS-OCP-003 ou LS-JBOSS-004 conforme a camada.
 
+## Avaliação básica de processos
+
+[docs/avaliacao-de-processos.md](docs/avaliacao-de-processos.md) reúne perguntas sobre pessoas e processos: resposta a incidentes, segurança e políticas, operação, monitoramento e detecção, e desenvolvimento. Junto com as recomendações para incidentes, é uma das duas áreas em que entra conteúdo que não é específico de tecnologias Red Hat. Ao acrescentar ou alterar uma pergunta:
+
+- mantenha as três colunas: **Pergunta**, **O que conta como "sim"** (uma evidência verificável, não uma opinião) e **Por que importa** (em termos de movimentação lateral, contenção ou detecção);
+- mantenha a avaliação básica: antes de acrescentar uma pergunta, veja se ela substitui uma existente. Não crie nota, pontuação nem nível de maturidade;
+- cite o controle do catálogo relacionado quando existir, e acrescente à tabela de lacunas um primeiro passo de baixo esforço;
+- se a numeração ou o total de perguntas mudar, atualize as referências a números de pergunta na própria página e o total citado em `README.md` e `docs/metodologia.md`;
+- não cite produtos comerciais nem ferramentas de terceiros como resposta esperada.
+
 ## Recomendações gerais para incidentes
 
-[docs/recomendacoes-para-incidentes.md](docs/recomendacoes-para-incidentes.md) reúne medidas de emergência para incidentes em andamento. É a única área em que entram recomendações que não são específicas de tecnologias Red Hat (perímetro de rede, processo de resposta), desde que protejam esses ambientes durante a crise. Ao acrescentar uma recomendação:
+[docs/recomendacoes-para-incidentes.md](docs/recomendacoes-para-incidentes.md) reúne medidas de emergência para incidentes em andamento. Junto com a avaliação básica de processos, é uma das duas áreas em que entram recomendações que não são específicas de tecnologias Red Hat (perímetro de rede, processo de resposta), desde que protejam esses ambientes durante a crise. Ao acrescentar uma recomendação:
 
 - mantenha os quatro blocos: **Quando usar**, **O que fazer**, **Cuidados** e **Como desfazer**;
 - diga na tabela de resumo se a medida contém o invasor ou apenas reduz ruído;

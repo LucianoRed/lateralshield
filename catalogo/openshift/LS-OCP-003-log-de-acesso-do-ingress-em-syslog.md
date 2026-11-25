@@ -59,7 +59,7 @@ Repita para cada IngressController adicional. O operador recria os pods do rotea
 
 O formato padrão do HAProxy já traz origem, rota, código de resposta e tempos. Para personalizar, use o campo `spec.logging.access.httpLogFormat`.
 
-Este controle cobre o ingress. Para os demais logs do cluster (aplicações, infraestrutura e auditoria da API), o caminho é o operador OpenShift Logging com um `ClusterLogForwarder` de saída syslog — mais trabalho, previsto no [roadmap](../../docs/roadmap.md).
+Este controle cobre o ingress. Para o log de auditoria da API, veja o [LS-OCP-006](LS-OCP-006-auditoria-da-api-fora-do-cluster.md), que usa o operador OpenShift Logging com um `ClusterLogForwarder`. O mesmo encaminhador atende os logs de aplicações e de infraestrutura.
 
 ## Validação
 

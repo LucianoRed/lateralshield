@@ -118,7 +118,7 @@ Remover apenas `ls-negar-entrada-por-padrao` devolve o namespace ao comportament
 
 - Chamadas entre namespaces que ninguém documentou vão parar. Aplique primeiro em homologação e tenha a reversão à mão.
 - Operadores e webhooks de admissão que rodam no namespace precisam receber conexões do plano de controle; verifique antes de aplicar em namespaces com operadores.
-- O conjunto base trata apenas a **entrada**. O controle de saída dos pods para a rede dos nós e para fora do cluster está previsto no [roadmap](../../docs/roadmap.md).
+- O conjunto base trata apenas a **entrada**. A saída dos pods para a rede dos nós e para os metadados de nuvem é tratada no [LS-OCP-012](LS-OCP-012-adminnetworkpolicy.md), com regras de cluster que o namespace não sobrescreve.
 
 ## Detecção
 

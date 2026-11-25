@@ -72,6 +72,8 @@ Linhas contínuas são tráfego permitido, linhas tracejadas são tentativas de 
 | **Conter** | Bloqueia os caminhos tracejados: o componente invadido só alcança o que realmente usa | [LS-JBOSS-002](catalogo/jboss-eap/LS-JBOSS-002-egress-por-usuario.md), [LS-RHEL-001](catalogo/rhel/LS-RHEL-001-ssh-somente-de-origens-administrativas.md), [LS-OCP-001](catalogo/openshift/LS-OCP-001-machine-config-server.md), [LS-OCP-002](catalogo/openshift/LS-OCP-002-networkpolicy-negacao-padrao.md), [LS-AAP-001](catalogo/aap/LS-AAP-001-chave-de-automacao-restrita.md) |
 | **Detectar** | Transforma cada tentativa bloqueada e cada comando anômalo em alerta | [LS-RHEL-002](catalogo/rhel/LS-RHEL-002-syslog-central.md), [LS-OCP-003](catalogo/openshift/LS-OCP-003-log-de-acesso-do-ingress-em-syslog.md), [LS-JBOSS-003](catalogo/jboss-eap/LS-JBOSS-003-auditoria-de-processos.md), [LS-JBOSS-004](catalogo/jboss-eap/LS-JBOSS-004-logs-do-jboss-em-syslog.md) e os registros de bloqueio dos controles de contenção |
 
+O diagrama mostra só uma parte do catálogo. O [índice](catalogo/INDICE.md) lista todos os controles de OpenShift, RHEL, JBoss EAP e Ansible Automation Platform, com pilar e prioridade.
+
 ## Escopo tecnológico
 
 | Tecnologia | Foco |
@@ -98,10 +100,11 @@ Outras tecnologias Red Hat podem entrar no escopo conforme a relevância dos ris
 
 1. Leia a [metodologia](docs/metodologia.md) e o [modelo de ameaça](docs/modelo-de-ameaca.md).
 2. **Verifique primeiro se os logs saem dos servidores** para um syslog central ([LS-RHEL-002](catalogo/rhel/LS-RHEL-002-syslog-central.md), [LS-OCP-003](catalogo/openshift/LS-OCP-003-log-de-acesso-do-ingress-em-syslog.md), [LS-JBOSS-004](catalogo/jboss-eap/LS-JBOSS-004-logs-do-jboss-em-syslog.md)). Sem isso, os alertas dos demais controles não chegam a ninguém.
-3. Escolha controles no [catálogo](catalogo/INDICE.md), começando pelos de impacto alto e esforço baixo.
-4. Rode a etapa de **avaliação** de cada controle antes de mudar qualquer coisa.
-5. Aplique em laboratório ou homologação, valide e só então leve para produção. Todo controle traz a reversão.
-6. Use a [automação Ansible](automacao/README.md) para repetir avaliação e aplicação em escala.
+3. Faça a [avaliação básica de processos](docs/avaliacao-de-processos.md): 20 perguntas para saber se há quem responda a incidentes, quem defina as políticas e quem leia os alertas.
+4. Escolha controles no [catálogo](catalogo/INDICE.md), começando pelos de impacto alto e esforço baixo.
+5. Rode a etapa de **avaliação** de cada controle antes de mudar qualquer coisa.
+6. Aplique em laboratório ou homologação, valide e só então leve para produção. Todo controle traz a reversão.
+7. Use a [automação Ansible](automacao/README.md) para repetir avaliação e aplicação em escala.
 
 Está com um incidente em andamento? As [recomendações gerais para incidentes](docs/recomendacoes-para-incidentes.md) reúnem medidas de emergência, como restringir a entrada no perímetro a endereços do Brasil, com os cuidados e a forma de desfazer cada uma.
 
@@ -109,7 +112,7 @@ Está com um incidente em andamento? As [recomendações gerais para incidentes]
 
 | Caminho | Conteúdo |
 |---|---|
-| [docs/](docs/) | Metodologia, modelo de ameaça, roadmap e recomendações gerais para incidentes |
+| [docs/](docs/) | Metodologia, modelo de ameaça, roadmap, avaliação básica de processos e recomendações gerais para incidentes |
 | [catalogo/](catalogo/) | Controles, um arquivo por controle, organizados por tecnologia |
 | [automacao/](automacao/) | Playbooks e roles Ansible de avaliação e aplicação |
 | [scripts/](scripts/) | Validação do catálogo e geração do índice |
