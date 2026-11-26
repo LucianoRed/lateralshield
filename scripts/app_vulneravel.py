@@ -77,7 +77,7 @@ def gerar_manifesto():
         "# ATENÇÃO: aplicação deliberadamente vulnerável. Só para laboratório isolado.\n"
         "#\n"
         "#   oc new-project app-vulneravel-demo\n"
-        "#   oc apply -f app-vulneravel-demo/openshift/app-vulneravel-demo.yaml\n"
+        "#   oc apply -f https://raw.githubusercontent.com/LucianoRed/lateralshield/main/app-vulneravel-demo/openshift/app-vulneravel-demo.yaml\n"
     )
     return cabecalho + base + cm
 

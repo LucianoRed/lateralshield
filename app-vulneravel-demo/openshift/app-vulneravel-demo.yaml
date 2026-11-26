@@ -4,7 +4,7 @@
 # ATENÇÃO: aplicação deliberadamente vulnerável. Só para laboratório isolado.
 #
 #   oc new-project app-vulneravel-demo
-#   oc apply -f app-vulneravel-demo/openshift/app-vulneravel-demo.yaml
+#   oc apply -f https://raw.githubusercontent.com/LucianoRed/lateralshield/main/app-vulneravel-demo/openshift/app-vulneravel-demo.yaml
 ---
 # App vulnerável de demonstração do LateralShield no OpenShift: aplicação e banco.
 #

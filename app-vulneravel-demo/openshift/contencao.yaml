@@ -3,7 +3,7 @@
 # ao projeto da app vulnerável. Aplique DEPOIS da base para mostrar a diferença
 # com a aplicação comprometida: o que o invasor alcançava deixa de ser alcançável.
 #
-#   oc apply -f app-vulneravel-demo/openshift/contencao.yaml
+#   oc apply -f https://raw.githubusercontent.com/LucianoRed/lateralshield/main/app-vulneravel-demo/openshift/contencao.yaml
 #
 # As políticas seguem LS-OCP-002 (negação padrão) e acrescentam uma política de
 # saída que limita a aplicação a falar apenas com o banco e o DNS, contendo a
@@ -14,7 +14,7 @@
 # contêiner. Para isso, veja os comandos "oc patch" no README (LS-OCP-009 e
 # LS-OCP-010). Para remover a contenção e voltar à linha de base:
 #
-#   oc delete -f app-vulneravel-demo/openshift/contencao.yaml
+#   oc delete -f https://raw.githubusercontent.com/LucianoRed/lateralshield/main/app-vulneravel-demo/openshift/contencao.yaml
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:

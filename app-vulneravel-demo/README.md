@@ -27,9 +27,11 @@ Classes de vulnerabilidade presentes na aplicação, para você saber o que a de
 
 ```bash
 oc new-project app-vulneravel-demo
-oc apply -f app-vulneravel-demo/openshift/app-vulneravel-demo.yaml
+oc apply -f https://raw.githubusercontent.com/LucianoRed/lateralshield/main/app-vulneravel-demo/openshift/app-vulneravel-demo.yaml
 oc rollout status deploy/app-vulneravel-web -n app-vulneravel-demo
 ```
+
+Ou, a partir de uma cópia do repositório, troque o endereço por `app-vulneravel-demo/openshift/app-vulneravel-demo.yaml`.
 
 O manifesto cria, no projeto `app-vulneravel-demo`, a aplicação (na imagem `ubi9/php-82`, **sem etapa de build**: o código chega por um ConfigMap) e um banco MySQL (`rhel9/mysql-80`) com volume de 1 Gi.
 
@@ -55,7 +57,7 @@ A instalação acima é a linha de base **sem defesa**: rede plana e token da se
 1. **Rede.** As políticas do LateralShield, já prontas para este projeto:
 
    ```bash
-   oc apply -f app-vulneravel-demo/openshift/contencao.yaml
+   oc apply -f https://raw.githubusercontent.com/LucianoRed/lateralshield/main/app-vulneravel-demo/openshift/contencao.yaml
    ```
 
    Elas seguem o [LS-OCP-002](../catalogo/openshift/LS-OCP-002-networkpolicy-negacao-padrao.md): negam a entrada por padrão e limitam a saída da aplicação ao banco e ao DNS, o que contém a requisição forjada (SSRF) e a saída para a internet. O encaminhamento de porta continua funcionando, porque não passa pela rede de pods. A política de saída exige um provedor de rede que a suporte, como o OVN-Kubernetes padrão do OpenShift.
@@ -67,7 +69,7 @@ A instalação acima é a linha de base **sem defesa**: rede plana e token da se
      -p '{"spec":{"template":{"spec":{"automountServiceAccountToken":false}}}}'
    ```
 
-Para voltar à linha de base, remova a contenção (`oc delete -f app-vulneravel-demo/openshift/contencao.yaml`) e desfaça o patch (`automountServiceAccountToken: true`).
+Para voltar à linha de base, remova a contenção (`oc delete -f https://raw.githubusercontent.com/LucianoRed/lateralshield/main/app-vulneravel-demo/openshift/contencao.yaml`) e desfaça o patch (`automountServiceAccountToken: true`).
 
 ## Executar em um contêiner
 
