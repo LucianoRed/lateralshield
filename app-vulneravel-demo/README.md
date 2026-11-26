@@ -42,7 +42,25 @@ oc port-forward -n app-vulneravel-demo deploy/app-vulneravel-web 8080:8080
 # abra http://127.0.0.1:8080
 ```
 
-Se a ferramenta de ataque roda dentro do cluster, aponte-a para o serviço `app-vulneravel-web.app-vulneravel-demo.svc:8080`. Só crie uma `Route` se o cluster inteiro estiver isolado e você souber o que está fazendo.
+Se a ferramenta de ataque roda dentro do cluster, aponte-a para o serviço `app-vulneravel-web.app-vulneravel-demo.svc:8080`.
+
+### Expor por rota (opcional e arriscado)
+
+> ⚠ **Só faça isto em um cluster de laboratório totalmente isolado.** A aplicação tem execução remota de comando, SSRF e leitura de arquivos. Uma rota a publica no roteador do cluster, e o domínio de aplicações costuma ser resolvível na internet: **qualquer pessoa que encontrar o endereço executa comandos dentro do seu cluster e tenta se mover a partir dele.** Prefira o `oc port-forward` acima. Se mesmo assim precisar de uma rota, restrinja a origem no perímetro e remova-a assim que terminar.
+
+```bash
+oc create route edge app-vulneravel-web \
+  --service=app-vulneravel-web --insecure-policy=Redirect \
+  -n app-vulneravel-demo
+oc get route app-vulneravel-web -n app-vulneravel-demo
+```
+
+Depois dos testes, remova a rota (ou toda a aplicação):
+
+```bash
+oc delete route app-vulneravel-web -n app-vulneravel-demo   # só a rota
+oc delete project app-vulneravel-demo                        # a aplicação inteira
+```
 
 Pré-requisitos: permissão para criar projetos (`oc new-project`), uma StorageClass padrão e acesso do cluster a `registry.redhat.io` e `registry.access.redhat.com`.
 
