@@ -624,6 +624,81 @@ window.LS_DADOS = {
    "problema": "No AAP, quem administra uma credencial pode alterá-la, trocar o segredo, associá-la a outros job templates e conceder acesso a outras pessoas. Quando cada time cria e administra as próprias credenciais, ou quando elas pertencem a usuários individuais, ninguém sabe ao certo quantas credenciais com acesso a produção existem, quem pode usá-las e quem pode repassá-las.",
    "beneficio": "O número de contas capazes de alterar ou redistribuir credenciais cai para o do time da plataforma. Comprometer a conta de um operador dá ao invasor o uso das credenciais daquele time, nos job templates daquele time, mas não a capacidade de ampliar esse acesso nem de trocar segredos.",
    "avaliacao": "Pela interface, abra cada credencial e veja as abas de acesso de usuários e de times. No automation controller 2.4, pela API:\n\n```bash\n# credenciais sem organização (pertencem a usuários)\ncurl -s -H \"Authorization: Bearer <token>\" \\\n  \"https://aap.exemplo.com.br/api/v2/credentials/?organization__isnull=true\" | jq -r '.results[].name'\n\n# quem tem acesso a uma credencial, e com quais papéis\ncurl -s -H \"Authorization: Bearer <token>\" \\\n  \"https://aap.exemplo.com.br/api/v2/credentials/<id>/access_list/\" \\\n  | jq -r '.results[] | [.username, ([.summary_fields.direct_access[].role.name] | join(\",\"))] | @tsv'\n```\n\nNo AAP 2.5 ou superior, os nomes dos papéis e os caminhos da API mudam; use as abas de acesso da credencial e confira os caminhos na raiz `/api/` da instalação.\n\nIndicadores de exposição:\n\n- Credenciais sem organização, pertencentes a usuários individuais.\n- Papel de administração de credenciais nas mãos de usuários ou times fora do time da plataforma.\n- Papéis concedidos diretamente a usuários, e não a times.\n- Credenciais duplicadas com o mesmo segredo em organizações diferentes."
+  },
+  {
+   "id": "LS-AAP-012",
+   "titulo": "Publicar apenas o Platform Gateway como entrada",
+   "tecnologia": "aap",
+   "pilar": "prevenir",
+   "impacto": "alto",
+   "esforco": "medio",
+   "prioridade": 2,
+   "versoes": "Ansible Automation Platform 2.5 ou superior",
+   "status": "rascunho",
+   "arquivo": "catalogo/aap/LS-AAP-012-entrada-somente-pelo-gateway.md",
+   "problema": "No AAP 2.5 ou superior, o Platform Gateway é o serviço que autentica, autoriza e serve a interface unificada. Controllers, private automation hub e Event-Driven Ansible continuam escutando HTTPS, mas esse acesso direto existe sobretudo para compatibilidade com instalações migradas da 2.4.",
+   "beneficio": "Todo acesso humano e de integração à plataforma passa por um único ponto: o Platform Gateway. Contas locais órfãs, tokens de componente e papéis que só existem atrás do gateway deixam de ser alcançáveis a partir da rede externa à plataforma.",
+   "avaliacao": "**1. Inventariar o que responde na 443** a partir de uma estação da rede de usuários (não de um nó da plataforma):\n\n```bash\nfor alvo in aap.exemplo.com.br controller.exemplo.com.br \\\n            hub.exemplo.com.br eda.exemplo.com.br; do\n  codigo=$(curl -sk -o /dev/null -w '%{http_code}' --connect-timeout 5 \"https://$alvo/\" || echo falha)\n  echo \"$alvo $codigo\"\ndone\n```\n\n**2. Conferir o balanceador e o DNS.** Liste os backends HTTPS e os registros que apontam para IPs de controller, hub ou EDA. Qualquer nome ainda usado por pessoas ou scripts, fora do FQDN do gateway, é entrada paralela.\n\n**3. Procurar URLs legadas em scripts e job templates** (variáveis de ambiente, cofres, inventários de automação) com caminhos como `/api/v2/` apontando para o host do controller, e não para o gateway.\n\nInterpretação: de fora da plataforma, só o FQDN do gateway (e, se houver, o balanceador à frente dele) deve responder. Resposta HTTPS de controller, hub ou EDA a partir da rede de usuários é **exposição**. Comunicação interna entre os próprios nós da plataforma na 443 é esperada e não conta como entrada externa."
+  },
+  {
+   "id": "LS-AAP-013",
+   "titulo": "Autenticar integrações com OAuth ou PAT do gateway",
+   "tecnologia": "aap",
+   "pilar": "prevenir",
+   "impacto": "alto",
+   "esforco": "medio",
+   "prioridade": 2,
+   "versoes": "Ansible Automation Platform 2.5 ou superior",
+   "status": "rascunho",
+   "arquivo": "catalogo/aap/LS-AAP-013-tokens-e-oauth-no-gateway.md",
+   "problema": "Pipelines, portais e scripts costumam falar com o AAP usando usuário e senha de administrador (basic auth) ou tokens criados ainda no automation controller da 2.4. Tokens antigos do gateway e do controller chegaram a valer por mil anos; mesmo depois da correção que reduziu o padrão para um ano, esses tokens já emitidos mantêm a validade longa até serem revogados.",
+   "beneficio": "Cada integração passa a ter um token próprio, criado no Platform Gateway, com escopo mínimo e dono definido. A senha de administrador deixa de circular em scripts, e tokens legados de componente ou de validade milenar deixam de abrir a API.",
+   "avaliacao": "**1. Basic auth do gateway.** Em **Settings > Platform gateway**, confira se **Gateway basic auth enabled** está ativo. Se estiver, qualquer cliente ainda pode autenticar com usuário e senha na API do gateway.\n\n**2. Listar tokens e aplicações OAuth** em **Access Management > OAuth Applications** e, por usuário, na aba **Tokens**. Pela API do gateway (ajuste o token de avaliação):\n\n```bash\ncurl -s -H \"Authorization: Bearer <token>\" \\\n  \"https://aap.exemplo.com.br/api/gateway/v1/tokens/?page_size=200\" \\\n  | jq -r '.results[] | [.id, .user, .application, .scope, .expires] | @tsv'\n```\n\n**3. Procurar senhas e tokens em claro** em repositórios de automação, variáveis de CI e inventários (sem imprimir o segredo no terminal compartilhado).\n\nIndicadores de exposição:\n\n- Scripts com usuário `admin` (ou outro administrador) e senha via basic auth.\n- Tokens com data de expiração da ordem de séculos ou criados antes do patch que reduziu o padrão para um ano (documentação: tokens anteriores a esse patch no gateway/controller 2.4 mantêm validade de mil anos).\n- Token de conta com System Administrator usado por várias ferramentas.\n- Aplicações OAuth sem responsável conhecido."
+  },
+  {
+   "id": "LS-AAP-014",
+   "titulo": "Eliminar segredos de playbooks e extra_vars",
+   "tecnologia": "aap",
+   "pilar": "conter",
+   "impacto": "alto",
+   "esforco": "medio",
+   "prioridade": 2,
+   "versoes": "Ansible Automation Platform 2.4 e 2.5 ou superior",
+   "status": "rascunho",
+   "arquivo": "catalogo/aap/LS-AAP-014-sem-segredos-em-playbooks-e-extra-vars.md",
+   "problema": "Senhas, tokens e chaves acabam no lugar errado: no YAML do playbook, em `group_vars`, no campo Extra Variables do job template, em respostas de survey do tipo texto e em `extra_vars` passados na API de lançamento.",
+   "beneficio": "O alcance de quem só lê projetos e jobs deixa de incluir senhas. Para usar o segredo, é preciso o papel de **Use** sobre uma credencial — conjunto pequeno, auditável e revogável.",
+   "avaliacao": "Os passos mostram **onde** há suspeita, sem despejar o valor em tickets ou chats.\n\n**1. Extra Variables nos job templates** (automation controller / execution). Pela API, ajuste o host (gateway na 2.5 ou superior):\n\n```bash\ncurl -s -H \"Authorization: Bearer <token>\" \\\n  \"https://aap.exemplo.com.br/api/v2/job_templates/?page_size=200\" \\\n  | jq -r '\n    .results[]\n    | select(.extra_vars != null and .extra_vars != \"\" and .extra_vars != \"{}\")\n    | select(.extra_vars | test(\"passw|secret|token|api_?key|private_key|login\"; \"i\"))\n    | [.id, .name] | @tsv'\n```\n\n**2. Surveys.** Liste surveys cujo tipo de resposta não é `password` mas cujo nome ou variável sugere segredo, e surveys que ainda guardam valor padrão.\n\n**3. Repositórios dos projetos.** Nos clones usados pelo controller (ou no SCM), procure padrões em playbooks e vars — sem publicar o trecho completo:\n\n```bash\ngrep -RIn -E 'password:|passwd:|ansible_password:|api_token:|secret:' \\\n  --include='*.yml' --include='*.yaml' . | head\n```\n\n**4. Saída de jobs.** Em jobs recentes, procure tarefas sem `no_log` que exibem `ansible_password`, tokens ou conteúdo de cofres; e job templates de produção com verbosidade de debug.\n\nInterpretação: cada acerto é candidato. Segredo confirmado em claro no Git, em `extra_vars` ou em log de job deve ser tratado como **exposto**."
+  },
+  {
+   "id": "LS-AAP-015",
+   "titulo": "Exigir TLS verify-full nas conexões com o PostgreSQL",
+   "tecnologia": "aap",
+   "pilar": "conter",
+   "impacto": "alto",
+   "esforco": "medio",
+   "prioridade": 2,
+   "versoes": "Ansible Automation Platform 2.5 ou superior, instalação RPM e em contêiner",
+   "status": "rascunho",
+   "arquivo": "catalogo/aap/LS-AAP-015-tls-verify-full-no-postgresql.md",
+   "problema": "O banco PostgreSQL do AAP guarda as credenciais de automação cifradas, a `SECRET_KEY` relacionada ao material criptográfico da plataforma e os registros de atividade. Por padrão, os componentes podem tentar conexão cifrada sem exigir verificação completa do certificado do servidor — e, na instalação RPM, o SSL no Postgres gerenciado pelo instalador chega desligado (`postgres_use_ssl` com padrão `false`).",
+   "beneficio": "Gateway, controller, hub e Event-Driven Ansible só falam com o PostgreSQL autenticando o certificado do servidor (e, quando configurado, com certificado de cliente). Um serviço na rede que se passa pelo banco sem o certificado certo deixa de ser aceito.",
+   "avaliacao": "**1. Inventário de instalação.** Confira as variáveis de segurança do banco.\n\nInstalação RPM — valores recomendados pela documentação de hardening:\n\n```text\npostgres_use_ssl=true\npg_sslmode=verify-full\nautomation_gateway_pg_sslmode=verify-full\nautomationcontroller_pg_sslmode=verify-full\nautomationhub_pg_sslmode=verify-full\nautomationedacontroller_pg_sslmode=verify-full\n```\n\nInstalação em contêiner — valores recomendados:\n\n```text\npostgresql_disable_tls=false\ngateway_pg_sslmode=verify-full\ncontroller_pg_sslmode=verify-full\nhub_pg_sslmode=verify-full\neda_pg_sslmode=verify-full\n```\n\nAusência de `postgres_use_ssl=true` (RPM) ou presença de `postgresql_disable_tls=true` (contêiner), e `sslmode` diferente de `verify-full` / `verify-ca` onde a política exige verificação, são **exposição**.\n\n**2. No servidor PostgreSQL**, confira se aceita só conexões SSL e qual é o certificado apresentado (ferramentas do próprio Postgres ou inspeção da configuração gerenciada pelo instalador). Não use um cliente qualquer da rede de aplicação: a porta 5432 não deve estar aberta para ela ([LS-AAP-010](catalogo/aap/LS-AAP-010-segmentacao-de-rede-dos-nos.md)).\n\n**3. Nos nós dos componentes**, inspecione a configuração de banco efetiva após a instalação (arquivos gerados pelo instalador) e confirme `sslmode` e caminhos de certificado — os caminhos exatos variam entre RPM, contêiner e operador; use o que a versão documentar."
+  },
+  {
+   "id": "LS-AAP-016",
+   "titulo": "Assinar e aprovar conteúdo no private automation hub",
+   "tecnologia": "aap",
+   "pilar": "prevenir",
+   "impacto": "alto",
+   "esforco": "medio",
+   "prioridade": 2,
+   "versoes": "Ansible Automation Platform 2.5 ou superior com private automation hub",
+   "status": "rascunho",
+   "arquivo": "catalogo/aap/LS-AAP-016-assinatura-e-aprovacao-no-hub.md",
+   "problema": "Collections e execution environments são o código que o AAP executa nos servidores gerenciados. Sem assinatura e sem aprovação no private automation hub, qualquer publicação — erro humano, conta de CI comprometida ou registro público espelhado sem curadoria — vira o próximo playbook privilegiado.",
+   "beneficio": "Só entra em uso o conteúdo que a organização assinou e aprovou. Collections sem assinatura válida e imagens que não vêm do private hub deixam de ser o caminho silencioso para executar código em massa.",
+   "avaliacao": "**1. Inventário de instalação do hub.** Verifique se o serviço de assinatura e a aprovação estão ligados. A documentação de conteúdo usa, entre outras:\n\n```text\nautomationhub_create_default_collection_signing_service=True\nautomationhub_auto_sign_collections=True\nautomationhub_require_content_approval=True\nautomationhub_collection_signing_service_key=/caminho/para/galaxy_signing_service.gpg\nautomationhub_collection_signing_service_script=/caminho/para/collection_signing.sh\n```\n\nNa instalação em contêiner, os nomes equivalentes começam com `hub_` (por exemplo `hub_collection_auto_sign`). Ausência de aprovação obrigatória ou de assinatura automática/manual operacionalizada é **exposição**.\n\n**2. Na interface.** Em **Automation Content > Collection Approvals**, confira se há fluxo de aprovação. Em **Automation Content > Signature Keys**, confira se existem chaves de collections e de containers. Em **Execution Environments**, veja se imagens de produção aparecem como assinadas.\n\n**3. Nos consumidores.** Nos hosts que instalam collections (incluindo builds de EE) e nos nós de execução:\n\n```bash\n# keyring usado pelo ansible-galaxy (exemplo; o caminho é o da organização)\ngpg --no-default-keyring --keyring ~/.ansible/pubring.kbx --list-keys\n```\n\nJob templates que apontam `registry.redhat.io`, `quay.io` ou registries fora do hub para EE de produção, sem política de assinatura no cliente de contêineres, são **exposição**."
   }
  ],
  "logs": [
@@ -1418,7 +1493,20 @@ window.LS_DADOS = {
     "controles": [
      "LS-AAP-002",
      "LS-AAP-003",
-     "LS-AAP-008"
+     "LS-AAP-008",
+     "LS-AAP-012"
+    ]
+   },
+   {
+    "caminho": "Token ou senha de integração com alcance de administrador",
+    "controles": [
+     "LS-AAP-013"
+    ]
+   },
+   {
+    "caminho": "Segredo no playbook, em `extra_vars` ou no log do job",
+    "controles": [
+     "LS-AAP-014"
     ]
    },
    {
@@ -1427,7 +1515,8 @@ window.LS_DADOS = {
      "LS-AAP-004",
      "LS-AAP-005",
      "LS-AAP-006",
-     "LS-AAP-010"
+     "LS-AAP-010",
+     "LS-AAP-015"
     ]
    },
    {
@@ -1435,6 +1524,12 @@ window.LS_DADOS = {
     "controles": [
      "LS-AAP-009",
      "LS-AAP-011"
+    ]
+   },
+   {
+    "caminho": "Conteúdo de automação adulterado no hub ou na EE",
+    "controles": [
+     "LS-AAP-016"
     ]
    },
    {

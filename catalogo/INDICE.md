@@ -63,3 +63,8 @@ Controles do LateralShield para tecnologias Red Hat. A prioridade segue o filtro
 | [LS-AAP-009](aap/LS-AAP-009-credenciais-por-finalidade-e-ambiente.md) | Separar as credenciais por finalidade e ambiente | conter | alto | medio | 2 | rascunho |
 | [LS-AAP-010](aap/LS-AAP-010-segmentacao-de-rede-dos-nos.md) | Segmentar a rede dos nós do AAP | conter | alto | medio | 2 | rascunho |
 | [LS-AAP-011](aap/LS-AAP-011-credenciais-com-propriedade-central.md) | Centralizar a propriedade das credenciais e conceder aos times apenas o papel Use | conter | alto | medio | 2 | rascunho |
+| [LS-AAP-012](aap/LS-AAP-012-entrada-somente-pelo-gateway.md) | Publicar apenas o Platform Gateway como entrada | prevenir | alto | medio | 2 | rascunho |
+| [LS-AAP-013](aap/LS-AAP-013-tokens-e-oauth-no-gateway.md) | Autenticar integrações com OAuth ou PAT do gateway | prevenir | alto | medio | 2 | rascunho |
+| [LS-AAP-014](aap/LS-AAP-014-sem-segredos-em-playbooks-e-extra-vars.md) | Eliminar segredos de playbooks e extra_vars | conter | alto | medio | 2 | rascunho |
+| [LS-AAP-015](aap/LS-AAP-015-tls-verify-full-no-postgresql.md) | Exigir TLS verify-full nas conexões com o PostgreSQL | conter | alto | medio | 2 | rascunho |
+| [LS-AAP-016](aap/LS-AAP-016-assinatura-e-aprovacao-no-hub.md) | Assinar e aprovar conteúdo no private automation hub | prevenir | alto | medio | 2 | rascunho |
