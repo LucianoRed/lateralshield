@@ -66,9 +66,13 @@ Ficam fora do escopo: ataques físicos, comprometimento da cadeia de suprimentos
 - O AAP guarda credenciais com acesso a quase tudo. Quem o controla, controla o ambiente.
 - No sentido inverso: a chave pública da automação instalada em todos os servidores aceita conexão de qualquer origem, e não apenas dos nós de execução.
 - Contas locais compartilhadas, sem MFA, e perfil de System Administrator usado no dia a dia.
+- Entrada HTTPS direta a controller, hub ou Event-Driven Ansible, sem passar pelo Platform Gateway.
+- Tokens de API de longa duração, basic auth de administrador em scripts e segredos em playbooks ou `extra_vars`.
 - Acesso ao sistema operacional dos nós da plataforma: quem lê a `SECRET_KEY` e o banco de dados decifra as credenciais armazenadas.
+- Conexão com o PostgreSQL sem TLS com verificação do certificado.
 - Senhas do inventário de instalação em texto claro, em repositórios e estações.
 - Uma mesma credencial usada em todos os ambientes, e times com permissão de administrar credenciais que só precisariam usar.
+- Collections e execution environments sem assinatura nem aprovação no private automation hub.
 
 ## Como o catálogo responde
 
@@ -91,9 +95,12 @@ Ficam fora do escopo: ataques físicos, comprometimento da cadeia de suprimentos
 | Invasor apaga os logs do host invadido | [LS-RHEL-002](../catalogo/rhel/LS-RHEL-002-syslog-central.md) |
 | Ações privilegiadas e troca de binários passam despercebidas | [LS-RHEL-003](../catalogo/rhel/LS-RHEL-003-auditd-identidade-sudo-e-modulos.md), [LS-RHEL-009](../catalogo/rhel/LS-RHEL-009-uso-de-sudo-registrado-e-revisado.md), [LS-RHEL-012](../catalogo/rhel/LS-RHEL-012-integridade-de-arquivos-com-aide.md) |
 | Chave da automação aceita de qualquer origem | [LS-AAP-001](../catalogo/aap/LS-AAP-001-chave-de-automacao-restrita.md) |
-| Tomada do AAP por uma conta de usuário | [LS-AAP-002](../catalogo/aap/LS-AAP-002-mfa-no-provedor-de-identidade.md), [LS-AAP-003](../catalogo/aap/LS-AAP-003-administrador-somente-break-glass.md), [LS-AAP-008](../catalogo/aap/LS-AAP-008-idp-corporativo-sem-contas-compartilhadas.md) |
-| Extração das credenciais do AAP pelo sistema operacional, pelo banco ou pelo instalador | [LS-AAP-004](../catalogo/aap/LS-AAP-004-acesso-ao-so-dos-nos.md), [LS-AAP-005](../catalogo/aap/LS-AAP-005-protecao-da-secret-key.md), [LS-AAP-006](../catalogo/aap/LS-AAP-006-senhas-do-instalador-em-vault.md), [LS-AAP-010](../catalogo/aap/LS-AAP-010-segmentacao-de-rede-dos-nos.md) |
+| Tomada do AAP por uma conta de usuário | [LS-AAP-002](../catalogo/aap/LS-AAP-002-mfa-no-provedor-de-identidade.md), [LS-AAP-003](../catalogo/aap/LS-AAP-003-administrador-somente-break-glass.md), [LS-AAP-008](../catalogo/aap/LS-AAP-008-idp-corporativo-sem-contas-compartilhadas.md), [LS-AAP-012](../catalogo/aap/LS-AAP-012-entrada-somente-pelo-gateway.md) |
+| Token ou senha de integração com alcance de administrador | [LS-AAP-013](../catalogo/aap/LS-AAP-013-tokens-e-oauth-no-gateway.md) |
+| Segredo no playbook, em `extra_vars` ou no log do job | [LS-AAP-014](../catalogo/aap/LS-AAP-014-sem-segredos-em-playbooks-e-extra-vars.md) |
+| Extração das credenciais do AAP pelo sistema operacional, pelo banco ou pelo instalador | [LS-AAP-004](../catalogo/aap/LS-AAP-004-acesso-ao-so-dos-nos.md), [LS-AAP-005](../catalogo/aap/LS-AAP-005-protecao-da-secret-key.md), [LS-AAP-006](../catalogo/aap/LS-AAP-006-senhas-do-instalador-em-vault.md), [LS-AAP-010](../catalogo/aap/LS-AAP-010-segmentacao-de-rede-dos-nos.md), [LS-AAP-015](../catalogo/aap/LS-AAP-015-tls-verify-full-no-postgresql.md) |
 | Uma credencial do AAP abre todos os ambientes | [LS-AAP-009](../catalogo/aap/LS-AAP-009-credenciais-por-finalidade-e-ambiente.md), [LS-AAP-011](../catalogo/aap/LS-AAP-011-credenciais-com-propriedade-central.md) |
+| Conteúdo de automação adulterado no hub ou na EE | [LS-AAP-016](../catalogo/aap/LS-AAP-016-assinatura-e-aprovacao-no-hub.md) |
 | Uso indevido do AAP passa despercebido | [LS-AAP-007](../catalogo/aap/LS-AAP-007-logs-e-activity-stream-em-agregador.md) |
 
 Os caminhos ainda sem controle publicado estão no [roadmap](roadmap.md).

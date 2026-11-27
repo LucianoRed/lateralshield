@@ -8,9 +8,10 @@ O roadmap segue o escopo do projeto: OpenShift, RHEL, JBoss EAP e Ansible Automa
 - [x] Metodologia, modelo de ameaça e modelo de controle.
 - [x] Primeiros dez controles em `rascunho`, cobrindo as quatro tecnologias e os três pilares.
 - [x] Lista prioritária de OpenShift, RHEL e Ansible Automation Platform escrita: mais 30 controles em `rascunho`, 40 no total.
+- [x] Segunda leva do AAP (gateway, tokens, segredos em playbooks, TLS no PostgreSQL, assinatura no hub): 45 controles em `rascunho` no total.
 - [x] Validação automática do catálogo e geração do índice.
 - [x] Primeira automação Ansible: avaliação de RHEL/JBoss e OpenShift, aplicação do LS-JBOSS-002.
-- [ ] Validar em laboratório os 40 controles e promovê-los a `validado`, registrando versões testadas.
+- [ ] Validar em laboratório os 45 controles e promovê-los a `validado`, registrando versões testadas.
 
 ## Fase 1 — Controles de prioridade 1
 
@@ -49,7 +50,11 @@ Controles candidatos, ainda não escritos. Os candidatos que já viraram control
 
 ### Ansible Automation Platform
 
-Os candidatos desta fase já foram escritos e estão no catálogo. Não há candidato em aberto no momento.
+| Candidato | Pilar |
+|---|---|
+| HTTPS e HSTS com certificados de CA nos componentes (não autoassinados do instalador) | Prevenir |
+| RBAC por organização e equipe com papéis mínimos por persona | Prevenir |
+| Credenciais do Event-Driven Ansible fora de `extra_vars` | Conter |
 
 ## Fase 2 — Automação
 
